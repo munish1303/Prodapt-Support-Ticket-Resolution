@@ -29,12 +29,18 @@ from app.config import settings
 from app.core.database import get_db
 from app.services import monitoring
 from app.services.decision import interpret_confidence
-from app.services.ingestion import IngestionReport
+from app.services.ingestion import IngestionReport, IngestionService
 from app.services.pipeline import PipelineResult
 from app.services.understanding import IntentDef
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1")
+
+
+def _require_ingestion(container: Container) -> IngestionService:
+    if container.ingestion is None:
+        raise HTTPException(status_code=503, detail="ingestion service not available")
+    return container.ingestion
 
 
 def _excerpt(text_: str, n: int = 280) -> str:
@@ -119,16 +125,17 @@ async def submit_feedback(request_id: str, req: FeedbackRequest, db: AsyncSessio
 @router.post("/ingestion", response_model=IngestionResponse, tags=["ingestion"])
 async def ingest(req: IngestionRequest, container: Container = Depends(get_container)):
     """Incrementally add or update resolved tickets and KB articles (embeddings generated on the fly)."""
+    ingestion = _require_ingestion(container)
     report = IngestionReport()
-    await container.ingestion.ingest_tickets(req.tickets, report)
-    await container.ingestion.ingest_kb_articles(req.kb_articles, report)
+    await ingestion.ingest_tickets(req.tickets, report)
+    await ingestion.ingest_kb_articles(req.kb_articles, report)
     return IngestionResponse(**report.__dict__)
 
 
 @router.post("/taxonomy/intents", tags=["ingestion"])
 async def add_intent(req: IntentCreateRequest, container: Container = Depends(get_container)):
     """Register a new (or update an existing) ticket class at runtime."""
-    await container.ingestion.upsert_intents([IntentDef(req.intent_name, req.description, req.examples)])
+    await _require_ingestion(container).upsert_intents([IntentDef(req.intent_name, req.description, req.examples)])
     await container.refresh_taxonomy()
     return {"status": "ok", "intents": [i.intent_name for i in container.understanding.intents]}
 

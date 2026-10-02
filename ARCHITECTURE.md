@@ -58,6 +58,41 @@ retrieval run **concurrently** because both depend only on the complaint embeddi
 | `ingestion` | evolving data | idempotent upserts, re-embedding on change, KB versions archived, runtime intent registration |
 | `monitoring` | system health | metrics (latency percentiles, decision mix, groundedness, fallback rate, feedback), drift report (unknown-intent rate, intent-mix TVD, nearest-neighbour similarity) |
 
+### 3.1 Database schema
+
+Single PostgreSQL 16 database (`migrations/001_initial_schema.sql`); vectors live next to the rows they describe.
+
+| Table | Purpose | Key columns | Indexes |
+|---|---|---|---|
+| `tickets` | historical tickets (retrieval corpus, k-NN labels) | `ticket_id` PK, `complaint`, `resolution`, `category`, `product`, `severity`, `sentiment`, `created_at`, provenance (`source`, `label_source`, `verified`, `split`), `metadata` JSONB, `embedding vector(384)` (complaint + resolution), `complaint_embedding vector(384)`, `text_search tsvector` (generated) | ivfflat on both vectors (`lists = √rows`, built after ingestion), GIN on `text_search`, b-tree on category / product / severity / source / created_at |
+| `kb_articles` | KB procedures | `article_id` PK, `title`, `content`, `category`, `product`, `tags[]`, `version`, `metadata`, `embedding`, `text_search` | ivfflat, GIN, b-tree on category / product / updated_at |
+| `kb_article_versions` | superseded KB versions | (`article_id`, `version`) PK, `title`, `content`, `archived_at` | PK |
+| `intent_taxonomy` | ticket classes, extensible at runtime | `intent_name` unique, `description`, `examples` JSONB, `parent_intent_id`, `active` | name, active |
+| `product_taxonomy` | products and aliases | `product_name` unique, `category`, `aliases[]`, `active` | name, category, active |
+| `resolution_requests` | audit and monitoring log, one row per request | `request_id` UUID, `complaint_hash`, `complaint_redacted` (PII-masked), extracted metadata, sources and relevance, draft, citations, citation accuracy / coverage, groundedness, confidence and components, decision and reason, flags, generator, latency and per-stage latency, agent feedback | created_at, decision, confidence |
+
+Raw complaints are never stored: only a SHA-256 hash and a PII-redacted copy.
+
+### 3.2 API design
+
+REST over JSON, versioned under `/api/v1`; full reference with examples and error codes in
+[docs/api.md](docs/api.md), interactive OpenAPI at `/docs`.
+
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/tickets/resolve` | complaint → understanding, sources, cited steps, per-step validation, confidence (with components), decision, flags, per-stage latency |
+| POST | `/tickets/{request_id}/feedback` | agent rating (1–5) of a draft, stored for future confidence calibration |
+| POST | `/ingestion` | upsert tickets and KB articles (idempotent; re-embeds changed rows; versions KB edits; per-row errors) |
+| GET / POST | `/taxonomy/intents` | list / register ticket classes at runtime |
+| GET | `/health` | DB connectivity, models loaded, LLM configured or fallback, corpus size |
+| GET | `/metrics` | volume, decision mix, latency p50/p95/p99, groundedness, citation quality, fallback rate, feedback |
+| GET | `/monitoring/drift` | recent vs baseline: unknown-intent rate, intent-mix TVD (size-aware threshold), nearest-neighbour similarity, alerts |
+
+Design choices: one synchronous resolve call (the agent is waiting, p50 1–5 s, so no job queue is needed at this
+scale); Pydantic models validate size limits (complaint 10–5,000 chars, batch ≤ 5,000 tickets); every response
+carries `x-request-id` (client-supplied or generated) and `x-process-time-ms`; failures in monitoring writes never
+fail the request.
+
 ## 4. Design decisions and alternatives
 
 Each decision lists what was rejected and why. Where an experiment backs a decision, the result is in
@@ -85,7 +120,8 @@ happens over **one** semantic and **one** lexical ranking spanning tickets and K
 interleaving lets the #1 of 40 KB articles tie the #1 of 2,000 tickets (the first E1 run caught this). Weights
 0.8 semantic / 0.2 lexical were chosen on the dev split. Measured gain over semantic-only: MRR +0.057 (p = 0.0005),
 Hit@5 +0.045 (p = 0.01), for about +120 ms median latency. KB articles are guaranteed 2 of the top-k slots rather than
-competing on score, because agents want the canonical procedure even when near-duplicate tickets outrank it.
+competing on score, because agents want the canonical procedure even when near-duplicate tickets outrank it. Measured:
+the scenario's KB article reaches the generator's 8-source context for 77% of complaints with the slots vs 19% without.
 
 ### 4.4 Relevance used for evidence is cosine similarity, not the RRF score
 RRF scores (~1/(60+rank)) only order results; they say nothing about *how* relevant the best hit is. Evidence

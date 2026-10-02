@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Protocol
 
 import numpy as np
 
@@ -49,6 +50,12 @@ def extract_citations(step: str) -> tuple[str, list[int]]:
             seen.add(n)
             ordered.append(n)
     return claim, ordered
+
+
+class NLIBackend(Protocol):
+    def predict(self, pairs: list[tuple[str, str]]) -> list[dict[str, float]]:
+        """Label probabilities ({'entailment', 'contradiction', 'neutral'}) for each (premise, hypothesis)."""
+        ...
 
 
 class NLIModel:
@@ -136,7 +143,7 @@ class GroundednessChecker:
     def __init__(
         self,
         embedder: EmbeddingService,
-        nli: NLIModel | None,
+        nli: NLIBackend | None,
         thresholds: GroundednessThresholds | None = None,
         nli_top_premises: int | None = None,
         premise_unit: str | None = None,
@@ -178,8 +185,7 @@ class GroundednessChecker:
             best["lexical"] = max(best["lexical"], lexical_overlap(claim, src.text))
             for i in np.argsort(-sims)[: self.nli_top_premises]:
                 premises.append((float(sims[i]), units[i]))
-        run_nli = self.nli is not None and premises and not (best["quoted"] and skip_nli_if_quoted)
-        if run_nli:
+        if self.nli is not None and premises and not (best["quoted"] and skip_nli_if_quoted):
             probs = self.nli.predict([(p, claim) for _, p in premises])
             best["entailment"] = max(pr.get("entailment", 0.0) for pr in probs)
             if self.contradiction_agg == "max":

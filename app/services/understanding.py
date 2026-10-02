@@ -24,7 +24,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 from sqlalchemy import text
@@ -183,7 +183,10 @@ class SentimentAnalyzer:
     def __init__(self, model_name: str | None = None):
         from transformers import pipeline
 
-        self._pipe = pipeline("sentiment-analysis", model=model_name or settings.SENTIMENT_MODEL, top_k=None, device=-1)
+        make_pipeline: Any = pipeline  # transformers' overloads don't cover top_k=None
+        self._pipe = make_pipeline(
+            "sentiment-analysis", model=model_name or settings.SENTIMENT_MODEL, top_k=None, device=-1
+        )
 
     def analyze(self, complaint: str) -> dict:
         scores = self._pipe(complaint[:1000], truncation=True)
@@ -201,7 +204,7 @@ def label_from_polarity(polarity: float, probs: dict[str, float]) -> str:
     EVALUATION.md) map to the label definition used here; unset thresholds => argmax."""
     neg_t, pos_t = settings.SENTIMENT_NEGATIVE_THRESHOLD, settings.SENTIMENT_POSITIVE_THRESHOLD
     if neg_t is None or pos_t is None:
-        return max(probs, key=probs.get)
+        return max(probs, key=lambda label: probs[label])
     if polarity < neg_t:
         return "negative"
     if polarity > pos_t:
@@ -410,6 +413,8 @@ class UnderstandingService:
         return knn_vote(labelled, settings.INTENT_MIN_CONFIDENCE, settings.INTENT_MIN_SIMILARITY)
 
     async def _classify_llm(self, complaint: str) -> dict | None:
+        if self.llm is None:
+            return None
         cats = [(i.intent_name, i.description) for i in self.intents]
         try:
             result = await self.llm.generate_json(
@@ -440,6 +445,8 @@ class UnderstandingService:
 
     async def _extract_products_llm(self, complaint: str) -> list[str]:
         names = [p.product_name for p in self.products]
+        if self.llm is None:
+            return []
         try:
             result = await self.llm.generate_json(
                 [

@@ -99,3 +99,16 @@ def test_list_intents(client):
     resp = client.get("/api/v1/taxonomy/intents")
     assert resp.status_code == 200
     assert "connectivity_issue" in {i["intent_name"] for i in resp.json()}
+
+
+def test_ingestion_unavailable_returns_503(client):
+    resp = client.post("/api/v1/ingestion", json={"tickets": [], "kb_articles": []})
+    assert resp.status_code == 503 and resp.json()["detail"] == "ingestion service not available"
+    resp = client.post(
+        "/api/v1/taxonomy/intents", json={"intent_name": "roaming_issue", "description": "abroad issues"}
+    )
+    assert resp.status_code == 503
+
+
+def test_feedback_validation(client):
+    assert client.post("/api/v1/tickets/abc/feedback", json={"rating": 9}).status_code == 422

@@ -10,11 +10,15 @@ and KB-Recall@k (is the scenario's KB article retrieved?).
 
 from __future__ import annotations
 
+import sys
 import time
+from pathlib import Path
 
 import numpy as np
 
-from evaluation.metrics import (
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # allow `python evaluation/retrieval_eval.py`
+
+from evaluation.metrics import (  # noqa: E402
     capped_recall_at_k,
     hit_at_k,
     mean,
@@ -64,3 +68,45 @@ async def run_queries(search_fn, queries: list[dict], qrels: dict[str, dict[str,
         },
         "per_query": per_query,
     }
+
+
+async def _main() -> None:
+    """Evaluate the *production* retrieval configuration (hybrid RRF with the configured weights, KB slots, context size and
+    reranking setting) on the 200 held-out queries. E1/E2 compare methods; this reports what is deployed."""
+    import json
+
+    from app.config import settings
+    from app.core.database import dispose_engine, get_session_factory
+    from app.models.embeddings import get_embedding_service
+    from app.services.retrieval import HybridRetriever, Reranker, RetrievalService
+    from evaluation.data import load_eval, load_qrels, save_result
+
+    sf = get_session_factory()
+    service = RetrievalService(
+        HybridRetriever(sf, get_embedding_service()), Reranker() if settings.USE_RERANKING else None
+    )
+
+    async def search(q: str) -> list[str]:
+        res = await service.retrieve(q, top_k=settings.RETRIEVAL_TOP_K)  # what the generator actually sees
+        return [i.document.id for i in res.items]
+
+    queries, qrels = load_eval("retrieval_eval"), load_qrels()
+    await search(queries[0]["complaint"])  # warm-up
+    out = await run_queries(search, queries, qrels)
+    out.pop("per_query")
+    out["config"] = {
+        "rrf_weights": [settings.RRF_SEMANTIC_WEIGHT, settings.RRF_LEXICAL_WEIGHT],
+        "kb_min_slots": settings.RETRIEVAL_KB_MIN_SLOTS,
+        "lexical_query_mode": settings.LEXICAL_QUERY_MODE,
+        "use_reranking": settings.USE_RERANKING,
+        "top_k": settings.RETRIEVAL_TOP_K,
+    }
+    print(json.dumps(out, indent=2))
+    print(f"saved {save_result('retrieval_production', out)}")
+    await dispose_engine()
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(_main())

@@ -58,7 +58,10 @@ class OpenAICompatibleProvider(LLMProvider):
         if self.api_key:
             from openai import AsyncOpenAI
 
-            import httpx
+            try:  # openai>=3 is built on httpx2; older SDKs on httpx (same API)
+                import httpx2 as httpx
+            except ImportError:  # pragma: no cover
+                import httpx  # type: ignore[no-redef]
 
             # Connection-level retries (connect errors / resets only; never re-sends a request that reached
             # the server). Optionally bind to 0.0.0.0 to force IPv4 on networks that advertise but drop IPv6.
@@ -93,14 +96,16 @@ class OpenAICompatibleProvider(LLMProvider):
         for attempt in range(self.max_retries):
             try:
                 started = time.perf_counter()
-                response = await self._client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    temperature=settings.LLM_TEMPERATURE if temperature is None else temperature,
-                    max_tokens=max_tokens or settings.LLM_MAX_TOKENS,
-                    response_format={"type": "json_object"},
-                    extra_body={"reasoning_effort": self.reasoning_effort} if self.reasoning_effort else None,
-                )
+                request: dict[str, Any] = {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": settings.LLM_TEMPERATURE if temperature is None else temperature,
+                    "max_tokens": max_tokens or settings.LLM_MAX_TOKENS,
+                    "response_format": {"type": "json_object"},
+                }
+                if self.reasoning_effort:
+                    request["extra_body"] = {"reasoning_effort": self.reasoning_effort}
+                response = await self._client.chat.completions.create(**request)
                 content = response.choices[0].message.content or "{}"
                 usage = getattr(response, "usage", None)
                 logger.info(

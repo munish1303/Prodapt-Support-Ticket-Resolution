@@ -1,0 +1,4 @@
+# Development-only tools (not installed in the production image).
+-r requirements.txt
+mypy>=1.10
+locust>=2.20

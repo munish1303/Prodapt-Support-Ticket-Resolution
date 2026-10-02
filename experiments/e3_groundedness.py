@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+from typing import Any
 import sys
 import time
 from pathlib import Path
@@ -85,7 +86,7 @@ def tune(items, scores, method):
     return best_t
 
 
-CONFIGS = {
+CONFIGS: dict[str, dict[str, Any]] = {
     # v1: what E3 originally validated - 400-char chunk premises, max contradiction, no quote rule.
     "v1_chunk_max": {"premise_unit": "chunk", "contradiction_agg": "max", "use_quote": False},
     # v2: sentence premises, contradiction from the most similar premise, verbatim quotes => supported.
@@ -99,7 +100,7 @@ def verbatim_items() -> list[dict]:
     from scripts.datagen.scenarios import SCENARIOS
 
     tickets = read_jsonl(PROCESSED_DIR / "tickets.jsonl")
-    out = []
+    out: list[dict[str, Any]] = []
     for sc in [s for s in SCENARIOS if s["wave"] == 1]:
         t = next(t for t in tickets if t["metadata"]["scenario_id"] == sc["id"] and t["metadata"]["steps_used"])
         out.append(
@@ -146,7 +147,7 @@ def main() -> None:
     dev_sc = set(scenarios[::2])
     embedder = get_embedding_service()
     nli = NLIModel(args.nli_model)
-    output = {
+    output: dict[str, Any] = {
         "nli_model": args.nli_model,
         "n_items": len(items),
         "kinds": {
@@ -171,7 +172,7 @@ def main() -> None:
         dev_items, dev_scores = zip(*dev)
         test_items, test_scores = zip(*test)
 
-        results = {"score_ms_per_claim_full_nli": round(per_item_ms, 1), "methods": {}}
+        results: dict[str, Any] = {"score_ms_per_claim_full_nli": round(per_item_ms, 1), "methods": {}}
         for method in ["similarity", "lexical", "nli", "multi"]:
             tuned = tune(dev_items, dev_scores, method)
             test_preds = [decide_support(sc, tuned, method) for sc in test_scores]
@@ -190,7 +191,7 @@ def main() -> None:
                 f"acc={r['accuracy']:.3f} | false-alarm para={sub['paraphrase']['false_alarm_rate']:.2f} "
                 f"verb={sub['verbatim']['false_alarm_rate']:.2f} | contra-recall={r.get('contradiction_recall')}"
             )
-        by_kind = {}
+        by_kind: dict[str, list[dict[str, float]]] = {}
         for it, sc in zip(items, scores):
             by_kind.setdefault(it["kind"], []).append(sc)
         results["mean_signals_by_kind"] = {

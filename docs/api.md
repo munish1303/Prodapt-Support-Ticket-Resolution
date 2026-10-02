@@ -99,3 +99,25 @@ accuracy / coverage, LLM fallback rate, mean agent feedback. Omit `hours` for al
 
 Recent window vs everything before it: unknown-intent rate, intent distribution and its total-variation distance,
 mean nearest-neighbour similarity, escalation rate, plus `alerts` when thresholds (`DRIFT_*` settings) are crossed.
+
+## Errors
+
+All errors are JSON. Every response, including errors, carries an `x-request-id` header; quote it when reporting
+a problem (it ties the response to the structured server logs).
+
+| Status | When | Body |
+|---|---|---|
+| 200 + `"status": "degraded"` | `/health` when the database is unreachable or models are not loaded (the endpoint itself still answers) | health object |
+| 400 | `/tickets/{request_id}/feedback` with a malformed request id (not a UUID) | `{"detail": "invalid request_id"}` |
+| 404 | feedback for an unknown request id | `{"detail": "request not found"}` |
+| 422 | request validation failed: complaint shorter than 10 or longer than 5,000 chars, missing fields, rating outside 1–5, invalid intent name, batch too large, invalid ticket severity | FastAPI/Pydantic format: `{"detail": [{"loc": [...], "msg": "...", "type": "..."}]}` |
+| 500 | unexpected server error (logged with stack trace) | `{"detail": "internal error", "request_id": "<id>"}` |
+| 503 | ingestion or taxonomy endpoints called on a deployment without the ingestion service | `{"detail": "ingestion service not available"}` |
+
+Degraded behaviour that is **not** an error: when the LLM is unreachable, rate-limited or not configured,
+`/tickets/resolve` still returns 200 with an extractive draft; the response shows `resolution.generator =
+"extractive"` and the flag `llm_unavailable_extractive_fallback`. Ingestion reports per-row failures in `errors`
+with status 200 rather than failing the whole batch.
+
+**Authentication:** none in this build (internal tool behind the agent desktop). For production, put the service
+behind an API gateway with OAuth2/JWT and per-client rate limits (see ARCHITECTURE.md §6, "Security and privacy").

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from typing import Any
 import sys
 from pathlib import Path
 
@@ -67,6 +68,8 @@ async def main() -> None:
     args = parser.parse_args()
 
     container = await build_container()
+    ingestion = container.ingestion
+    assert ingestion is not None
     if args.extractive:
         container.pipeline.generation = GenerationService(None, ExtractiveGenerator())
     sf = container.session_factory
@@ -90,14 +93,14 @@ async def main() -> None:
         drift_before_ingest = await monitoring.get_drift_report(s, 24)
 
     report = IngestionReport()
-    await container.ingestion.upsert_intents([ROAMING])
-    await container.ingestion.ingest_tickets(wave2, report)
-    await container.ingestion.ingest_kb_articles(kb2, report)
+    await ingestion.upsert_intents([ROAMING])
+    await ingestion.ingest_tickets(wave2, report)
+    await ingestion.ingest_kb_articles(kb2, report)
     await container.refresh_taxonomy()
 
     after = await run_phase(container.pipeline, cases, kb_ids)
 
-    payload = {
+    payload: dict[str, Any] = {
         "n_cases": len(cases),
         "phase_a_before": phase_summary(before, "roaming_issue"),
         "drift_report_after_phase_a": drift_before_ingest,

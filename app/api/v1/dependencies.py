@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 from app.config import settings
 from app.core.database import get_session_factory
@@ -32,8 +33,8 @@ class Container:
     llm: LLMProvider | None
     understanding: UnderstandingService
     pipeline: ResolutionPipeline
-    ingestion: IngestionService
-    session_factory: object
+    ingestion: IngestionService | None
+    session_factory: Any  # async_sessionmaker in production; None in API tests
 
     async def refresh_taxonomy(self) -> None:
         async with self.session_factory() as session:

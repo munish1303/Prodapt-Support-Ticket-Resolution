@@ -143,7 +143,7 @@ async def main() -> None:
                 reasoning_effort="low",
             )
             if args.judge_model
-            else container.llm
+            else (container.llm if container is not None else None)
         )
         if judge_llm is None or not judge_llm.available:
             raise SystemExit("--judge needs LLM_API_KEY")
@@ -152,6 +152,7 @@ async def main() -> None:
     for case in cases:
         if case["id"] in done or args.summarize_only or args.novel_only:
             continue
+        assert pipeline is not None and container is not None  # not in --summarize-only mode
         r = await pipeline.process(case["complaint"], record=False)
         recall, precision = step_match(
             container.embedder, r.generation.resolution_steps, case["reference_steps"], args.match_threshold
@@ -203,6 +204,7 @@ async def main() -> None:
     for case in novel:
         if case["id"] in done or args.summarize_only:
             continue
+        assert pipeline is not None and container is not None  # not in --summarize-only mode
         r = await pipeline.process(case["complaint"], record=False)
         checkpoint(
             {

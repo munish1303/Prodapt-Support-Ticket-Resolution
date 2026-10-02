@@ -35,6 +35,35 @@ in the problem statement.
 threshold, sentiment polarity thresholds, severity-bump ablation, groundedness thresholds) was selected on the
 **dev split** (`test.jsonl`, or the dev half of the E3 set), never on the set the metric is reported on.
 
+### 1.1 Metric definitions
+
+| Metric | Definition |
+|---|---|
+| **Intent accuracy / macro-F1** | share of complaints whose predicted intent equals the label; macro-F1 = unweighted mean of per-class F1 over the 9 known classes (`unknown_intent` predictions count as errors) |
+| **False-unknown rate** | share of in-distribution complaints predicted `unknown_intent` |
+| **Product micro P / R / F1** | over (complaint, product) pairs: predicted vs labelled product sets, pooled across complaints; *exact match* = predicted set equals labelled set |
+| **Severity accuracy / within-one** | exact 4-level match; within-one = predicted level at most one step from the label |
+| **Sentiment accuracy / macro-F1** | 3 classes (negative / neutral / positive) |
+| **nDCG@10** | graded relevance (2 = same root-cause scenario, 1 = same intent + overlapping product): DCG = Σ (2^g − 1) / log₂(rank + 1) over the top 10, divided by the ideal DCG |
+| **MRR** | mean of 1 / rank of the first grade-2 document in the top 20 (0 if none) |
+| **P@k** | grade-2 documents in the top k, divided by k |
+| **Hit@k** | 1 if any grade-2 document is in the top k |
+| **Recall@k (capped)** | \|grade-2 ∩ top-k\| / min(k, \|grade-2\|); plain recall is uninformative when a query has dozens of equally relevant tickets |
+| **KB-Recall@k** | 1 if the scenario's KB article is in the top k |
+| **Citation accuracy** | valid citations (source number exists) / all citations in a draft |
+| **Citation coverage** | steps with at least one valid citation / all steps |
+| **Groundedness** | (supported + 0.5 × weakly supported) / all steps; uncited, unsupported and contradicted steps score 0 |
+| **Reference-step recall / step precision** | MiniLM cosine ≥ 0.6 between a generated step and a scenario reference fix step: recall = reference steps matched by some generated step; precision = generated steps matching some reference step |
+| **F1 (not-supported)** | E3: detection of unsupported ∪ contradicted claims as the positive class |
+| **Contradiction recall** | E3: contradicted claims labelled `contradicted` / all contradicted claims |
+| **Confidence AUROC** | area under the ROC curve of the heuristic confidence for predicting a *good* draft (reference-step recall ≥ 0.5); 0.5 = no signal |
+| **Intent-mix TVD** | ½ Σ \|p_recent(intent) − p_baseline(intent)\| between two request windows |
+| **Latency p50 / p95 / p99** | percentiles of end-to-end server time per request (client time in load tests) |
+| **Throughput** | completed requests / wall-clock seconds at a fixed concurrency |
+
+Statistical tests: 95% confidence intervals by percentile bootstrap (1,000 resamples); method comparisons by one-sided
+paired bootstrap on per-query or per-case differences (2,000 resamples); p-values are reported, not just "better".
+
 ## 2. Understanding (L1)
 
 **Script:** `python evaluation/understanding_eval.py` → `experiments/results/understanding_knn_memory.json`.
@@ -132,6 +161,12 @@ queries have dozens of equally relevant tickets, which makes plain Recall@10 uni
 | **hybrid RRF 0.8:0.2 (weight chosen on dev)** | **0.572** | **0.657** | **0.561** | **0.760** |
 | hybrid + cross-encoder rerank (E2; disabled: +2.7 s) | 0.625 | 0.723 | 0.613 | 0.800 |
 
+**Deployed configuration** (`python evaluation/retrieval_eval.py` → `experiments/results/retrieval_production.json`):
+the generator receives **8 sources** (`RETRIEVAL_TOP_K`) with 2 guaranteed KB slots. On the same 200 queries: MRR 0.657,
+P@5 0.561, Hit@5 0.760 (unchanged from E1's hybrid), and **the scenario's KB article is in the generator's context for
+77% of complaints, vs 19% without KB slots** (E1 hybrid, top 10). The slots trade two ticket positions for the canonical
+procedure. nDCG@10 (0.475) and P@10 are lower only because the list is 8 long with 2 KB positions. Latency p50 151 ms.
+
 **Baseline comparison (L3):** keyword search finds a highly relevant ticket in the top 5 for 40.5% of complaints;
 the deployed hybrid retriever does for 76.0% (+0.355, p < 0.001). Hybrid's gain over semantic-only is significant
 but modest and concentrated at rank 1 (MRR +0.057, p = 0.0005).
@@ -185,27 +220,28 @@ for "contradictions" on verbatim-quoted steps, which exposed the NLI premise iss
 `experiments/results/generation_llm.json`. Generator `qwen/qwen3.8-27b`, judge `openai/gpt-oss-120b`
 (different model family, to reduce self-preference bias), Groq free tier.
 
-**Coverage: 46 of the 100 planned cases; the 60 novel-class cases have not run yet.** The run hit Groq's free-tier
-cap of **200,000 tokens per day per model** (each draft costs about 1.8–2k tokens, so roughly 100 drafts per day, and
-the budget was partly spent on earlier aborted runs). The 46 cases are the first 52 of the fixed, pre-shuffled
-eval order minus 6 that were rate-limited (not a cherry-picked subset). Rate-limited cases were excluded and will be retried, not scored as failures.
+**Coverage: 52 of the 100 planned cases** (GEN-0001 to GEN-0052 of the fixed, pre-shuffled eval order; not a
+cherry-picked subset). The run hit Groq's free-tier cap of **200,000 tokens per day per model**: each draft costs
+about 1.8–2k tokens, so roughly 100 drafts per day, and the budget was partly spent on earlier aborted runs.
+Rate-limited cases were retried later (6 of the 52 ran in the API container), never scored as failures.
 
-| Metric (n = 46) | LLM | Extractive (same 46) | Δ, paired bootstrap |
+| Metric (n = 52) | LLM | Extractive (same 52) | Δ, paired bootstrap |
 |---|---:|---:|---|
-| Reference-step recall | 0.728 [95% CI 0.618–0.839] | 0.706 | +0.022 (p = 0.31, n.s.) |
-| **Step precision** | **0.591** | 0.522 | **+0.069 (p = 0.027)** |
-| Groundedness | 0.949 | 1.000 | −0.051 (extractive copies verbatim) |
-| Citation accuracy / coverage | 0.957 / 0.957 | 1.000 / 1.000 | |
-| Steps per draft | 4.61 | 5.00 | |
+| Reference-step recall | 0.726 [95% CI 0.607–0.830] | 0.711 | +0.015 (p = 0.37, n.s.) |
+| **Step precision** | **0.596** | 0.531 | **+0.065 (p = 0.024)** |
+| Groundedness | 0.955 | 1.000 | −0.045 (extractive copies verbatim) |
+| Citation accuracy / coverage | 0.962 / 0.962 | 1.000 / 1.000 | |
+| Steps per draft | 4.65 | 5.00 | |
 | Drafts with a contradicted step | 2 | 0 | |
 | Empty drafts (LLM declined: sources don't address the complaint) | 2 | n/a | |
-| Decisions RESOLVE / REVIEW / ESCALATE | 34 / 7 / 5 | 37 / 8 / 1 | |
-| **Confidence AUROC (predicting a good draft)** | **0.819** | 0.751 (on all 100) | |
-| LLM-judge 1–5: relevance / completeness / specificity / correctness | 4.07 / 3.98 / 3.85 / 4.11 | n/a | directional only |
-| Latency p50 / p95 | 5.3 s / 11.9 s | 1.0 s / 1.5 s | |
-| Mean stage latency: generate / validate | 6.8 s / 2.9 s | 0 / 0.8 s | |
+| Decisions RESOLVE / REVIEW / ESCALATE | 39 / 8 / 5 | 42 / 9 / 1 | |
+| **Confidence AUROC (predicting a good draft)** | **0.802** | 0.751 (on all 100) | |
+| LLM-judge 1–5: relevance / completeness / specificity / correctness | 4.02 / 3.94 / 3.87 / 4.06 | n/a | directional only |
+| End-to-end latency p50 / p95 | 5.5 s / 15.4 s | 1.0 s / 1.5 s | |
+| Generation stage alone p50 / p95 | 0.97 s / 6.8 s | 0 | |
+| Mean stage latency: generate / validate | 6.1 s / 3.5 s | 0 / 0.8 s | |
 
-Quality by decision (LLM): **RESOLVE 0.816** reference-step recall (n = 34), **REVIEW 0.679** (n = 7),
+Quality by decision (LLM): **RESOLVE 0.795** reference-step recall (n = 39), **REVIEW 0.719** (n = 8),
 **ESCALATE 0.200** (n = 5). The decision layer separates good drafts from bad ones much more sharply with the LLM
 than with extractive drafts, because the LLM declines or writes thin drafts when the evidence is poor, and
 validation and confidence pick that up.
@@ -215,9 +251,11 @@ validation and confidence pick that up.
   steps), occasional refusals when sources don't fit, and better-separated confidence. Recall is statistically tied
   with the extractive generator. Extractive is a deliberately strong baseline here because historical resolutions are
   templated; on messier real tickets the abstractive advantage should grow, but that is untested.
-* Paraphrased LLM steps cost validation time (2.9 s vs 0.8 s): quoted steps skip NLI, paraphrases don't.
-* The latency max (186 s) is a rate-limit retry wait, not processing. p95 includes some retry waits; on a paid tier
-  generation latency would be roughly the model's raw latency (≈1–3 s measured in isolation).
+* Paraphrased LLM steps cost validation time (3.5 s vs 0.8 s mean): quoted steps skip NLI, paraphrases don't.
+* **Latency: p95 15.4 s is just over the plan's 15 s MVP target, as measured.** The tail is free-tier rate limiting:
+  generation alone has p50 0.97 s, but rate-limit retry waits push the mean to 6.1 s (max 186 s). On a paid tier the
+  expected end-to-end p95 is roughly retrieval + generation + validation ≈ 0.3 + 2–7 + 3.5 s. That is an estimate
+  from the measured stages, not a measurement.
 * LLM-judge scores are directional only (single judge, no human calibration).
 
 **Second LLM family (cross-check): Gemini.** `experiments/results/generation_llm_gemini.json`, generator
@@ -250,7 +288,7 @@ declined 26 of 60, which the pipeline turns into ESCALATE ("insufficient evidenc
 unseen issue type fall by more than half (48% → 22%). It does not eliminate them: 13 drafts were still RESOLVEd,
 so the traffic-level intent-mix drift alert (E4′) remains necessary as the second line of defence.
 
-**Remaining gap:** Qwen covers 46 of the 100 generation cases (free-tier daily token cap); resumable with
+**Remaining gap:** Qwen covers 52 of the 100 generation cases (free-tier daily token cap); resumable with
 `python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`.
 
 ## 5. Groundedness validation (L1)
@@ -280,8 +318,8 @@ concurrency. One worker serialises CPU-bound inference (embedding, sentiment, NL
 queue. Server latency ≈ client latency, so the queue is inside the service, not the network. Scaling path, in
 order: more workers or pods behind a load balancer (each holds about 1.7 GB of models), then a batched inference service
 (GPU) for NLI and embeddings, which also cuts per-request latency. The plan's MVP target (P95 < 15 s) holds up to
-concurrency 8 on this laptop *without* the LLM. With the LLM (§4.2, p95 11.9 s at concurrency 1) the target only
-holds at low concurrency on free-tier rate limits.
+concurrency 8 on this laptop *without* the LLM. With the free-tier LLM (§4.2) end-to-end p95 is 15.4 s at
+concurrency 1, just over the target, driven by rate-limit waits.
 
 ### 6.2 Monitoring and drift
 
@@ -315,13 +353,29 @@ runtime clue that should lower confidence; (2) sentence-level / late-interaction
 outvote the symptom sentence; (3) the LLM generator, which sees the evening-Wi-Fi KB article in its context and can
 decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on the cited sources.
 
+### 6.4 Human evaluation (prepared, awaiting ratings)
+
+The plan's Tier-2 human evaluation is set up but **not yet rated**, so no human results are reported.
+`data/evaluation/human_eval_sheet.xlsx` (built by `evaluation/build_human_eval_sheet.py`) holds 50 Qwen drafts
+(seed 7, both "declined" drafts included, shuffled). Each row has the complaint, the 8 sources the generator saw
+(re-retrieved with the production retriever, verified to reproduce the original run for all 50), the cited draft and
+the reference fix. The rater fills relevance / completeness / correctness (1–5), "safe to use as-is" and their own
+RESOLVE / REVIEW / ESCALATE. System outputs and LLM-judge scores sit on a hidden sheet to avoid anchoring.
+
+Once rated, `python evaluation/human_eval_analysis.py` reports: decision agreement and Cohen's kappa vs the system,
+precision of system RESOLVE, Spearman correlations validating the LLM judge, the heuristic confidence and the automatic
+reference-recall metric, confidence AUROC for "safe", and a RESOLVE-threshold sweep, the data Experiment 5
+(threshold tuning) needs. The workbook's Summary formulas were verified with the `formulas` engine (no errors when
+empty; values match an independent computation on a synthetic fill).
+
 ## 7. Engineering checks
 
 | Check | Result |
 |---|---|
-| Unit + API + DB integration tests (`pytest`) | 67 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Unit + API + DB integration tests (`pytest`) | 69 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 83% |
-| `black --check`, `flake8` | clean |
+| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 66 files) | clean |
+| Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |
 | `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
 | Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |
 | Build robustness | no apt layer (stdlib health check); whole-step retries for pip and model downloads. Both were added after the build failed on this network's DNS/HTTP glitches |
@@ -335,10 +389,10 @@ decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on
   intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
 * Intent macro-F1 (0.723) is below the plan's provisional 0.75 target; the LLM classifier
   (`INTENT_CLASSIFIER=llm`) has not been evaluated.
-* LLM generation evaluated on 46 of 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
+* LLM generation evaluated on 52 of 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
   gpt-oss-20b: free-tier daily caps (200k tokens/day on Groq, 20 requests/day on Gemini) prevented one model from
   covering everything.
 * E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
 * One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
-* Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.82 LLM for predicting a good draft); the
+* Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.80 LLM for predicting a good draft); the
   feedback endpoint collects the data needed to calibrate it.

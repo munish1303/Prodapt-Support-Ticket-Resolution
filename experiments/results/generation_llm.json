@@ -1,37 +1,37 @@
 {
   "summary": {
     "generator": "qwen/qwen3.8-27b",
-    "n": 46,
-    "n_planned": 100,
-    "n_novel": 0,
+    "n": 52,
+    "n_planned": 52,
+    "n_novel": 4,
     "match_threshold": 0.6,
     "metrics": {
-      "citation_accuracy": 0.9565,
-      "citation_coverage": 0.9565,
-      "groundedness": 0.9493,
-      "reference_step_recall": 0.7283,
-      "step_precision": 0.5909,
-      "n_steps": 4.6087,
-      "kb_retrieved": 0.7174,
-      "intent_correct": 0.6522,
-      "confidence": 0.843
+      "citation_accuracy": 0.9615,
+      "citation_coverage": 0.9615,
+      "groundedness": 0.9551,
+      "reference_step_recall": 0.726,
+      "step_precision": 0.5958,
+      "n_steps": 4.6538,
+      "kb_retrieved": 0.7308,
+      "intent_correct": 0.6538,
+      "confidence": 0.8474
     },
     "generation_errors": 0,
     "drafts_with_contradiction": 2,
     "decisions": {
-      "RESOLVE": 34,
-      "REVIEW": 7,
+      "RESOLVE": 39,
+      "REVIEW": 8,
       "ESCALATE": 5
     },
     "quality_by_decision": {
       "RESOLVE": {
-        "n": 34,
-        "mean_reference_step_recall": 0.8162,
+        "n": 39,
+        "mean_reference_step_recall": 0.7949,
         "mean_groundedness": 1.0
       },
       "REVIEW": {
-        "n": 7,
-        "mean_reference_step_recall": 0.6786,
+        "n": 8,
+        "mean_reference_step_recall": 0.7188,
         "mean_groundedness": 1.0
       },
       "ESCALATE": {
@@ -40,29 +40,33 @@
         "mean_groundedness": 0.5333
       }
     },
-    "confidence_quality_auc": 0.8194,
+    "confidence_quality_auc": 0.8021,
     "latency_ms": {
-      "p50": 5290,
-      "p95": 11861,
+      "p50": 5481,
+      "p95": 15362,
       "max": 185551
     },
     "stage_latency_ms_mean": {
-      "embed": 39,
-      "understand_retrieve": 279,
-      "generate": 6814,
-      "validate": 2869,
+      "embed": 43,
+      "understand_retrieve": 305,
+      "generate": 6142,
+      "validate": 3532,
       "decide": 0
     },
-    "novel_intent_decisions": {},
-    "novel_intent_empty_drafts": 0,
+    "novel_intent_decisions": {
+      "REVIEW": 1,
+      "ESCALATE": 2,
+      "RESOLVE": 1
+    },
+    "novel_intent_empty_drafts": 1,
     "novel_intent_generation_errors": 0,
     "llm_judge_mean": {
-      "relevance": 4.065,
-      "completeness": 3.978,
-      "specificity": 3.848,
-      "correctness": 4.109
+      "relevance": 4.019,
+      "completeness": 3.942,
+      "specificity": 3.865,
+      "correctness": 4.058
     },
-    "llm_judge_n": 46,
+    "llm_judge_n": 52,
     "llm_judge_model": "openai/gpt-oss-120b"
   },
   "rows": [
@@ -1964,6 +1968,94 @@
       }
     },
     {
+      "id": "GEN-0044",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.881,
+      "decision": "RESOLVE",
+      "latency_ms": 14023,
+      "stage_ms": {
+        "embed": 48,
+        "understand_retrieve": 727,
+        "generate": 988,
+        "validate": 12257,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses to the customer. [1][2][5][6][7]",
+        "Add the static IP add-on to the customer's account. [1][2][5][6][7]",
+        "Ask the customer to restart their router to receive the new static IP. [1][2][6][7]",
+        "Suggest dynamic DNS as a free alternative for reaching the NAS. [1][6][7]"
+      ],
+      "summary": "The customer is requesting a static IP address for their home NAS. The standard resolution involves explaining the IP types, adding the static IP add-on, and instructing the customer to restart their router.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft mirrors the reference fix, covering all necessary steps, directly addresses the customer's need, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0045",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9112,
+      "decision": "REVIEW",
+      "latency_ms": 4942,
+      "stage_ms": {
+        "embed": 162,
+        "understand_retrieve": 974,
+        "generate": 1121,
+        "validate": 2683,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side. [1][3][5][6][7]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet. [1][3][5][6][7]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold. [1][2][3][6][7]",
+        "Enable QoS on the router to prioritise video calls during peak hours. [1][2][3][6][7]",
+        "If these steps do not resolve the issue, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing peak-hour broadband slowdowns, which is typically caused by network congestion on the local exchange or cabinet backhaul. The resolution involves confirming the issue with wired speed tests, checking the network capacity dashboard, raising a congestion ticket if necessary, and enabling QoS on the router to prioritize video calls.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly tackles the download slowdown, includes all required steps from the reference (speed test, capacity check, congestion ticket, QoS) and adds a sensible escalation step. The actions are clear, actionable, and accurate."
+      }
+    },
+    {
       "id": "GEN-0046",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
@@ -2004,6 +2096,53 @@
         "specificity": 4,
         "correctness": 5,
         "reasoning": "The draft directly tackles the IP change problem, includes all necessary actions from the reference, and gives correct advice. Steps are clear but somewhat generic, lacking detailed instructions (e.g., how to add the add\u2011on), so specificity is slightly lower."
+      }
+    },
+    {
+      "id": "GEN-0047",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 6,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8329,
+      "decision": "RESOLVE",
+      "latency_ms": 10347,
+      "stage_ms": {
+        "embed": 54,
+        "understand_retrieve": 357,
+        "generate": 878,
+        "validate": 9057,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied to the line. [1][3][4][6]",
+        "Ask the customer to restart the router so the line re-syncs at the new speed profile. [1][3][4][6]",
+        "Run a line check to confirm the synced speed matches the new profile. [1][3][4][6]",
+        "If the profile is not applied, escalate the issue to provisioning. [1][3][4][6]",
+        "Run a wired speed test at peak and off-peak times to confirm if the slowdown is network-side. [2][5][7][8]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet. [2][5][7][8]"
+      ],
+      "summary": "The complaint indicates a speed upgrade not applied, which is the primary issue. The resolution steps address this by confirming the profile, restarting the router, and running a line check. If the profile is not applied, it is escalated to provisioning. Additionally, steps to check for network congestion are included to address potential peak-hour slowdowns.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 2,
+        "correctness": 1,
+        "reasoning": "The draft addresses wired router provisioning, while the reference fix concerns mobile 5G settings. It does not solve the customer's problem and provides unrelated steps, making it largely irrelevant and incorrect."
       }
     },
     {
@@ -2052,6 +2191,96 @@
       }
     },
     {
+      "id": "GEN-0049",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9147,
+      "decision": "RESOLVE",
+      "latency_ms": 16999,
+      "stage_ms": {
+        "embed": 33,
+        "understand_retrieve": 362,
+        "generate": 1221,
+        "validate": 15381,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray, and restart the device. [1][2][3][4][5][6][7]",
+        "Test the SIM in another phone to isolate whether the issue is with the SIM or the handset. [1][2][3][4][5][6][7]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number. [5][6][7]",
+        "If the SIM works in another phone, refer the handset for repair. [6][7]",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's phone is not detecting the SIM, which is a common hardware issue that can be resolved by reseating the SIM or replacing it if it is faulty. If the SIM works in another phone, the handset itself may need repair.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the SIM detection issue, includes all key steps from the reference and adds a sensible escalation step, with clear actionable instructions and no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0050",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.25,
+      "step_precision": 0.4,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8901,
+      "decision": "RESOLVE",
+      "latency_ms": 2581,
+      "stage_ms": {
+        "embed": 56,
+        "understand_retrieve": 333,
+        "generate": 857,
+        "validate": 1333,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side. [2][3][6][7]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet. [2][3][5][6][7]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold. [2][3][5][7]",
+        "Enable QoS on the router to prioritise video calls during peak hours. [2][5][7]",
+        "If the issue persists, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing a significant drop in broadband speed, which is a common symptom of network congestion at peak hours. The resolution involves confirming the issue with wired tests, checking for cabinet congestion, and enabling QoS to prioritize essential traffic.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 2,
+        "correctness": 1,
+        "reasoning": "The draft suggests network congestion checks and QoS, which do not address the likely cause of low measured speed (adapter link speed, cabling, router ports). It misses key steps from the reference, provides irrelevant actions, and includes potentially unnecessary steps, making it incomplete and incorrect."
+      }
+    },
+    {
       "id": "GEN-0051",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
@@ -2095,7 +2324,97 @@
         "correctness": 2,
         "reasoning": "The draft suggests DNS troubleshooting, which does not address the likely issue of PPPoE credentials or VLAN settings indicated in the reference. It misses key steps, making it irrelevant and incomplete, though the steps are specific and generally correct for DNS problems."
       }
+    },
+    {
+      "id": "GEN-0052",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8549,
+      "decision": "RESOLVE",
+      "latency_ms": 12242,
+      "stage_ms": {
+        "embed": 52,
+        "understand_retrieve": 288,
+        "generate": 910,
+        "validate": 10990,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable going into the ONT for any sharp bends, kinks, or pinching, and straighten it if found. [2][3][4][6][7]",
+        "Ensure the green fibre connector is fully clicked into the ONT port, being careful not to touch the fibre end. [2][3][4][6][7]",
+        "Check the outage map to see if there is a known fibre fault in the customer's area. [2][3][4][6][7]",
+        "If the LOS light remains red after the above steps, raise a fibre fault ticket and dispatch a field engineer. [3][4][6][7]",
+        "If the issue is still not resolved after dispatching a field engineer, escalate the case to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing a red LOS light on their fibre ONT, indicating a loss of optical signal. The resolution involves checking the fibre cable and connector, verifying the outage map, and dispatching a field engineer if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the red LOS issue, covers all reference steps, adds clear actionable details, and includes no incorrect advice."
+      }
     }
   ],
-  "novel_rows": []
+  "novel_rows": [
+    {
+      "id": "NOV-0001",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 0.8,
+      "max_relevance": 0.5062704969161085,
+      "confidence": 0.7383,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0002",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: Low retrieval relevance (top-5 mean=0.39)",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 0.7,
+      "max_relevance": 0.4112683991309949,
+      "confidence": 0.7093,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0003",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 4,
+      "groundedness": 1.0,
+      "max_relevance": 0.6282662069004169,
+      "confidence": 0.8585,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0005",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "unknown_intent",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.49126768320405545,
+      "confidence": 0.2742,
+      "generation_error": null
+    }
+  ]
 }

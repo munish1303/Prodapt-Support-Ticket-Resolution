@@ -27,7 +27,8 @@ class ContextBuilder:
     def build(self, documents: list[Document], max_chars: int | None = None) -> tuple[str, int]:
         """Return (context, n_sources_included). Sources keep their 1-based numbering."""
         max_chars = max_chars or settings.MAX_CONTEXT_CHARS
-        parts, used = [], 0
+        parts: list[str] = []
+        used = 0
         for idx, doc in enumerate(documents, start=1):
             if doc.doc_type == "kb_article":
                 header = f"[Source {idx}] KB article {doc.id}: {doc.metadata.get('title', '')}"

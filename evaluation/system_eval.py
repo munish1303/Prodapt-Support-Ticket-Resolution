@@ -25,7 +25,10 @@ from evaluation.metrics import percentile  # noqa: E402
 
 async def run_level(client: httpx.AsyncClient, url: str, complaints: list[str], concurrency: int) -> dict:
     sem = asyncio.Semaphore(concurrency)
-    latencies, statuses, generators, server_ms = [], Counter(), Counter(), []
+    latencies: list[float] = []
+    server_ms: list[float] = []
+    statuses: Counter[object] = Counter()
+    generators: Counter[str] = Counter()
 
     async def one(text: str):
         async with sem:

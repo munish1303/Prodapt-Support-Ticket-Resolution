@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from typing import Any
 import sys
 import time
 from collections import Counter
@@ -36,6 +37,7 @@ from app.services.understanding import (  # noqa: E402
     UNKNOWN_INTENT,
     InMemoryNeighbourIndex,
     IntentDef,
+    NeighbourIndex,
     SentimentAnalyzer,
     UnderstandingService,
     knn_vote,
@@ -191,7 +193,7 @@ async def main() -> None:
         from app.core.database import dispose_engine, get_session_factory
         from app.services.understanding import PgNeighbourIndex
 
-        index = PgNeighbourIndex(get_session_factory())
+        index: NeighbourIndex = PgNeighbourIndex(get_session_factory())
     else:
         index = build_memory_index(embedder, ["tickets.jsonl"])
 
@@ -201,7 +203,7 @@ async def main() -> None:
     dev = load_eval("test")
 
     preds, lat = await run_service(service, items)
-    result = {
+    result: dict[str, Any] = {
         "config": {
             "index": args.index,
             "classifier": args.classifier,

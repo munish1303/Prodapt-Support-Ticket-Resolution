@@ -17,7 +17,9 @@ contradiction : a claim that directly contradicts the canonical fix (E3).
 wave     : 1 = present at launch; 2 = arrives later (evolving ticket class demo).
 """
 
-SCENARIOS = [
+from typing import Any
+
+SCENARIOS: list[dict[str, Any]] = [
     # ------------------------------------------------------------------ connectivity
     {
         "id": "CONN_WIFI_EVENING_INTERFERENCE",

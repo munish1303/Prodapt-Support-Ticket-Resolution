@@ -6,6 +6,18 @@ import pytest
 from app.core.llm import LLMUnavailable, OpenAICompatibleProvider
 
 
+def _httpx_module():
+    """openai>=3 builds on httpx2; its error classes expect httpx2 request/response objects."""
+    try:
+        import httpx2
+
+        return httpx2
+    except ImportError:  # pragma: no cover
+        import httpx
+
+        return httpx
+
+
 @pytest.mark.asyncio
 async def test_no_key_is_unavailable():
     provider = OpenAICompatibleProvider(api_key="")
@@ -31,7 +43,7 @@ class FakeCompletions:
 def provider_with(outcomes, monkeypatch):
     provider = OpenAICompatibleProvider(api_key="test", base_url="http://localhost:1", model="m", max_retries=3)
     completions = FakeCompletions(outcomes)
-    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=completions))  # type: ignore[assignment]
 
     async def no_sleep(_):
         return None
@@ -49,8 +61,9 @@ async def test_retries_on_bad_json_then_succeeds(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_retries_on_connection_error_then_gives_up(monkeypatch):
-    import httpx
     import openai
+
+    httpx = _httpx_module()
 
     req = httpx.Request("POST", "http://localhost:1")
     err = openai.APIConnectionError(request=req)
@@ -62,8 +75,9 @@ async def test_retries_on_connection_error_then_gives_up(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_non_retryable_status_raises_immediately(monkeypatch):
-    import httpx
     import openai
+
+    httpx = _httpx_module()
 
     resp = httpx.Response(401, request=httpx.Request("POST", "http://localhost:1"))
     err = openai.AuthenticationError("bad key", response=resp, body=None)

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import re
+from typing import Protocol
 from collections.abc import Sequence
 
 import numpy as np
@@ -286,6 +287,16 @@ class Reranker:
         return sorted(items, key=lambda i: -i.fused_score)[:top_k]
 
 
+class SupportsRetrieve(Protocol):
+    async def retrieve(
+        self,
+        query_text: str,
+        top_k: int | None = None,
+        query_embedding: np.ndarray | None = None,
+        metadata_filters: dict | None = None,
+    ) -> RetrievalResult: ...
+
+
 class RetrievalService:
     def __init__(self, retriever: HybridRetriever, reranker: Reranker | None = None, use_reranking: bool | None = None):
         self.retriever = retriever
@@ -300,10 +311,10 @@ class RetrievalService:
         metadata_filters: dict | None = None,
     ) -> RetrievalResult:
         top_k = top_k or settings.RETRIEVAL_TOP_K
-        rerank = self.use_reranking and self.reranker is not None
-        k = settings.RERANK_CANDIDATES if rerank else top_k
+        reranker = self.reranker if self.use_reranking else None
+        k = settings.RERANK_CANDIDATES if reranker is not None else top_k
         result = await self.retriever.retrieve(query_text, k, "hybrid", query_embedding, metadata_filters)
-        if rerank:
-            result.items = await asyncio.to_thread(self.reranker.rerank, query_text, result.items, top_k)
+        if reranker is not None:
+            result.items = await asyncio.to_thread(reranker.rerank, query_text, result.items, top_k)
             result.method = "hybrid_reranked"
         return result

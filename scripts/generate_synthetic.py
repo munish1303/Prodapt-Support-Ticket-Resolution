@@ -162,8 +162,8 @@ def main() -> None:
     processed.mkdir(parents=True, exist_ok=True)
     evaluation.mkdir(parents=True, exist_ok=True)
 
-    tickets = {1: [], 2: []}
-    kb = {1: [], 2: []}
+    tickets: dict[int, list[dict]] = {1: [], 2: []}
+    kb: dict[int, list[dict]] = {1: [], 2: []}
     ticket_counter = 0
     wave_windows = {
         1: (datetime(2025, 1, 1), datetime(2026, 6, 30)),
@@ -180,7 +180,8 @@ def main() -> None:
             c = compose_complaint(rng, sc, "corpus")
             unresolved = rng.random() < 0.04
             if unresolved:
-                resolution, used = "Customer did not respond to follow-up. Closed without confirmed resolution.", []
+                used: list[int] = []
+                resolution = "Customer did not respond to follow-up. Closed without confirmed resolution."
             else:
                 resolution, used = compose_resolution(rng, sc)
             created = random_date(rng, *wave_windows[wave])

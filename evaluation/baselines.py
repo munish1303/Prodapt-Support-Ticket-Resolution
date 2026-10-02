@@ -47,7 +47,8 @@ class KeywordSearchBaseline:
             return []
         async with self.session_factory() as session:
             for op in (" AND ", " OR "):  # all keywords first; fall back to any keyword
-                clauses, params = [], {"k": top_k}
+                clauses: list[str] = []
+                params: dict[str, object] = {"k": top_k}
                 for i, kw in enumerate(kws):
                     clauses.append(f"(complaint ILIKE :kw{i} OR resolution ILIKE :kw{i})")
                     params[f"kw{i}"] = f"%{kw}%"

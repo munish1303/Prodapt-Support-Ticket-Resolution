@@ -14,7 +14,7 @@ from app.models.embeddings import EmbeddingService
 from app.models.schemas import DecisionResult, GenerationResult, QueryMetadata, RetrievalResult, ValidationResult
 from app.services.decision import DecisionService
 from app.services.generation import GenerationService
-from app.services.retrieval import RetrievalService
+from app.services.retrieval import SupportsRetrieve
 from app.services.understanding import UnderstandingService
 from app.services.validation import ValidationService
 from app.utils.text import looks_like_prompt_injection, redact_pii, sha256
@@ -40,7 +40,7 @@ class ResolutionPipeline:
         self,
         embedder: EmbeddingService,
         understanding: UnderstandingService,
-        retrieval: RetrievalService,
+        retrieval: SupportsRetrieve,
         generation: GenerationService,
         validation: ValidationService,
         decision: DecisionService,

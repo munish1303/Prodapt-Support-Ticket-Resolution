@@ -274,7 +274,7 @@ the alert treated as a review trigger, not an automatic action.
 | Plan ID | Topic | Status |
 |---|---|---|
 | E4 | Embedding model comparison | not run |
-| E5 | Confidence threshold tuning | not run: needs human judgements (feedback endpoint collects them) |
+| E5 | Confidence threshold tuning | not run: needs human judgements. The 50-sample rating sheet and the analysis (incl. threshold sweep) are ready (EVALUATION.md §6.4) |
 | E6 | LLM temperature | not run |
 | E7 | Context length (top-k sources) | not run |
 | E8 | Caching | not run (Tier 3) |
