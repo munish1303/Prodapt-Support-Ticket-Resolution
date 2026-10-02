@@ -1,0 +1,12 @@
+[
+  {"intent_name": "connectivity_issue", "description": "Internet, Wi-Fi or mobile network connection drops or cannot connect", "examples": ["internet keeps dropping", "can't connect to wifi", "no signal at home", "connection cuts out"]},
+  {"intent_name": "speed_issue", "description": "Connection works but is slower than expected", "examples": ["internet is really slow", "videos keep buffering", "not getting the speed I pay for", "mobile data crawling"]},
+  {"intent_name": "billing_dispute", "description": "Unexpected, incorrect or duplicate charges on a bill", "examples": ["charged twice", "my bill went up", "charges I didn't authorise", "still billed after cancelling"]},
+  {"intent_name": "hardware_problem", "description": "Router, modem, SIM or other device faults", "examples": ["router keeps rebooting", "modem has no lights", "phone says no SIM", "ethernet port dead"]},
+  {"intent_name": "service_activation", "description": "New service, SIM, line or number transfer not yet working", "examples": ["new SIM not activated", "fibre installed but no service", "number transfer stuck"]},
+  {"intent_name": "plan_change", "description": "Upgrading, downgrading or adding to a plan", "examples": ["upgraded but speed is the same", "want a cheaper plan", "add a line to my family plan"]},
+  {"intent_name": "technical_support", "description": "How-to and configuration help for working services", "examples": ["set up my email", "open ports for gaming", "set up voicemail", "need a static IP"]},
+  {"intent_name": "account_management", "description": "Login, password, account holder or payment-method changes", "examples": ["locked out of my account", "OTP code never arrives", "change account holder", "autopay failing"]},
+  {"intent_name": "outage_report", "description": "Service down for a whole area or caused by network-side events", "examples": ["whole street has no internet", "no mobile service in town", "line down after storm"]},
+  {"intent_name": "unknown_intent", "description": "Novel or unrecognised issue type; routed to a human", "examples": []}
+]

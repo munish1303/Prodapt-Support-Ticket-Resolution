@@ -1,0 +1,71 @@
+{
+  "near_dup_threshold": 0.95,
+  "sets": {
+    "understanding_eval": {
+      "n": 500,
+      "id_overlap": 0,
+      "exact_text_overlap": 0,
+      "template_family_overlap": 0,
+      "near_duplicates": 0,
+      "max_sim_to_corpus": {
+        "mean": 0.658,
+        "p50": 0.6676,
+        "p95": 0.7739,
+        "max": 0.8827
+      }
+    },
+    "retrieval_eval": {
+      "n": 200,
+      "id_overlap": 0,
+      "exact_text_overlap": 0,
+      "template_family_overlap": 0,
+      "near_duplicates": 0,
+      "max_sim_to_corpus": {
+        "mean": 0.6627,
+        "p50": 0.6697,
+        "p95": 0.7789,
+        "max": 0.8158
+      }
+    },
+    "generation_eval": {
+      "n": 100,
+      "id_overlap": 0,
+      "exact_text_overlap": 0,
+      "template_family_overlap": 0,
+      "near_duplicates": 0,
+      "max_sim_to_corpus": {
+        "mean": 0.6649,
+        "p50": 0.6733,
+        "p95": 0.7566,
+        "max": 0.7969
+      }
+    },
+    "test": {
+      "n": 199,
+      "id_overlap": 0,
+      "exact_text_overlap": 0,
+      "template_family_overlap": 0,
+      "near_duplicates": 0,
+      "max_sim_to_corpus": {
+        "mean": 0.6506,
+        "p50": 0.6551,
+        "p95": 0.7541,
+        "max": 0.8216
+      }
+    },
+    "novel_intent_eval": {
+      "n": 60,
+      "id_overlap": 0,
+      "exact_text_overlap": 0,
+      "template_family_overlap": 0,
+      "near_duplicates": 0,
+      "max_sim_to_corpus": {
+        "mean": 0.7103,
+        "p50": 0.7324,
+        "p95": 0.7981,
+        "max": 0.8103
+      }
+    }
+  },
+  "failures": []
+}

@@ -1,0 +1,11 @@
+[
+  {"product_name": "broadband", "category": "internet", "aliases": ["broadband", "internet", "home internet", "dsl", "adsl", "landline internet"]},
+  {"product_name": "fiber", "category": "internet", "aliases": ["fiber", "fibre", "ftth", "ont", "fiber optic", "fibre optic", "gigabit"]},
+  {"product_name": "mobile_service", "category": "mobile", "aliases": ["mobile", "cell phone", "cellular", "phone signal", "sim", "mobile data", "4g", "lte", "voicemail", "roaming"]},
+  {"product_name": "5g_service", "category": "mobile", "aliases": ["5g", "5g network", "5g plan"]},
+  {"product_name": "router", "category": "device", "aliases": ["router", "wifi", "wi-fi", "wireless", "hub", "mesh", "extender"]},
+  {"product_name": "modem", "category": "device", "aliases": ["modem", "cable modem", "dsl modem"]},
+  {"product_name": "billing_system", "category": "service", "aliases": ["bill", "billing", "invoice", "charge", "charged", "payment", "refund", "autopay", "direct debit"]},
+  {"product_name": "email_service", "category": "service", "aliases": ["email", "e-mail", "mailbox", "outlook", "imap", "smtp"]},
+  {"product_name": "account_portal", "category": "service", "aliases": ["login", "log in", "password", "portal", "my account", "otp"]}
+]
