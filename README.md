@@ -188,12 +188,16 @@ app/
 data/
   taxonomies/      intents.json, products.json
   processed/       generated corpus (tickets, KB; wave-2 = new ticket class)
-  evaluation/      held-out eval sets, TREC qrels, leakage report
-scripts/           generate_synthetic, verify_splits, init_db, ingest, report_dataset_stats, datagen/scenarios.py
-evaluation/        metrics, understanding/retrieval/generation/system evals, keyword baseline
-experiments/       E1-E3 (+ evolving classes), results/*.json
-tests/             unit/ (offline), integration/ (API with in-memory container; DB tests marked `db`)
+  evaluation/      held-out eval sets, TREC qrels, leakage report, human_eval_sheet.xlsx
+scripts/           generate_synthetic, verify_splits, init_db, ingest, report_dataset_stats, run_experiments,
+                   docker_entrypoint.sh, datagen/scenarios.py
+evaluation/        metrics, understanding/retrieval/generation/system evals, keyword baseline,
+                   build_human_eval_sheet, human_eval_analysis
+experiments/       E1-E3, evolving classes, results/*.json (raw output of every number in the docs)
+tests/             unit/ (offline), integration/ (API with in-memory container; DB tests marked `db`), load/locustfile.py
+docs/              api.md, setup.md, deployment.md, troubleshooting.md
 migrations/        SQL schema
+Dockerfile, docker-compose.yml, requirements.txt, requirements-dev.txt, pyproject.toml, setup.cfg, LICENSE (MIT)
 ```
 
 ## API summary

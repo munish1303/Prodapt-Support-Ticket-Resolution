@@ -396,3 +396,24 @@ empty; values match an independent computation on a synthetic fill).
 * One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
 * Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.80 LLM for predicting a good draft); the
   feedback endpoint collects the data needed to calibrate it.
+
+## 9. Future work (prioritised by expected impact on the measured weaknesses)
+
+1. **Per-request "wrong scenario" detection** (the "grounded but wrong" mode, §4.1 and §6.3). Add (a) semantic vs
+   lexical *ranker disagreement* as an uncertainty signal in the confidence score, and (b) a complaint ↔ cited-source
+   relevance check with the cross-encoder applied to the 3–5 cited sources only. Evaluate on the 60 novel-class
+   complaints and the §6.3 example; success = fewer confident wrong RESOLVEs with no loss of RESOLVE rate in-distribution.
+2. **Sentence-level / late-interaction retrieval** so boilerplate sentences ("I work from home…") cannot outvote the
+   symptom sentence; re-run E1.
+3. **Calibrate the confidence score** from the human ratings (§6.4) and the feedback endpoint (isotonic or Platt on
+   "safe to use"); then run Experiment 5 to set RESOLVE/REVIEW thresholds for a target precision.
+4. **Intent:** evaluate the LLM classifier (`INTENT_CLASSIFIER=llm`) against k-NN (target macro-F1 > 0.75), and
+   consider a hybrid (k-NN unless the vote is split).
+5. **Throughput:** batched GPU inference for NLI and embeddings, then multiple workers; re-run the load test (target
+   > 5 req/s) and re-run E2 on GPU to decide whether reranking (+0.052 P@5) becomes affordable.
+6. **Complete the LLM evaluation** on one model across all 100 + 60 cases on a paid tier (free tiers capped it at 52).
+7. **Real data:** re-run every evaluation on real (anonymised) tickets; the synthetic set fixes relevance labels but
+   not linguistic variety.
+8. **Optional experiments not run:** E4 embedding models (e.g. all-mpnet-base-v2), E6 LLM temperature, E7 context
+   length, E8 caching.
+
