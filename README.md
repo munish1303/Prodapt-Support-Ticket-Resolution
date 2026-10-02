@@ -37,8 +37,10 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 | Understanding (500 complaints) | intent acc 0.724 · products F1 0.716 · severity acc 0.784 · sentiment acc 0.790 |
 | New ticket class, no retraining | 0% → **85%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
 | LLM drafts (Groq `qwen3.8-27b`, 46 cases) | groundedness 0.949 · RESOLVE drafts recover 82% of reference steps, ESCALATE 20% · confidence AUROC 0.82 |
+| Unseen issue type (60 complaints) | confident wrong answers: 48% with extractive drafts → **22% with an LLM** that declines when sources don't fit |
 | Latency / load (1 worker, laptop CPU) | 1.0 s p50 without LLM, 5.3 s with LLM · ~1 req/s per worker, 0% errors at concurrency 8 |
 | Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
+| Deployment | `docker compose up --build` verified end to end on the dev machine (image 3.7 GB, ~41 s cold start, offline model loading) |
 
 ## Quick start (Docker)
 
@@ -63,6 +65,7 @@ cited, with no LLM involved. The response's `resolution.generator` field says wh
 
 > **Windows note:** Docker Desktop stores images on C: by default. The API image is 3.7 GB (CPU torch + baked models).
 > If C: is short on space, set Docker Desktop → Settings → Resources → Advanced → *Disk image location* to another drive.
+> On an 8 GB machine, cap the Docker/WSL VM so Windows keeps headroom: `%USERPROFILE%\.wslconfig` with `[wsl2]` / `memory=3GB` (Postgres + API fit comfortably).
 
 ## Local development (without Docker for the API)
 

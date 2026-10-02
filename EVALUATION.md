@@ -173,7 +173,7 @@ as expected for an uncalibrated heuristic.
 similar enough to mobile-connectivity tickets (cosine ≈ 0.7) to pass the relevance gate, and the extractive
 generator has no notion of "these sources don't answer this question". Groundedness verifies *draft ↔ sources*,
 not *sources ↔ complaint*. Mitigations: the LLM generator is instructed to return no steps when sources don't
-address the complaint (measured in §4.2); a complaint↔source relevance verifier (e.g. the cross-encoder from E2
+address the complaint (measured in §4.2: wrong RESOLVEs fall from 48% to 22%); a complaint↔source relevance verifier (e.g. the cross-encoder from E2
 applied to the 3–5 cited sources only) is the natural next safeguard; drift monitoring watches the
 nearest-neighbour similarity of incoming traffic.
 
@@ -235,9 +235,23 @@ Gemini on its own 19: decisions 11 / 4 / 4 (RESOLVE / REVIEW / ESCALATE), confid
 Two LLMs from different families agree closely, which supports the conclusions above. n = 19 is a consistency check,
 not a precise estimate.
 
-**Pending:** remaining 54 cases and the 60 novel-class cases (the "grounded but wrong" test for the LLM), resumable
-with `python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`
-once the daily quota refills.
+**Novel-class complaints with an LLM generator: the "grounded but wrong" test.**
+`experiments/results/generation_llm_gptoss20b_novel.json`: the same 60 roaming complaints as §4.1 (a class absent
+from the corpus), generator Groq `openai/gpt-oss-20b` (low reasoning effort), run in the API container. A different
+model from the Qwen/Gemini runs: their daily quotas were exhausted, and gpt-oss-20b has its own.
+
+| Novel-class complaints (n = 60) | RESOLVE | REVIEW | ESCALATE | Drafts declined (no steps) |
+|---|---:|---:|---:|---:|
+| Extractive generator (§4.1) | **29 (48%)** | 30 | 1 | n/a |
+| LLM generator (gpt-oss-20b) | **13 (22%)** | 17 | 30 | **26 (43%)** |
+
+The prompt rule *"if the sources do not address the complaint, return an empty list"* does real work: the LLM
+declined 26 of 60, which the pipeline turns into ESCALATE ("insufficient evidence"). Confident wrong answers on an
+unseen issue type fall by more than half (48% → 22%). It does not eliminate them: 13 drafts were still RESOLVEd,
+so the traffic-level intent-mix drift alert (E4′) remains necessary as the second line of defence.
+
+**Remaining gap:** Qwen covers 46 of the 100 generation cases (free-tier daily token cap); resumable with
+`python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`.
 
 ## 5. Groundedness validation (L1)
 
@@ -321,7 +335,9 @@ decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on
   intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
 * Intent macro-F1 (0.723) is below the plan's provisional 0.75 target; the LLM classifier
   (`INTENT_CLASSIFIER=llm`) has not been evaluated.
-* LLM generation evaluated on 46 of 100 cases, and not yet on the novel-class set (free-tier daily token cap).
+* LLM generation evaluated on 46 of 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
+  gpt-oss-20b: free-tier daily caps (200k tokens/day on Groq, 20 requests/day on Gemini) prevented one model from
+  covering everything.
 * E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
 * One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
 * Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.82 LLM for predicting a good draft); the
