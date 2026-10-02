@@ -24,6 +24,22 @@ and gets back:
 | [docs/api.md](docs/api.md) | endpoint reference with examples (interactive docs at `/docs`) |
 | [data/DATASET_STATISTICS.md](data/DATASET_STATISTICS.md) | actual dataset sizes, provenance, splits |
 
+## Results at a glance
+
+All measured on held-out data (synthetic telecom tickets; eval phrasings never appear in the corpus). Details and
+caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
+
+| What | Result |
+|---|---|
+| Finding a highly relevant past ticket in the top 5 | keyword search (status quo) **40.5%** → hybrid retrieval **76.0%** |
+| Hybrid vs semantic-only retrieval | MRR +0.057 (p = 0.0005); reranking adds +0.052 P@5 but +2.7 s on CPU, so kept off (E2) |
+| Groundedness check, F1 at catching unsupported/contradicted steps | **0.918** multi-method vs 0.694 similarity-only (E3) |
+| Understanding (500 complaints) | intent acc 0.724 · products F1 0.716 · severity acc 0.784 · sentiment acc 0.790 |
+| New ticket class, no retraining | 0% → **85%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
+| LLM drafts (Groq `qwen3.8-27b`, 46 cases) | groundedness 0.949 · RESOLVE drafts recover 82% of reference steps, ESCALATE 20% · confidence AUROC 0.82 |
+| Latency / load (1 worker, laptop CPU) | 1.0 s p50 without LLM, 5.3 s with LLM · ~1 req/s per worker, 0% errors at concurrency 8 |
+| Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
+
 ## Quick start (Docker)
 
 ```bash

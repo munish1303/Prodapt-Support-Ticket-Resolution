@@ -125,6 +125,10 @@ class Settings(BaseSettings):
     DRIFT_WINDOW_HOURS: int = 24
     DRIFT_UNKNOWN_RATE_ALERT: float = 0.15
     DRIFT_LOW_SIMILARITY_ALERT: float = 0.45
+    # Intent-mix shift alert: TVD > coef / sqrt(min window size) ~ 99th percentile of sampling noise
+    # (measured: p99 = 0.467 / 0.317 / 0.217 / 0.138 at n = 30 / 60 / 120 / 240). Recalibrate on real traffic.
+    DRIFT_TVD_ALERT_COEF: float = 2.5
+    DRIFT_MIN_WINDOW: int = 30
 
     # --- Paths -----------------------------------------------------------
     TAXONOMY_DIR: Path = PROJECT_ROOT / "data" / "taxonomies"

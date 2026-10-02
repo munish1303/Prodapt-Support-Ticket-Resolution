@@ -90,17 +90,36 @@ async def get_drift_report(session, window_hours: int | None = None) -> dict:
         }
 
     recent, baseline = summarise(windows["recent"]), summarise(windows["baseline"])
+    tvd = intent_tvd(recent, baseline)
+    return {
+        "window_hours": h,
+        "recent": recent,
+        "baseline": baseline,
+        "intent_tvd": tvd,
+        "intent_tvd_alert_threshold": tvd_threshold(recent, baseline),
+        "alerts": drift_alerts(recent, baseline, tvd),
+    }
+
+
+def intent_tvd(recent: dict, baseline: dict) -> float | None:
+    """Total variation distance between the recent and baseline intent distributions."""
+    if not (recent.get("n") and baseline.get("n")):
+        return None
+    r, b = recent["intent_distribution"], baseline["intent_distribution"]
+    return round(0.5 * sum(abs(r.get(k, 0) - b.get(k, 0)) for k in set(r) | set(b)), 4)
+
+
+def tvd_threshold(recent: dict, baseline: dict) -> float | None:
+    """Sampling noise in TVD shrinks like 1/sqrt(n); coef/sqrt(min window) approximates its 99th percentile
+    (coefficient measured on held-out traffic, see EVALUATION.md section 6). None if a window is too small."""
+    n = min(recent.get("n", 0), baseline.get("n", 0))
+    if n < settings.DRIFT_MIN_WINDOW:
+        return None
+    return round(settings.DRIFT_TVD_ALERT_COEF / n**0.5, 4)
+
+
+def drift_alerts(recent: dict, baseline: dict, tvd: float | None) -> list[str]:
     alerts = []
-    tvd = None
-    if recent.get("n") and baseline.get("n"):
-        keys = set(recent["intent_distribution"]) | set(baseline["intent_distribution"])
-        tvd = round(
-            0.5
-            * sum(
-                abs(recent["intent_distribution"].get(k, 0) - baseline["intent_distribution"].get(k, 0)) for k in keys
-            ),
-            4,
-        )
     if recent.get("n"):
         if recent["unknown_intent_rate"] > settings.DRIFT_UNKNOWN_RATE_ALERT:
             alerts.append(
@@ -113,7 +132,13 @@ async def get_drift_report(session, window_hours: int | None = None) -> dict:
                 f"mean nearest-neighbour similarity {sim} < {settings.DRIFT_LOW_SIMILARITY_ALERT}: "
                 "incoming complaints are unlike historical tickets"
             )
-    return {"window_hours": h, "recent": recent, "baseline": baseline, "intent_tvd": tvd, "alerts": alerts}
+    threshold = tvd_threshold(recent, baseline)
+    if tvd is not None and threshold is not None and tvd > threshold:
+        alerts.append(
+            f"intent mix shifted: TVD {tvd} > {threshold} (noise threshold for these window sizes); "
+            "a new issue type may be landing in existing classes - review recent requests"
+        )
+    return alerts
 
 
 async def record_feedback(session, request_id: str, rating: int, comment: str | None) -> bool:

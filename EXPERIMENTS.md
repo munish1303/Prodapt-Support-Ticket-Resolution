@@ -1,15 +1,15 @@
 # Experiments
 
 Every number below is copied from a results file in `experiments/results/`, produced by the script named in
-the section. Sections marked **PENDING** have runnable code but have not been executed yet (they need the
-PostgreSQL database); no results are reported for them.
+the section. Where an experiment was iterated (E1, E3, E4′), the earlier run is kept and the reason for the change
+is documented.
 
 | # | Question | Status | Decision |
 |---|---|---|---|
 | E1 | Does hybrid retrieval beat semantic-only, lexical-only and keyword search? | **Done** | Hybrid RRF 0.8:0.2 (weight chosen on dev) |
 | E2 | Does cross-encoder reranking pay for its latency? | **Done** | +0.052 P@5 but +2.7 s on CPU, so kept **off** |
 | E3 | Does multi-method groundedness beat single signals? | **Done** (v2) | Multi-method v2: sentence premises + quote rule; F1 0.918 |
-| E4′ | Can the system absorb a new ticket class without retraining? | Offline part done; API/DB part PENDING | see §4 |
+| E4′ | Can the system absorb a new ticket class without retraining? | **Done** | Yes (85% after ingestion); added intent-mix drift alert |
 
 ---
 
@@ -210,17 +210,61 @@ motivated by a failure seen in the generation eval, and its thresholds were then
 
 ---
 
-## E4′: Evolving ticket classes
+## E4′: Evolving ticket classes ✅
 
-**Scripts:** offline part in `evaluation/understanding_eval.py` (`novel_intent_*` keys of
-`understanding_knn_memory.json`); end-to-end part in `python experiments/evolving_classes.py`
-→ `experiments/results/evolving_classes.json` (PENDING, needs DB).
+**Script:** `python experiments/evolving_classes.py --extractive` → `experiments/results/evolving_classes.json`.
+Runs against the live database through the same services the API uses (`/ingestion`, `/taxonomy/intents`,
+`/monitoring/drift` code paths). Extractive generation, so no LLM quota is used and the run is deterministic.
 
-**Question.** A new issue type (`roaming_issue`, 3 scenarios, 221 tickets, 3 KB articles) appears after launch.
-(a) Before it exists, does the system notice? (b) After registering the intent and ingesting its tickets through
-the normal ingestion path, with no retraining, does it handle it?
+**Question.** A new issue type (`roaming_issue`: 3 scenarios, 221 tickets, 3 KB articles) starts arriving after
+launch. (a) Does the system notice before anyone tells it? (b) After the class is registered and its tickets are
+ingested through the normal ingestion path, with no retraining or redeploy, does the system handle it?
 
-**Results.** See EVALUATION.md §2.3 for the offline numbers (in-memory index). The API/DB run is PENDING.
+**Procedure.** 60 in-distribution complaints are sent and back-dated to form the drift baseline; 60 held-out roaming
+complaints are sent (phase A) and the drift report is read; the intent is registered and the wave-2 tickets and KB
+articles are ingested; the same 60 complaints are sent again (phase C). Afterwards wave-2 rows are removed so the
+other evaluations stay reproducible.
+
+**Results.**
+
+| | Phase A: class unknown | Phase C: after ingestion |
+|---|---:|---:|
+| Classified `roaming_issue` | 0% | **85.0%** |
+| Flagged `unknown_intent` | 3.3% | 0% |
+| Roaming KB article among sources | 0% | **86.7%** |
+| Decisions RESOLVE / REVIEW / ESCALATE | 29 / 30 / 1 | 39 / 21 / 0 |
+| Mean nearest-neighbour similarity | 0.632 | 0.710 |
+
+Ingestion: 221 tickets + 3 KB articles inserted, 445 embeddings, 0 errors, `new_categories = ["roaming_issue"]`.
+
+**Drift detection (phase A vs baseline).**
+
+| Signal | Baseline | Recent | Alert? |
+|---|---:|---:|---|
+| Unknown-intent rate | 0.017 | 0.033 | no (threshold 0.15) |
+| Mean nearest-neighbour similarity | 0.644 | 0.632 | no (threshold 0.45) |
+| **Intent-mix TVD** | | **0.517** | **yes** (threshold 2.5/√60 = 0.323) |
+
+The first run of this experiment raised **no alert**: the monitor computed TVD but only alerted on unknown rate
+and similarity, which barely move because roaming complaints resemble mobile tickets. The new class didn't look
+*unfamiliar*; it showed up as an unusual **mix** of familiar classes (connectivity 15% → 42%, outage 13% → 25%,
+billing 17% → 28%). A size-aware TVD alert was added. Its threshold approximates the 99th percentile of TVD between two
+normal windows (measured p99: 0.467 / 0.317 / 0.217 / 0.138 for windows of 30 / 60 / 120 / 240), and the re-run
+fires: *"intent mix shifted: TVD 0.517 > 0.323 … a new issue type may be landing in existing classes"*.
+
+**Findings.**
+* **Adaptation works without retraining:** register the intent, ingest tickets, and 85% of the new class is recognised
+  with its KB article retrieved 87% of the time.
+* **Before ingestion the system is overconfident:** 48% of novel complaints are RESOLVEd with drafts grounded in the
+  wrong tickets (see EVALUATION.md §4.1, "grounded but wrong"). Per-request signals can't see this; the
+  traffic-level intent-mix alert can, after about 60 requests. That is the operational backstop: the alert triggers a
+  review, the reviewer registers the class, and ingestion fixes it.
+* Cost of the new class: in-distribution intent accuracy drops 0.724 → 0.682 (offline eval), because roaming tickets
+  attract some mobile complaints of other classes.
+
+**Limitations.** One synthetic new class; the TVD coefficient was calibrated on this dataset's balanced class mix.
+Real traffic has seasonal mix shifts, so the coefficient should be recalibrated from historical windows and
+the alert treated as a review trigger, not an automatic action.
 
 ---
 

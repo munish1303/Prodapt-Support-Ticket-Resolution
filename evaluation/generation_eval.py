@@ -36,6 +36,7 @@ sys.path.insert(0, str(ROOT))
 from sklearn.metrics import roc_auc_score  # noqa: E402
 
 from app.api.v1.dependencies import build_container  # noqa: E402
+from app.config import settings  # noqa: E402
 from app.core.database import dispose_engine  # noqa: E402
 from app.core.llm import LLMUnavailable, OpenAICompatibleProvider  # noqa: E402
 from app.core.prompts import JUDGE_SYSTEM_PROMPT, build_judge_user_prompt  # noqa: E402
@@ -84,6 +85,11 @@ async def main() -> None:
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between requests (free-tier rate limits)")
     parser.add_argument("--tag", default="")
     parser.add_argument("--fresh", action="store_true", help="ignore an existing checkpoint and start over")
+    parser.add_argument(
+        "--summarize-only",
+        action="store_true",
+        help="no new pipeline/LLM calls: summarise the cases already in the checkpoint (e.g. after a quota cap)",
+    )
     args = parser.parse_args()
     name = f"generation_{args.generator}{('_' + args.tag) if args.tag else ''}"
 
@@ -92,7 +98,8 @@ async def main() -> None:
     ckpt = RESULTS_DIR / f"{name}.checkpoint.jsonl"
     done: dict[str, dict] = {}
     if ckpt.exists() and not args.fresh:
-        done = {r["id"]: r for r in read_jsonl(ckpt)}
+        # Rows that failed with a generation error (rate limit, outage) are retried, not treated as done.
+        done = {r["id"]: r for r in read_jsonl(ckpt) if not r.get("generation_error")}
         print(f"resuming: {len(done)} cases already in {ckpt.name}")
     elif ckpt.exists():
         ckpt.unlink()
@@ -103,17 +110,22 @@ async def main() -> None:
             f.write(json.dumps(row, default=str) + "\n")
         done[row["id"]] = row
 
-    container = await build_container()
-    pipeline = container.pipeline
-    if args.generator == "extractive":
+    container = pipeline = None
+    if args.summarize_only:
+        pass  # no models, no DB, no LLM: summarise checkpointed rows only
+    elif args.generator == "extractive":
+        container = await build_container()
+        pipeline = container.pipeline
         pipeline.generation = GenerationService(None, ExtractiveGenerator())
     else:
+        container = await build_container()
+        pipeline = container.pipeline
         if container.llm is None or not container.llm.available:
             raise SystemExit("LLM not configured: set LLM_API_KEY (and LLM_BASE_URL / LLM_MODEL) in .env")
         pipeline.generation = GenerationService(LLMGenerator(container.llm), ExtractiveGenerator(), fallback=False)
 
     judge_llm = None
-    if args.judge:
+    if args.judge and not args.summarize_only:
         judge_llm = (
             OpenAICompatibleProvider(model=args.judge_model, reasoning_effort="low")
             if args.judge_model
@@ -124,7 +136,7 @@ async def main() -> None:
 
     cases = load_eval("generation_eval")[: args.limit]
     for case in cases:
-        if case["id"] in done:
+        if case["id"] in done or args.summarize_only:
             continue
         r = await pipeline.process(case["complaint"], record=False)
         recall, precision = step_match(
@@ -157,7 +169,9 @@ async def main() -> None:
         checkpoint(row)
         if args.delay:
             await asyncio.sleep(args.delay)
-    rows = [done[c["id"]] for c in cases]
+    rows = [done[c["id"]] for c in cases if c["id"] in done]
+    if not rows:
+        raise SystemExit("no completed cases to summarise")
 
     good = [r["reference_step_recall"] >= 0.5 for r in rows]
     conf = [r["confidence"] for r in rows]
@@ -173,7 +187,7 @@ async def main() -> None:
 
     novel = load_eval("novel_intent_eval")[: (args.limit or 60)]
     for case in novel:
-        if case["id"] in done:
+        if case["id"] in done or args.summarize_only:
             continue
         r = await pipeline.process(case["complaint"], record=False)
         checkpoint(
@@ -191,14 +205,16 @@ async def main() -> None:
         )
         if args.delay:
             await asyncio.sleep(args.delay)
-    novel_rows = [done[c["id"]] for c in novel]
+    novel_rows = [done[c["id"]] for c in novel if c["id"] in done]
     novel_decisions = Counter(r["decision"] for r in novel_rows)
 
     lat = [r["latency_ms"] for r in rows]
     stage_keys = rows[0]["stage_ms"].keys() if rows else []
     summary = {
-        "generator": args.generator if args.generator == "extractive" else getattr(container.llm, "model", "llm"),
+        "generator": args.generator if args.generator == "extractive" else settings.LLM_MODEL,
         "n": len(rows),
+        "n_planned": len(cases),
+        "n_novel": len(novel_rows),
         "match_threshold": args.match_threshold,
         "metrics": {
             k: round(mean([r[k] for r in rows]), 4)
@@ -236,11 +252,12 @@ async def main() -> None:
             for k in ("relevance", "completeness", "specificity", "correctness")
         }
         summary["llm_judge_n"] = len(judged)
-        summary["llm_judge_model"] = getattr(judge_llm, "model", None)
+        summary["llm_judge_model"] = args.judge_model or settings.LLM_MODEL
     save_result(name, {"summary": summary, "rows": rows, "novel_rows": novel_rows})
 
     print(json.dumps(summary, indent=2))
-    await dispose_engine()
+    if container is not None:
+        await dispose_engine()
 
 
 if __name__ == "__main__":

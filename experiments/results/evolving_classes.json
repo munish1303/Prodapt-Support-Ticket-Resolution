@@ -1,0 +1,98 @@
+{
+  "n_cases": 60,
+  "phase_a_before": {
+    "intent_distribution": {
+      "outage_report": 15,
+      "billing_dispute": 17,
+      "connectivity_issue": 25,
+      "unknown_intent": 2,
+      "speed_issue": 1
+    },
+    "target_intent_accuracy": 0.0,
+    "unknown_intent_rate": 0.0333,
+    "decisions": {
+      "REVIEW": 30,
+      "ESCALATE": 1,
+      "RESOLVE": 29
+    },
+    "resolve_rate": 0.4833,
+    "mean_confidence": 0.8352,
+    "mean_nearest_similarity": 0.6315,
+    "mean_max_relevance": 0.5927,
+    "target_kb_retrieved_rate": 0.0,
+    "mean_groundedness": 1.0
+  },
+  "drift_report_after_phase_a": {
+    "window_hours": 24,
+    "recent": {
+      "n": 60,
+      "unknown_intent_rate": 0.0333,
+      "intent_distribution": {
+        "billing_dispute": 0.2833,
+        "connectivity_issue": 0.4167,
+        "outage_report": 0.25,
+        "speed_issue": 0.0167,
+        "unknown_intent": 0.0333
+      },
+      "mean_nearest_similarity": 0.6315,
+      "escalation_rate": 0.0167
+    },
+    "baseline": {
+      "n": 60,
+      "unknown_intent_rate": 0.0167,
+      "intent_distribution": {
+        "account_management": 0.0667,
+        "billing_dispute": 0.1667,
+        "connectivity_issue": 0.15,
+        "hardware_problem": 0.1,
+        "outage_report": 0.1333,
+        "plan_change": 0.05,
+        "service_activation": 0.1,
+        "speed_issue": 0.05,
+        "technical_support": 0.1667,
+        "unknown_intent": 0.0167
+      },
+      "mean_nearest_similarity": 0.6435,
+      "escalation_rate": 0.0
+    },
+    "intent_tvd": 0.5167,
+    "intent_tvd_alert_threshold": 0.3227,
+    "alerts": [
+      "intent mix shifted: TVD 0.5167 > 0.3227 (noise threshold for these window sizes); a new issue type may be landing in existing classes - review recent requests"
+    ]
+  },
+  "ingestion": {
+    "tickets_inserted": 221,
+    "tickets_updated": 0,
+    "tickets_unchanged": 0,
+    "kb_inserted": 3,
+    "kb_updated": 0,
+    "kb_unchanged": 0,
+    "embeddings_generated": 445,
+    "new_categories": [
+      "roaming_issue"
+    ],
+    "errors": []
+  },
+  "phase_c_after": {
+    "intent_distribution": {
+      "outage_report": 5,
+      "roaming_issue": 51,
+      "connectivity_issue": 4
+    },
+    "target_intent_accuracy": 0.85,
+    "unknown_intent_rate": 0.0,
+    "decisions": {
+      "REVIEW": 21,
+      "RESOLVE": 39
+    },
+    "resolve_rate": 0.65,
+    "mean_confidence": 0.8864,
+    "mean_nearest_similarity": 0.7103,
+    "mean_max_relevance": 0.6642,
+    "target_kb_retrieved_rate": 0.8667,
+    "mean_groundedness": 1.0
+  },
+  "generator": "extractive",
+  "cleanup": "wave-2 rows, roaming intent and experiment request log removed"
+}

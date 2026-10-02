@@ -1,8 +1,8 @@
 # Evaluation
 
 All numbers are copied from files in `experiments/results/` (and `data/evaluation/leakage_report.json`)
-produced by the scripts named in each section. Sections marked **PENDING** have runnable code but have not been
-executed yet (they need the PostgreSQL database and, for LLM rows, an API key). Nothing in them is estimated.
+produced by the scripts named in each section. Where a run is incomplete (the LLM evaluation, capped by the
+free-tier daily token quota) the coverage is stated explicitly. Nothing is estimated.
 
 ## 1. Data and methodology
 
@@ -39,7 +39,8 @@ threshold, sentiment polarity thresholds, severity-bump ablation, groundedness t
 
 **Script:** `python evaluation/understanding_eval.py` → `experiments/results/understanding_knn_memory.json`.
 Run with an exact in-memory k-NN over the same corpus (no DB). The production path uses the same code with
-pgvector ivfflat (`--index pg`, PENDING); ANN search may differ slightly from exact search.
+pgvector ivfflat (`--index pg`, not separately re-run). The pipeline-level intent accuracy measured through
+pgvector in §4.1 (0.69 on the 100 generation cases) is in line with the exact-search figure.
 
 Configuration: k-NN intent (k = 15, weight = sim³), min vote share 0.35, min nearest similarity 0.40;
 product share threshold 0.6; sentiment polarity thresholds −0.85 / 0.0; severity sentiment bump disabled.
@@ -120,8 +121,20 @@ class's tickets should be reviewed before ingestion, and the per-class F1 rechec
 Metrics: nDCG@10 (graded), MRR@20, P@5, Hit@5, capped Recall@10 (`|rel ∩ top10| / min(10, |rel|)`, because many
 queries have dozens of equally relevant tickets, which makes plain Recall@10 uninformative), KB-Recall@10.
 
-**Results:** PENDING: [TO BE MEASURED]. Keyword baseline, lexical (AND/OR), semantic and hybrid are compared on
-the same 200 queries.
+**Results** (200 held-out queries; full table, CIs and significance tests in EXPERIMENTS.md E1):
+
+| Configuration | nDCG@10 | MRR | P@5 | Hit@5 |
+|---|---:|---:|---:|---:|
+| keyword baseline (today's practice) | 0.223 | 0.270 | 0.210 | 0.405 |
+| lexical, `plainto_tsquery` (AND) | 0.000 | 0.000 | 0.000 | 0.000 |
+| lexical, OR-of-terms FTS | 0.274 | 0.452 | 0.270 | 0.565 |
+| semantic (pgvector) | 0.557 | 0.600 | 0.545 | 0.715 |
+| **hybrid RRF 0.8:0.2 (weight chosen on dev)** | **0.572** | **0.657** | **0.561** | **0.760** |
+| hybrid + cross-encoder rerank (E2; disabled: +2.7 s) | 0.625 | 0.723 | 0.613 | 0.800 |
+
+**Baseline comparison (L3):** keyword search finds a highly relevant ticket in the top 5 for 40.5% of complaints;
+the deployed hybrid retriever does for 76.0% (+0.355, p < 0.001). Hybrid's gain over semantic-only is significant
+but modest and concentrated at rank 1 (MRR +0.057, p = 0.0005).
 
 ## 4. Generation and pipeline (L2)
 
@@ -169,7 +182,47 @@ for "contradictions" on verbatim-quoted steps, which exposed the NLI premise iss
 
 ### 4.2 LLM generator
 
-PENDING: [TO BE MEASURED], run in progress (generator `qwen/qwen3.8-27b`, judge `openai/gpt-oss-120b`, Groq free tier).
+`experiments/results/generation_llm.json`. Generator `qwen/qwen3.8-27b`, judge `openai/gpt-oss-120b`
+(different model family, to reduce self-preference bias), Groq free tier.
+
+**Coverage: 46 of the 100 planned cases; the 60 novel-class cases have not run yet.** The run hit Groq's free-tier
+cap of **200,000 tokens per day per model** (each draft costs about 1.8–2k tokens, so roughly 100 drafts per day, and
+the budget was partly spent on earlier aborted runs). The 46 cases are the first 52 of the fixed, pre-shuffled
+eval order minus 6 that were rate-limited (not a cherry-picked subset). Rate-limited cases were excluded and will be retried, not scored as failures.
+
+| Metric (n = 46) | LLM | Extractive (same 46) | Δ, paired bootstrap |
+|---|---:|---:|---|
+| Reference-step recall | 0.728 [95% CI 0.618–0.839] | 0.706 | +0.022 (p = 0.31, n.s.) |
+| **Step precision** | **0.591** | 0.522 | **+0.069 (p = 0.027)** |
+| Groundedness | 0.949 | 1.000 | −0.051 (extractive copies verbatim) |
+| Citation accuracy / coverage | 0.957 / 0.957 | 1.000 / 1.000 | |
+| Steps per draft | 4.61 | 5.00 | |
+| Drafts with a contradicted step | 2 | 0 | |
+| Empty drafts (LLM declined: sources don't address the complaint) | 2 | n/a | |
+| Decisions RESOLVE / REVIEW / ESCALATE | 34 / 7 / 5 | 37 / 8 / 1 | |
+| **Confidence AUROC (predicting a good draft)** | **0.819** | 0.751 (on all 100) | |
+| LLM-judge 1–5: relevance / completeness / specificity / correctness | 4.07 / 3.98 / 3.85 / 4.11 | n/a | directional only |
+| Latency p50 / p95 | 5.3 s / 11.9 s | 1.0 s / 1.5 s | |
+| Mean stage latency: generate / validate | 6.8 s / 2.9 s | 0 / 0.8 s | |
+
+Quality by decision (LLM): **RESOLVE 0.816** reference-step recall (n = 34), **REVIEW 0.679** (n = 7),
+**ESCALATE 0.200** (n = 5). The decision layer separates good drafts from bad ones much more sharply with the LLM
+than with extractive drafts, because the LLM declines or writes thin drafts when the evidence is poor, and
+validation and confidence pick that up.
+
+**Interpretation.**
+* On this dataset the LLM's value is **judgment and focus, not recall**: more precise drafts (fewer irrelevant
+  steps), occasional refusals when sources don't fit, and better-separated confidence. Recall is statistically tied
+  with the extractive generator. Extractive is a deliberately strong baseline here because historical resolutions are
+  templated; on messier real tickets the abstractive advantage should grow, but that is untested.
+* Paraphrased LLM steps cost validation time (2.9 s vs 0.8 s): quoted steps skip NLI, paraphrases don't.
+* The latency max (186 s) is a rate-limit retry wait, not processing. p95 includes some retry waits; on a paid tier
+  generation latency would be roughly the model's raw latency (≈1–3 s measured in isolation).
+* LLM-judge scores are directional only (single judge, no human calibration).
+
+**Pending:** remaining 54 cases and the 60 novel-class cases (the "grounded but wrong" test for the LLM), resumable
+with `python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`
+once the daily quota refills.
 
 ## 5. Groundedness validation (L1)
 
@@ -180,25 +233,78 @@ set, with 40% false alarms on verbatim steps; the generation eval exposed this a
 
 ## 6. System health (L4)
 
-**Script:** `python evaluation/system_eval.py --url http://localhost:8000` (concurrency 1/4/8): client/server
-latency p50/p95/p99, throughput, error rate, and the generator actually used (LLM vs fallback).
-Runtime health is exposed continuously at `/api/v1/health`, `/api/v1/metrics` and `/api/v1/monitoring/drift`.
+### 6.1 Load test
 
-**Results:** PENDING: [TO BE MEASURED].
+**Script:** `python evaluation/system_eval.py --url http://127.0.0.1:8000 --requests 30 --concurrency 1 4 8`
+→ `experiments/results/system_load_extractive.json`. One uvicorn worker on a 4-core laptop CPU (no GPU), API run
+with `LLM_PROVIDER=extractive` (the Groq daily quota was exhausted; LLM generation latency is reported separately
+in §4.2). 30 distinct held-out complaints per level.
+
+| Concurrency | Throughput | Client latency p50 / p95 / p99 | Server latency p50 / p95 | Error rate |
+|---:|---:|---|---|---:|
+| 1 | 0.96 req/s | 1,023 / 1,232 / 1,282 ms | 1,004 / 1,212 ms | 0% |
+| 4 | 0.83 req/s | 4,614 / 5,677 / 5,752 ms | 4,573 / 5,627 ms | 0% |
+| 8 | 0.84 req/s | 9,253 / 10,937 / 11,103 ms | 9,188 / 10,887 ms | 0% |
+
+**Reading.** Zero errors under load, but throughput is flat at about 1 request/s and latency grows linearly with
+concurrency. One worker serialises CPU-bound inference (embedding, sentiment, NLI), so extra concurrent requests
+queue. Server latency ≈ client latency, so the queue is inside the service, not the network. Scaling path, in
+order: more workers or pods behind a load balancer (each holds about 1.7 GB of models), then a batched inference service
+(GPU) for NLI and embeddings, which also cuts per-request latency. The plan's MVP target (P95 < 15 s) holds up to
+concurrency 8 on this laptop *without* the LLM. With the LLM (§4.2, p95 11.9 s at concurrency 1) the target only
+holds at low concurrency on free-tier rate limits.
+
+### 6.2 Monitoring and drift
+
+Runtime health is exposed at `/api/v1/health`, `/api/v1/metrics` (volume, decision mix, latency percentiles,
+groundedness, fallback rate, feedback) and `/api/v1/monitoring/drift`. The drift monitor was validated end to end
+in E4′ (EXPERIMENTS.md): a new ticket class did **not** trip the unknown-intent or similarity alerts, but did trip
+the intent-mix alert added as a result (TVD 0.517 vs a size-aware noise threshold of 0.323 for 60-request windows).
+
+### 6.3 Worked failure case: the problem statement's own example
+
+> *"My broadband drops every evening around 8 and I've already restarted the router twice, I work from home and this
+> is costing me"*
+
+Understanding is reasonable (products `broadband, router`, severity `high` from the work-from-home cue, sentiment
+negative), but intent is `outage_report` and the extractive draft lists outage/maintenance checks, RESOLVEd at
+confidence 0.887. The closest scenario is evening Wi-Fi drops (channel interference) or peak-hour congestion; its
+KB article was retrieved, but only as source #7.
+
+Root cause, from per-ranker inspection:
+* **Lexical search ranks it well** (5 of its top 6 are evening-Wi-Fi or peak-congestion tickets, matching "every evening around 8").
+* **Semantic search ranks area-outage tickets first**, and with semantic weight 0.8 it dominates the fusion. Most of the
+  complaint is boilerplate shared across all scenarios ("restarted the router twice", "I work from home and this is
+  costing me"). A single embedding of the whole complaint is diluted by it, and "broadband drops" embeds closer to
+  "lost internet" than to "wifi keeps dropping".
+* The system cannot see its own error: the wrong tickets look relevant (cosine 0.67) and the draft is perfectly grounded
+  in them, which is the "grounded but wrong" mode of §4.1.
+
+Not tuned away (fitting the system to its demo example would be overfitting). What the evidence suggests instead:
+(1) **ranker disagreement as an uncertainty signal**: here the semantic and lexical top-10s barely overlap, a cheap
+runtime clue that should lower confidence; (2) sentence-level / late-interaction retrieval so boilerplate cannot
+outvote the symptom sentence; (3) the LLM generator, which sees the evening-Wi-Fi KB article in its context and can
+decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on the cited sources.
 
 ## 7. Engineering checks
 
 | Check | Result |
 |---|---|
-| Unit + API tests (`pytest`) | 57 passed, 1 skipped (DB tests skip without a database) |
-| Line coverage of `app/` | 72% (DB-only modules `retrieval`, `ingestion`, `monitoring` are covered by `tests/integration/test_db.py` once the DB is up) |
+| Unit + API + DB integration tests (`pytest`) | 67 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Line coverage of `app/` | 83% |
 | `black --check`, `flake8` | clean |
 
 ## 8. Limitations
 
 * Synthetic data; absolute values are optimistic or pessimistic in unknown ways relative to real tickets (§1).
 * Labels by construction: no inter-annotator agreement and no human verification.
+* **"Grounded but wrong"** (§4.1, §6.3): validation checks draft ↔ sources, not sources ↔ complaint. When retrieval
+  picks a semantically close but wrong scenario, the system can RESOLVE confidently. Mitigated at traffic level by the
+  intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
 * Intent macro-F1 (0.723) is below the plan's provisional 0.75 target; the LLM classifier
-  (`INTENT_CLASSIFIER=llm`) has not been evaluated yet.
-* E3 test half is small (80 triples).
-* Heuristic confidence is uncalibrated; the feedback endpoint collects data for that.
+  (`INTENT_CLASSIFIER=llm`) has not been evaluated.
+* LLM generation evaluated on 46 of 100 cases, and not yet on the novel-class set (free-tier daily token cap).
+* E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
+* One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
+* Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.82 LLM for predicting a good draft); the
+  feedback endpoint collects the data needed to calibrate it.
