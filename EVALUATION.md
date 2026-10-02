@@ -220,6 +220,21 @@ validation and confidence pick that up.
   generation latency would be roughly the model's raw latency (≈1–3 s measured in isolation).
 * LLM-judge scores are directional only (single judge, no human calibration).
 
+**Second LLM family (cross-check): Gemini.** `experiments/results/generation_llm_gemini.json`, generator
+`gemini-3-flash-preview` (preview model), same judge, run *inside the API container*. Gemini's free tier allows
+only **20 requests/day per model**, so it covers 19 cases. On the 19 complaints all three generators share:
+
+| (n = 19) | Gemini 3 Flash | Qwen 3.8 27B | Extractive |
+|---|---:|---:|---:|
+| Reference-step recall | 0.781 | 0.763 | 0.657 |
+| Step precision | 0.573 | 0.550 | 0.474 |
+| Groundedness | 0.944 | 0.947 | 1.000 |
+| Judge relevance / completeness / specificity / correctness | 4.05 / 4.00 / 4.21 / 4.00 | 4.00 / 3.89 / 4.00 / 3.95 | n/a |
+
+Gemini on its own 19: decisions 11 / 4 / 4 (RESOLVE / REVIEW / ESCALATE), confidence AUROC 0.792, latency p50 7.3 s.
+Two LLMs from different families agree closely, which supports the conclusions above. n = 19 is a consistency check,
+not a precise estimate.
+
 **Pending:** remaining 54 cases and the 60 novel-class cases (the "grounded but wrong" test for the LLM), resumable
 with `python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`
 once the daily quota refills.
@@ -293,6 +308,9 @@ decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on
 | Unit + API + DB integration tests (`pytest`) | 67 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 83% |
 | `black --check`, `flake8` | clean |
+| `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
+| Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |
+| Build robustness | no apt layer (stdlib health check); whole-step retries for pip and model downloads. Both were added after the build failed on this network's DNS/HTTP glitches |
 
 ## 8. Limitations
 

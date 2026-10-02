@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -82,9 +83,17 @@ async def main() -> None:
         default=None,
         help="judge with a different model than the generator (reduces self-preference bias); same endpoint",
     )
+    parser.add_argument(
+        "--judge-base-url",
+        default=None,
+        help="judge on a different OpenAI-compatible endpoint (key from env JUDGE_API_KEY), e.g. Groq while generating on Gemini",
+    )
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between requests (free-tier rate limits)")
     parser.add_argument("--tag", default="")
     parser.add_argument("--fresh", action="store_true", help="ignore an existing checkpoint and start over")
+    parser.add_argument(
+        "--novel-only", action="store_true", help="only run the novel-class (wave-2) complaints, no generation cases"
+    )
     parser.add_argument(
         "--summarize-only",
         action="store_true",
@@ -127,7 +136,12 @@ async def main() -> None:
     judge_llm = None
     if args.judge and not args.summarize_only:
         judge_llm = (
-            OpenAICompatibleProvider(model=args.judge_model, reasoning_effort="low")
+            OpenAICompatibleProvider(
+                api_key=os.environ.get("JUDGE_API_KEY") or None,
+                base_url=args.judge_base_url,
+                model=args.judge_model,
+                reasoning_effort="low",
+            )
             if args.judge_model
             else container.llm
         )
@@ -136,7 +150,7 @@ async def main() -> None:
 
     cases = load_eval("generation_eval")[: args.limit]
     for case in cases:
-        if case["id"] in done or args.summarize_only:
+        if case["id"] in done or args.summarize_only or args.novel_only:
             continue
         r = await pipeline.process(case["complaint"], record=False)
         recall, precision = step_match(
@@ -170,7 +184,7 @@ async def main() -> None:
         if args.delay:
             await asyncio.sleep(args.delay)
     rows = [done[c["id"]] for c in cases if c["id"] in done]
-    if not rows:
+    if not rows and not args.novel_only:
         raise SystemExit("no completed cases to summarise")
 
     good = [r["reference_step_recall"] >= 0.5 for r in rows]

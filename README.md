@@ -61,7 +61,7 @@ Open http://localhost:8000/docs for the interactive API.
 Without an `LLM_API_KEY` the service runs in **extractive mode**: steps are selected from the retrieved sources and
 cited, with no LLM involved. The response's `resolution.generator` field says which generator produced the draft.
 
-> **Windows note:** Docker Desktop stores images on C: by default. The image is ~3 GB (CPU torch + baked models).
+> **Windows note:** Docker Desktop stores images on C: by default. The API image is 3.7 GB (CPU torch + baked models).
 > If C: is short on space, set Docker Desktop → Settings → Resources → Advanced → *Disk image location* to another drive.
 
 ## Local development (without Docker for the API)

@@ -22,6 +22,7 @@ services:
         required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://support:support@db:5432/support
+      HF_HUB_OFFLINE: "1"  # models are baked into the image; never call the HF Hub at startup
     ports:
       - "8000:8000"
     depends_on:
