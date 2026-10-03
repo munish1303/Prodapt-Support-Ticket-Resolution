@@ -1,0 +1,149 @@
+{
+  "method": "see module docstring of scripts/assess_public_datasets.py",
+  "ours": {
+    "what": "synthetic telecom tickets generated from 43 hand-written root-cause scenarios",
+    "rows": 2043,
+    "labels": {
+      "category": {
+        "connectivity_issue": 279,
+        "billing_dispute": 264,
+        "service_activation": 251,
+        "technical_support": 251,
+        "outage_report": 246,
+        "hardware_problem": 239,
+        "speed_issue": 224,
+        "account_management": 168,
+        "plan_change": 121
+      }
+    },
+    "licence": "MIT (this repository)",
+    "rows_measured": 2043,
+    "complaint_median_chars": 179,
+    "distinct_complaints_share": 1.0,
+    "complaint_distinct_3gram": 0.094,
+    "complaints_with_telecom_terms_strict": 0.104,
+    "complaints_with_telecom_terms_broad": 0.512,
+    "answers_filled": 2043,
+    "unique_answers": 1817,
+    "answer_distinct_3gram": 0.04,
+    "answers_with_step_language": 0.85,
+    "answers_asking_for_more_info": 0.0,
+    "answers_with_placeholders": 0.0
+  },
+  "huggingface_tobi_bueck": {
+    "what": "synthetic (AI-generated) IT-helpdesk / online-store support emails with agent answers",
+    "file": "aa_dataset-tickets-multi-lang-5-2-50-version.csv",
+    "rows": 28587,
+    "rows_english": 16338,
+    "columns": [
+      "subject",
+      "body",
+      "answer",
+      "type",
+      "queue",
+      "priority",
+      "language",
+      "version",
+      "tag_1",
+      "tag_2",
+      "tag_3",
+      "tag_4",
+      "tag_5",
+      "tag_6",
+      "tag_7",
+      "tag_8"
+    ],
+    "labels": {
+      "language": {
+        "en": 16338,
+        "de": 12249
+      },
+      "queue": {
+        "Technical Support": 8362,
+        "Product Support": 5252,
+        "Customer Service": 4268,
+        "IT Support": 3433,
+        "Billing and Payments": 2788,
+        "Returns and Exchanges": 1437,
+        "Service Outages and Maintenance": 1148,
+        "Sales and Pre-Sales": 918,
+        "Human Resources": 576,
+        "General Inquiry": 405
+      },
+      "type": {
+        "Incident": 11466,
+        "Request": 8187,
+        "Problem": 6012,
+        "Change": 2922
+      },
+      "priority": {
+        "medium": 11515,
+        "high": 11178,
+        "low": 5894
+      }
+    },
+    "licence": "cc-by-nc-4.0",
+    "measured_on": "English rows; complaint = subject + body, answer = agent answer",
+    "rows_measured": 16338,
+    "complaint_median_chars": 416,
+    "distinct_complaints_share": 1.0,
+    "complaint_distinct_3gram": 0.501,
+    "complaints_with_telecom_terms_strict": 0.0,
+    "complaints_with_telecom_terms_broad": 0.036,
+    "answers_filled": 16335,
+    "unique_answers": 16335,
+    "answer_distinct_3gram": 0.39,
+    "answers_with_step_language": 0.163,
+    "answers_asking_for_more_info": 0.597,
+    "answers_with_placeholders": 0.557
+  },
+  "github_santhoshmishra": {
+    "what": "NYC 311-style city service requests (noise, parking, rodents, heat), no free-text complaint",
+    "rows": 25921,
+    "columns": [
+      "ticket_id",
+      "created_date",
+      "closed_date",
+      "agency",
+      "complaint_type",
+      "descriptor",
+      "borough",
+      "status",
+      "resolution_description"
+    ],
+    "labels": {
+      "agency": {
+        "NYPD": 16771,
+        "DOT": 2508,
+        "DOHMH": 2040,
+        "HPD": 1992,
+        "DSNY": 1422,
+        "DEP": 1188
+      },
+      "complaint_type": {
+        "Noise - Residential": 13384,
+        "Illegal Parking": 3759,
+        "Street Condition": 2136,
+        "Rodent": 2040,
+        "Heat/Hot Water": 1992,
+        "Sanitation Condition": 1422,
+        "Water System": 1188
+      }
+    },
+    "licence": null,
+    "repo_created_at": "2026-09-29T08:09:31Z",
+    "measured_on": "complaint = complaint_type + descriptor, answer = resolution_description",
+    "rows_measured": 25921,
+    "complaint_median_chars": 32,
+    "distinct_complaints_share": 0.001,
+    "complaint_distinct_3gram": 0.009,
+    "complaints_with_telecom_terms_strict": 0.0,
+    "complaints_with_telecom_terms_broad": 0.0,
+    "answers_filled": 22760,
+    "unique_answers": 16,
+    "answer_distinct_3gram": 0.005,
+    "answers_with_step_language": 0.0,
+    "answers_asking_for_more_info": 0.0,
+    "answers_with_placeholders": 0.0
+  }
+}

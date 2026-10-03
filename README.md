@@ -65,6 +65,9 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
   (counts, indexes, any ticket or KB article with its stored embedding) and a retrieval playground that runs semantic,
   lexical and hybrid search side by side, so you can see that answers come from retrieved data. No build step: plain
   HTML/CSS/JS served by the API.
+* **Graceful degradation**: if the database, an understanding/validation model or the LLM fails, the agent still
+  gets a safe, flagged answer (ESCALATE or REVIEW) instead of an error; a circuit breaker stops requests piling up on
+  a dead database (ARCHITECTURE.md §6.1).
 * **Operations**: health, metrics (latency percentiles, decision mix, groundedness, fallback rate, agent feedback),
   drift monitoring (unknown-intent rate, nearest-neighbour similarity, intent-mix shift), structured JSON logs with
   request ids, audit log of every resolution.
@@ -109,7 +112,8 @@ ingestion). Details, design decisions and rejected alternatives: [ARCHITECTURE.m
 held-out "wave 2" ticket class for the evolving-data experiment. Evaluation complaints use phrasings that never
 appear in the corpus; leakage checks report zero overlap. Provenance and label source are recorded on every row.
 Full statistics: [data/DATASET_STATISTICS.md](data/DATASET_STATISTICS.md). Why synthetic, and what that means for
-the numbers: [EVALUATION.md §1](EVALUATION.md).
+the numbers: [EVALUATION.md §1](EVALUATION.md), including a measured comparison with the two public datasets the
+use-case document suggests (`python scripts/assess_public_datasets.py`).
 
 ## Quick start (Docker)
 
@@ -175,13 +179,13 @@ uvicorn app.main:app --reload
 ## Tests and quality
 
 ```bash
-pytest --cov=app                 # 73 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
+pytest --cov=app                 # 89 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
 pytest -m db                     # DB integration tests only (needs the database running)
 black --check . && flake8 && mypy app scripts evaluation experiments tests
 locust -f tests/load/locustfile.py --host http://localhost:8000   # optional interactive load test
 ```
 
-Current status: 73 passed, black / flake8 / mypy clean (coverage below).
+Current status: 89 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
 
 ## Evaluations and experiments
 
@@ -216,6 +220,7 @@ data/
   processed/       generated corpus (tickets, KB; wave-2 = new ticket class)
   evaluation/      held-out eval sets, TREC qrels, leakage report, human_eval_sheet.xlsx
 scripts/           generate_synthetic, verify_splits, init_db, ingest, report_dataset_stats, run_experiments,
+                   assess_public_datasets,
                    docker_entrypoint.sh, datagen/scenarios.py
 evaluation/        metrics, understanding/retrieval/generation/system evals, keyword baseline,
                    build_human_eval_sheet, human_eval_analysis

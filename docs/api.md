@@ -59,7 +59,7 @@ The values above illustrate the shape only; they are not measurements.
 | `support_status` | `supported`, `weakly_supported`, `unsupported`, `contradicted`, or `uncited` |
 | `relevance_score` | cosine similarity between complaint and source (absolute; used for evidence checks) |
 | `generator` | `llm:<model>`, `extractive` (no LLM / fallback), or `none` (no sources) |
-| `flags` | `unknown_intent`, `possible_prompt_injection`, `llm_unavailable_extractive_fallback`, `contradiction_detected`, `low_confidence` |
+| `flags` | `unknown_intent`, `possible_prompt_injection`, `llm_unavailable_extractive_fallback`, `contradiction_detected`, `low_confidence`; degraded operation: `retrieval_unavailable`, `understanding_unavailable`, `validation_unavailable`, `generation_error`, `embedding_unavailable` (see ARCHITECTURE.md §6.1). A dependency failure returns 200 with these flags and a safe decision, not an error |
 | `decision.action` | `RESOLVE` use the draft · `REVIEW` an agent must check it · `ESCALATE` evidence insufficient |
 
 ## POST /tickets/{request_id}/feedback
@@ -88,7 +88,10 @@ registers or updates a ticket class at runtime; the understanding service reload
 
 ## GET /health
 
-`{"status": "healthy|degraded", "database": "connected", "llm_provider": "configured (model) | not_configured (extractive fallback)", "models_loaded": true, "corpus": {"tickets": n, "kb_articles": n}, "version": "1.0.0"}`
+`{"status": "healthy|degraded", "database": "connected", "llm_provider": "configured (model) | not_configured (extractive fallback)", "models_loaded": true, "corpus": {"tickets": n, "kb_articles": n}, "version": "1.0.0", "database_circuit": "closed|open|half_open"}`
+
+`database_circuit` is `open` after repeated database failures: resolve requests are then escalated without querying
+the database until a trial call succeeds (ARCHITECTURE.md §6.1). `status` is `degraded` while it is open.
 
 ## GET /metrics?hours=24
 

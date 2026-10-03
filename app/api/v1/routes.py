@@ -169,7 +169,9 @@ async def health(db: AsyncSession = Depends(get_db)):
         if llm is None or not llm.available
         else f"configured ({settings.LLM_MODEL})"
     )
-    ok = db_status == "connected" and container is not None
+    breaker = getattr(getattr(container, "pipeline", None), "db_breaker", None)
+    circuit = breaker.state if breaker is not None else "closed"
+    ok = db_status == "connected" and container is not None and circuit != "open"
     return HealthResponse(
         status="healthy" if ok else "degraded",
         database=db_status,
@@ -177,6 +179,7 @@ async def health(db: AsyncSession = Depends(get_db)):
         models_loaded=container is not None,
         corpus=corpus,
         version=settings.APP_VERSION,
+        database_circuit=circuit,
     )
 
 

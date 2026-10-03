@@ -4,6 +4,27 @@ All numbers are copied from files in `experiments/results/` (and `data/evaluatio
 produced by the scripts named in each section. Where a run is incomplete (the LLM evaluation, capped by the
 free-tier daily token quota) the coverage is stated explicitly. Nothing is estimated.
 
+## Plan targets vs measured
+
+The plan's provisional targets (IMPLEMENTATION_PLAN.md §4.2 / §40.2) against what was measured. Missed targets are
+reported as missed; the sections below explain each number.
+
+| Target | Measured | Met | Where |
+|---|---|:---:|---|
+| Intent classification macro-F1 > 0.75 | 0.723 (500 held-out complaints) | ✗ | §2.1 |
+| Product extraction F1 > 0.70 | 0.716 | ✓ | §2.1 |
+| Hybrid retrieval Recall@10 > 0.70 | 0.558 (capped Recall@10, E1 test split; plain Recall@10 is uninformative when a query has dozens of equally relevant tickets, §1.1) | ✗ | EXPERIMENTS.md E1 |
+| Citation accuracy > 0.90 | 0.962 (LLM, 52 cases); 1.000 (extractive) | ✓ | §4 |
+| Groundedness > 0.80 | 0.955 (LLM); E3 multi-method checker F1 0.918 | ✓ | §4, §5 |
+| P95 latency < 15 s (MVP) | 1.2 s without LLM (concurrency 1); 15.4 s with the free-tier LLM, driven by rate-limit waits | ✗ (with LLM, just) | §4.2, §6.1 |
+| Throughput > 5 req/s | ~1 req/s per worker on the laptop CPU, 0% errors at concurrency 8 | ✗ | §6.1 |
+| Test coverage > 70% | 88% of `app/` | ✓ | §7 |
+| Experiments 1-3 run, with decisions | E1, E2, E3 done (plus E4′ evolving classes) | ✓ | EXPERIMENTS.md |
+
+The misses have known causes and next steps (§9): intent and recall are limited by k-NN over templated data
+(LLM intent classifier and query rewriting are the levers); throughput and latency by CPU inference in one worker
+and free-tier LLM limits (more workers, batched GPU inference, a paid LLM tier).
+
 ## 1. Data and methodology
 
 **Dataset.** Synthetic, generated from 43 hand-authored telecom root-cause scenarios (40 at launch + 3 for a
@@ -15,6 +36,28 @@ root-cause grouping, so they can't provide graded relevance judgments or referen
 scenarios gives exact relevance labels and reference steps, which makes retrieval and generation measurable.
 The cost is that the language is less varied than real tickets, so **absolute values will not transfer to
 production; comparisons between methods are the meaningful output.**
+
+**Public datasets considered (measured).** The use-case document suggests two ticket datasets ("not restricted to,
+you can choose your dataset"). `scripts/assess_public_datasets.py` downloads both and measures them the same way as
+our corpus (`experiments/results/public_dataset_assessment.json`; measures defined in the script's docstring):
+
+| | Our corpus | HF `Tobi-Bueck/customer-support-tickets` (English rows) | GitHub `santhoshmishra/Ticket_data` |
+|---|---|---|---|
+| What it is | synthetic telecom tickets from 43 scenarios | synthetic (AI-generated) IT-helpdesk and online-store emails | NYC 311-style city service requests (noise, parking, rodents, heat) |
+| Rows | 2,043 | 28,587 in the newest file (16,338 English) | 25,921 |
+| Free-text complaint | yes, median 179 chars | yes, median 416 chars | no: category + descriptor; 0.1% distinct |
+| Wording variety (distinct word trigrams) | 0.094 | **0.501** | 0.009 |
+| Telecom terms, strict / broad list | 10% / 51% (rest are billing and account tickets; telecom by construction) | 0% / 4% | 0% / 0% |
+| Answers containing actionable steps | **85%** | 16% | 0% (16 canned outcomes) |
+| Answers asking the customer for more information | 0% | 60% | 0% |
+| Answers with template placeholders (`<name>`) | 0% | 56% | 0% |
+| Licence | MIT | CC-BY-NC-4.0 (non-commercial) | none stated |
+
+*Decision.* The GitHub dataset is not support tickets and has nothing to retrieve or cite. The Hugging Face dataset
+has far more varied wording (the weakness of our templated corpus) but is itself synthetic, IT-helpdesk rather than
+telecom, and most of its answers acknowledge the problem or ask for details instead of resolving it, so it would give
+the generator little to cite. Neither has root-cause groups for graded relevance. We therefore use the scenario-based
+corpus for retrieval and evaluation; the Hugging Face data is the natural out-of-domain stress set (Future work, §9).
 
 **Making the test hard on purpose.** Each scenario has 6 symptom paraphrases. Corpus tickets use paraphrases
 1–4 only; every evaluation complaint uses paraphrases 5–6 and a held-out detail sentence. Eval queries therefore
@@ -368,13 +411,33 @@ reference-recall metric, confidence AUROC for "safe", and a RESOLVE-threshold sw
 (threshold tuning) needs. The workbook's Summary formulas were verified with the `formulas` engine (no errors when
 empty; values match an independent computation on a synthetic fill).
 
+### 6.5 Outage drill: database stopped under a running API
+
+Graceful degradation (ARCHITECTURE.md §6.1) checked on the real stack, not only with unit-test fakes: the database
+container was stopped while the API kept serving, then restarted (`experiments/results/outage_drill.txt`, procedure
+included).
+
+| Phase | Response | Client time |
+|---|---|---:|
+| Healthy | 200, RESOLVE, 4 cited steps | 5.9 s |
+| Database stopped, requests 1-2 (circuit closed) | 200, ESCALATE "Knowledge base unavailable", flags `retrieval_unavailable`, `understanding_unavailable` | 10.1 s, 13.1 s |
+| Request 3 (circuit opens after 5 database failures) | 200, ESCALATE | 3.4 s |
+| Requests 4-5 (circuit open) | 200, ESCALATE, database not touched | 0.05 s |
+| `/health` during the outage | `degraded`, `database_circuit: open` | |
+| Database back, circuit still open | 200, ESCALATE | 0.09 s |
+| After the 30 s recovery window | 200, RESOLVE, 4 cited steps; `/health` back to `healthy`, circuit `closed` | 1.8 s |
+
+No request failed, nothing was resolved without evidence, and the service recovered by itself. The first requests
+of an outage are slow because each waits up to `DB_STAGE_TIMEOUT_S` (10 s) before the circuit opens; a lower timeout
+trades that wait for more false alarms under load.
+
 ## 7. Engineering checks
 
 | Check | Result |
 |---|---|
-| Unit + API + DB integration tests (`pytest`) | 73 passed (DB tests run against the live pgvector container; they skip if no DB) |
-| Line coverage of `app/` | 83% |
-| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 66 files) | clean |
+| Unit + API + DB integration tests (`pytest`) | 89 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Line coverage of `app/` | 88% |
+| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 74 files) | clean |
 | Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |
 | `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
 | Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |
@@ -416,4 +479,6 @@ empty; values match an independent computation on a synthetic fill).
    not linguistic variety.
 8. **Optional experiments not run:** E4 embedding models (e.g. all-mpnet-base-v2), E6 LLM temperature, E7 context
    length, E8 caching.
+9. **Out-of-domain stress test** with the Hugging Face tickets (§1): measure how often the system RESOLVEs IT
+   tickets it has no knowledge for, and whether the drift monitor alerts.
 

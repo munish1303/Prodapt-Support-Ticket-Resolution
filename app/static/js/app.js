@@ -32,6 +32,10 @@
     generation_error: ["bad", "Generation error"],
     contradiction_detected: ["bad", "A step contradicts its source"],
     low_confidence: ["warn", "Low confidence"],
+    retrieval_unavailable: ["bad", "Knowledge base unavailable"],
+    embedding_unavailable: ["bad", "Complaint could not be processed"],
+    understanding_unavailable: ["warn", "Understanding unavailable"],
+    validation_unavailable: ["warn", "Steps not validated"],
   };
   const SUPPORT = {
     supported: ["✓", "Supported"],
@@ -39,6 +43,7 @@
     unsupported: ["✕", "Unsupported"],
     contradicted: ["✕", "Contradicted"],
     uncited: ["?", "No citation"],
+    unverified: ["?", "Not validated"],
   };
   const DECISION_ICON = { RESOLVE: "✓", REVIEW: "◐", ESCALATE: "▲" };
 
@@ -301,7 +306,8 @@
 
     const v = d.validation;
     const gen = d.resolution.generator.replace(/^llm:/, "");
-    $("#rGenerator").textContent = `${gen === "extractive" ? "extractive draft (no LLM)" : `drafted by ${gen}`} · groundedness ${pct(v.groundedness_score)} · citations ${pct(v.citation_accuracy)} valid`;
+    const genText = gen === "extractive" ? "extractive draft (no LLM)" : gen === "none" ? "no draft" : `drafted by ${gen}`;
+    $("#rGenerator").textContent = `${genText} · groundedness ${pct(v.groundedness_score)} · citations ${pct(v.citation_accuracy)} valid`;
 
     const steps = d.resolution.steps;
     const list = $("#rSteps");

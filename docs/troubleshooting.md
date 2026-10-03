@@ -79,6 +79,11 @@ The known "grounded but wrong" failure mode (EVALUATION.md §4.1, §6.3): valida
 sources ↔ complaint. Check the cited sources; watch `/api/v1/monitoring/drift` for intent-mix alerts that indicate a
 new issue type.
 
+**Every request is ESCALATEd with the flag `retrieval_unavailable` ("Knowledge base unavailable").**
+The database is unreachable or too slow, or the circuit breaker opened after repeated failures. Check
+`/api/v1/health` (`database`, `database_circuit`) and `docker compose ps`; once the database is back, the next
+request after `DB_CIRCUIT_RECOVERY_S` (30 s) closes the circuit automatically.
+
 **Everything is escalated with "contradicted" steps.**
 Seen once during development when NLI used multi-sentence premises; fixed (EXPERIMENTS.md, E3 v2). If it reappears
 with a different NLI model, re-run `experiments/e3_groundedness.py` and re-tune the `GROUNDED_*` thresholds on its

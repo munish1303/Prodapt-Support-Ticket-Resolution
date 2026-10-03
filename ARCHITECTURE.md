@@ -195,6 +195,10 @@ confidence ≥ 0.75 → RESOLVE; ≥ 0.55 → REVIEW; else ESCALATE. All thresho
 | Argmax sentiment label | Polarity thresholds calibrated on dev | Complaints describe problems, so argmax labels nearly everything negative (EVALUATION.md §2) |
 | Dictionary product extraction | + products implied by same-class neighbours | Complaints often imply a product without naming it ("the web keeps cutting out"); dev product F1 0.385 → 0.767 |
 | Single `embedding` column | + `complaint_embedding` | k-NN intent must compare complaint to complaint, not to complaint+resolution |
+| "Real-time agent UI" out of scope (API only) | Web console at `/` plus read-only knowledge-base endpoints (`/corpus/*`, `/requests`) | Added at the project owner's request so a reviewer can see what RAG retrieves from; plain HTML/CSS/JS served by the API, no extra service. The corpus endpoints are unauthenticated like the rest of this demo API and belong behind auth in production |
+| `POST /ingestion/tickets` | `POST /ingestion` | One idempotent endpoint accepts tickets and KB articles together |
+| Public dataset first, synthetic as augmentation (§12.1) | Scenario-based synthetic corpus only | Both suggested public datasets were measured and rejected for retrieval (EVALUATION.md §1): one is not support data, the other has few actionable answers and is not telecom |
+| `circuitbreaker` package for DB calls | Small in-house breaker (`app/core/resilience.py`) around the two database stages | Needs async support, a per-request trial allowance and selective failure types; ~70 lines, fully unit-tested |
 
 ## 6. Production considerations
 
@@ -220,7 +224,8 @@ unknown-intent rate, falling nearest-neighbour similarity, intent-mix shift).
 
 **Reliability.** Connection-level retries in the HTTP transport (connect errors and resets only, never a request that reached the server) plus request-level retries with exponential backoff and `Retry-After` handling on LLM calls; optional IPv4 pinning (`LLM_FORCE_IPV4`) for networks that advertise IPv6 but drop it (seen on the dev machine as `WinError 64` resets); non-retryable 4xx fail fast; extractive fallback;
 monitoring writes never break the request path; savepoints so one bad ingestion row doesn't abort a batch;
-DB pool pre-ping and recycling; container health checks.
+DB pool pre-ping and recycling; container health checks. Stage-level fallbacks and the database circuit
+breaker are described in §6.1.
 
 **Security and privacy.** PII (emails, phones, card and account numbers) is redacted before LLM calls and in the
 audit log (which stores a hash plus a redacted complaint). Prompt-injection heuristics flag instruction-like input and
@@ -232,11 +237,45 @@ rate limiting per client, encryption at rest, data-retention policy for the requ
 token usage and latency, decision mix, groundedness, fallback rate, agent feedback, and drift. `/metrics` returns
 JSON; exporting the same to Prometheus/Grafana is a Tier-3 extension.
 
+### 6.1 Failure handling (graceful degradation)
+
+A failing dependency never becomes an error for the agent: each stage has a safe fallback and a flag in the
+response (`app/services/pipeline.py`, tests in `tests/unit/test_degradation.py`).
+
+| Failure | What the agent gets | Flag |
+|---|---|---|
+| LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual | `llm_unavailable_extractive_fallback` |
+| Database down, slow (> `DB_STAGE_TIMEOUT_S`, 10 s) or circuit open | no LLM call; ESCALATE "Knowledge base unavailable" | `retrieval_unavailable` |
+| Understanding fails | intent treated as unknown, so the decision is at most REVIEW; retrieval and drafting continue | `understanding_unavailable` |
+| Generator crashes | no draft; ESCALATE | `generation_error` |
+| Validation model fails | draft returned with every step marked `unverified`; never RESOLVE, REVIEW when sources are relevant | `validation_unavailable` |
+| Embedding model fails | ESCALATE | `embedding_unavailable` |
+| Audit-log write fails | logged, the response is still returned; skipped while the circuit is open; write failures don't trip the breaker (answering needs reads, not the log) | (none) |
+
+**Circuit breaker.** Understanding and retrieval queries run through one database breaker. After
+`DB_CIRCUIT_FAILURE_THRESHOLD` (5) consecutive database failures (connection errors, SQL errors, timeouts) it opens
+and requests are escalated immediately instead of each waiting for a timeout and exhausting the pool. After
+`DB_CIRCUIT_RECOVERY_S` (30 s) two trial calls (one request) are let through; success closes it. Errors that are not
+database failures (bugs) still degrade the request but don't trip the breaker. `/health` reports
+`database_circuit` and turns `degraded` while it is open.
+
+### 6.2 Deliberately not built (Tier 3), and when we would add it
+
+| Component | Why not now | Add it when |
+|---|---|---|
+| Redis cache (embeddings, LLM answers) | identical complaints rarely repeat; time goes to CPU inference and LLM rate limits, which a cache does not fix | the repeat-complaint rate (measurable from `complaint_hash` in the request log) is high enough to pay off, e.g. during a known outage |
+| Celery / job queue | the agent waits for the draft (1-5 s), so a queue only adds latency and infrastructure | bulk work appears: re-embedding the corpus after a model change, nightly batch drafting, large ingestion jobs |
+| Prometheus + Grafana | `/metrics`, `/monitoring/drift`, structured logs and the console's Insights panel cover a single deployment | there are several replicas to aggregate, or on-call alerting is needed (export the same numbers via a Prometheus endpoint) |
+| Fine-tuned classifiers | trained on templated synthetic data they would learn the templates; k-NN takes new classes without retraining (E4′) | there is enough real, labelled ticket history and intent F1 is the bottleneck |
+| Service extraction | a modular monolith is simpler to run and debug at this size (§4.1) | one stage needs different hardware or scaling, first candidate: NLI validation on a GPU worker |
+| Advanced confidence calibration | needs human labels first | the human ratings (EVALUATION.md §6.4) and agent feedback exist; then fit isotonic/Platt and run Experiment 5 |
+
 ## 7. Known limitations
 
 * The dataset is **synthetic** (template-generated from 43 hand-written scenarios). Labels are correct by
   construction but the language is less varied than real tickets. Absolute metric values will not transfer to
   production data; the *comparisons* (hybrid vs semantic, multi-method vs similarity) are the transferable part.
+  The suggested public datasets were measured and not used (EVALUATION.md §1).
 * Novel-intent detection from k-NN vote share is weak (EVALUATION.md §2.3).
 * Heuristic confidence is uncalibrated until agent feedback is collected.
 * Single-language (English) FTS configuration.

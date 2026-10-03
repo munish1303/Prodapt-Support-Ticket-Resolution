@@ -122,3 +122,6 @@ class HealthResponse(BaseModel):
     models_loaded: bool
     corpus: dict[str, int]
     version: str
+    # closed = normal; open = recent database failures, requests are escalated without querying the database;
+    # half_open = trial calls are testing whether the database has recovered.
+    database_circuit: str = "closed"

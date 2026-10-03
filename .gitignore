@@ -10,3 +10,4 @@ htmlcov/
 .idea/
 .vscode/
 *.checkpoint.jsonl
+data/external/
