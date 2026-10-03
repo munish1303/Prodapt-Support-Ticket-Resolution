@@ -53,8 +53,14 @@ class Settings(BaseSettings):
     LLM_REASONING_EFFORT: str | None = None
 
     # --- Models ----------------------------------------------------------
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
-    EMBEDDING_DIM: int = 384
+    # all-mpnet-base-v2 replaced all-MiniLM-L6-v2 after Experiment 4 (+0.16 nDCG@10). Changing the model is safe:
+    # on startup scripts/reembed.py notices the change (system_meta table), resizes the vector columns and
+    # re-embeds the corpus. Scale-dependent thresholds below were re-tuned for this model (EXPERIMENTS.md).
+    EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
+    EMBEDDING_DIM: int = 768
+    # Evaluation-only: reference-step matching in evaluation/generation_eval.py keeps using MiniLM (cosine >= 0.6)
+    # so the metric means the same thing before and after the embedding switch.
+    METRIC_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     SENTIMENT_MODEL: str = "cardiffnlp/twitter-roberta-base-sentiment-latest"
     # Lighter than roberta-large-mnli (see ARCHITECTURE.md, "NLI model choice").
     NLI_MODEL: str = "cross-encoder/nli-deberta-v3-small"

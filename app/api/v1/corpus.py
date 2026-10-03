@@ -263,7 +263,7 @@ async def corpus_search(
         "query": q,
         "k": k,
         "methods": {
-            "semantic": "pgvector cosine similarity (ivfflat) on all-MiniLM-L6-v2 embeddings",
+            "semantic": f"pgvector cosine similarity (ivfflat) on {settings.EMBEDDING_MODEL.split('/')[-1]} embeddings",
             "lexical": "PostgreSQL full-text search (tsvector, OR-of-terms tsquery, ts_rank)",
             "hybrid": f"weighted reciprocal rank fusion, semantic {settings.RRF_SEMANTIC_WEIGHT} / "
             f"lexical {settings.RRF_LEXICAL_WEIGHT}",

@@ -5,6 +5,9 @@ set -e
 echo "applying migrations..."
 python scripts/init_db.py
 
+# Vectors must come from the configured embedding model: resize/re-embed if the model changed (no-op otherwise).
+python scripts/reembed.py
+
 COUNT=$(python - <<'EOF'
 import asyncio
 from sqlalchemy import text

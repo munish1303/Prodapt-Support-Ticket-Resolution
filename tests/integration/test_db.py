@@ -141,19 +141,19 @@ async def test_corpus_endpoints_expose_the_knowledge_base(services):
     )
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as c:
         stats = (await c.get("/api/v1/corpus/stats")).json()
-        assert stats["tickets"]["total"] >= 2000 and stats["embedding"]["dims"] == 384
+        assert stats["tickets"]["total"] >= 2000 and stats["embedding"]["dims"] == settings.EMBEDDING_DIM
         assert any("ivfflat" in i["definition"] for i in stats["indexes"])
 
         page = (await c.get("/api/v1/corpus/tickets", params={"q": "LOS", "limit": 5})).json()
         assert page["total"] > 0 and len(page["items"]) <= 5
         tid = page["items"][0]["ticket_id"]
         ticket = (await c.get(f"/api/v1/corpus/tickets/{tid}")).json()
-        assert ticket["embedding"]["dims"] == 384 and abs(ticket["embedding"]["l2_norm"] - 1) < 0.01
+        assert ticket["embedding"]["dims"] == settings.EMBEDDING_DIM and abs(ticket["embedding"]["l2_norm"] - 1) < 0.01
         assert (await c.get("/api/v1/corpus/tickets/NOPE-1")).status_code == 404
 
         kb = (await c.get("/api/v1/corpus/kb")).json()
         art = (await c.get(f"/api/v1/corpus/kb/{kb['items'][0]['article_id']}")).json()
-        assert art["type"] == "kb_article" and art["embedding"]["dims"] == 384
+        assert art["type"] == "kb_article" and art["embedding"]["dims"] == settings.EMBEDDING_DIM
 
         res = (await c.get("/api/v1/corpus/search", params={"q": "red LOS light on the fibre box", "k": 5})).json()
         assert set(res["results"]) == {"semantic", "lexical", "hybrid"}

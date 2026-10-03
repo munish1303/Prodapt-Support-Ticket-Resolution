@@ -1,4 +1,4 @@
-"""Sentence-embedding service (all-MiniLM-L6-v2 by default, 384-dim, normalised)."""
+"""Sentence-embedding service (settings.EMBEDDING_MODEL: all-mpnet-base-v2 by default, 768-dim, normalised)."""
 
 from __future__ import annotations
 

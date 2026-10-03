@@ -6,6 +6,9 @@ from sqlalchemy import text
 
 from app.config import settings
 
+# Embedding model of request-log rows written before the model name was logged (the original default).
+LEGACY_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
 
 async def get_metrics(session, hours: int | None = None) -> dict:
     window = "" if hours is None else "WHERE created_at >= NOW() - make_interval(hours => :h)"
@@ -67,8 +70,11 @@ async def get_drift_report(session, window_hours: int | None = None) -> dict:
                (extracted_metadata->>'nearest_similarity')::float AS nn_sim,
                decision
         FROM resolution_requests
+        -- Similarities are only comparable within one embedding model, so the baseline restarts when the model
+        -- changes. Rows logged before the model was recorded all came from the legacy default.
+        WHERE coalesce(extracted_metadata->>'embedding_model', :legacy) = :model
     """),
-            {"h": h},
+            {"h": h, "legacy": LEGACY_EMBEDDING_MODEL, "model": settings.EMBEDDING_MODEL},
         )
     ).all()
     windows = {"recent": [r for r in rows if r[0]], "baseline": [r for r in rows if not r[0]]}

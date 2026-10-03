@@ -1,0 +1,42 @@
+{
+  "n_queries": 200,
+  "candidates": 30,
+  "final_k": 10,
+  "hybrid": {
+    "ndcg@10": 0.5715,
+    "mrr": 0.6538,
+    "p@5": 0.561,
+    "p@10": 0.558,
+    "hit@1": 0.565,
+    "hit@5": 0.76,
+    "recall@10_capped": 0.558,
+    "recall@20_capped": 0.279,
+    "kb_recall@5": 0.08,
+    "kb_recall@10": 0.19
+  },
+  "hybrid_reranked": {
+    "ndcg@10": 0.6248,
+    "mrr": 0.7226,
+    "p@5": 0.613,
+    "p@10": 0.607,
+    "hit@1": 0.66,
+    "hit@5": 0.8,
+    "recall@10_capped": 0.607,
+    "recall@20_capped": 0.3035,
+    "kb_recall@5": 0.01,
+    "kb_recall@10": 0.06
+  },
+  "p@5_abs_gain": 0.052,
+  "p@5_rel_gain": 0.0927,
+  "ndcg@10_abs_gain": 0.0533,
+  "p_value_p@5": 0.002,
+  "latency_ms": {
+    "hybrid_mean": 258.1,
+    "hybrid_p95": 535.6,
+    "reranked_mean": 2980.0,
+    "reranked_p95": 4948.5,
+    "added_mean": 2721.9
+  },
+  "decision_rule": "enable iff P@5 gain > 0.05 and added latency < 2000 ms",
+  "decision": "KEEP reranking disabled"
+}

@@ -3,7 +3,7 @@
 Every generated step is a claim. For each claim we check:
 1. Citation validity  - cited source numbers exist.
 2. Groundedness       - is the claim supported by the sources it cites? Three signals:
-     semantic   max cosine(claim, source chunk)                  (MiniLM embeddings)
+     semantic   max cosine(claim, source chunk)                  (settings.EMBEDDING_MODEL)
      entailment max P(entailment | source chunk => claim)         (NLI cross-encoder)
      lexical    fraction of the claim's content words in source   (stemmed tokens)
    NLI also gives P(contradiction), which lets us flag claims that contradict a source.

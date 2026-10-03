@@ -22,6 +22,7 @@ RUN for i in 1 2 3 4 5; do \
       python -c "\
 from sentence_transformers import SentenceTransformer, CrossEncoder; \
 from transformers import pipeline; \
+SentenceTransformer('sentence-transformers/all-mpnet-base-v2'); \
 SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2'); \
 CrossEncoder('cross-encoder/nli-deberta-v3-small'); \
 CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2'); \

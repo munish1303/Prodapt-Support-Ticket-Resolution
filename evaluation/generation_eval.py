@@ -41,6 +41,7 @@ from app.config import settings  # noqa: E402
 from app.core.database import dispose_engine  # noqa: E402
 from app.core.llm import LLMUnavailable, OpenAICompatibleProvider  # noqa: E402
 from app.core.prompts import JUDGE_SYSTEM_PROMPT, build_judge_user_prompt  # noqa: E402
+from app.models.embeddings import get_embedding_service  # noqa: E402
 from app.services.generation import ExtractiveGenerator, GenerationService, LLMGenerator  # noqa: E402
 from app.services.validation import extract_citations  # noqa: E402
 from evaluation.data import RESULTS_DIR, load_eval, read_jsonl, save_result  # noqa: E402
@@ -133,6 +134,10 @@ async def main() -> None:
             raise SystemExit("LLM not configured: set LLM_API_KEY (and LLM_BASE_URL / LLM_MODEL) in .env")
         pipeline.generation = GenerationService(LLMGenerator(container.llm), ExtractiveGenerator(), fallback=False)
 
+    # Reference-step matching always uses the metric model (MiniLM, cosine >= --match-threshold), independent of the
+    # system's embedding model, so the metric stays comparable across embedding switches.
+    metric_embedder = None if args.summarize_only else get_embedding_service(settings.METRIC_EMBEDDING_MODEL)
+
     judge_llm = None
     if args.judge and not args.summarize_only:
         judge_llm = (
@@ -155,7 +160,7 @@ async def main() -> None:
         assert pipeline is not None and container is not None  # not in --summarize-only mode
         r = await pipeline.process(case["complaint"], record=False)
         recall, precision = step_match(
-            container.embedder, r.generation.resolution_steps, case["reference_steps"], args.match_threshold
+            metric_embedder, r.generation.resolution_steps, case["reference_steps"], args.match_threshold
         )
         row = {
             "id": case["id"],
