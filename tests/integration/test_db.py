@@ -45,7 +45,7 @@ async def services():
     from app.services.ingestion import IngestionService
     from app.services.retrieval import HybridRetriever
 
-    # The corpus holds real MiniLM vectors, so DB tests must embed queries with the same model.
+    # The corpus holds vectors from the configured embedding model, so DB tests must embed queries with the same model.
     embedder = get_embedding_service()
     sf = get_session_factory()
     prefix = f"ZZTEST-{uuid.uuid4().hex[:6]}"
