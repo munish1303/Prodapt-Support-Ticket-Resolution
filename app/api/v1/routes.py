@@ -74,6 +74,8 @@ def to_response(r: PipelineResult) -> TicketResolutionResponse:
                 title=item.document.metadata.get("title"),
                 excerpt=_excerpt(item.document.text),
                 relevance_score=round(item.relevance, 4),
+                semantic_rank=item.semantic_rank,
+                lexical_rank=item.lexical_rank,
             )
             for i, item in enumerate(r.retrieval.items, start=1)
         ],

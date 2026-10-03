@@ -5,11 +5,14 @@ from __future__ import annotations
 import logging
 import time
 import uuid
+from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
+from app.api.v1.corpus import router as corpus_router
 from app.api.v1.dependencies import init_container
 from app.api.v1.routes import router
 from app.config import settings
@@ -57,8 +60,13 @@ async def request_context(request: Request, call_next):
 
 
 app.include_router(router)
+app.include_router(corpus_router)
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/", include_in_schema=False)
-async def root():
-    return {"service": settings.APP_NAME, "docs": "/docs", "health": "/api/v1/health"}
+async def console() -> FileResponse:
+    """Agent console (single-page frontend)."""
+    return FileResponse(STATIC_DIR / "index.html")

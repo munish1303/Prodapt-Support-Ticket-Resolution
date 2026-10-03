@@ -22,7 +22,7 @@ than an escalation, so every number the agent sees comes from observable evidenc
 
 ```mermaid
 flowchart LR
-    A[Agent / ticketing UI] -->|POST /api/v1/tickets/resolve| API[FastAPI service]
+    A[Agent: web console at /<br/>or a ticketing system] -->|POST /api/v1/tickets/resolve| API[FastAPI service]
 
     subgraph API[FastAPI service: modular monolith]
         direction TB
@@ -41,6 +41,7 @@ flowchart LR
     D -->|audit row| PG
     ING[POST /ingestion<br/>POST /taxonomy/intents] -->|upsert + embed, KB versioning| PG
     MON[GET /metrics<br/>GET /monitoring/drift] --> PG
+    KBV[GET /corpus/*, /requests<br/>read-only views for the console] --> PG
 ```
 
 Request flow and the latency budget of each stage are logged per request (`stage_latency_ms`). Understanding and
@@ -56,6 +57,8 @@ retrieval run **concurrently** because both depend only on the complaint embeddi
 | `validation` | is each step supported by its citations? | citation parsing/validity; per-claim semantic similarity (chunk level), NLI entailment + contradiction (DeBERTa-v3 cross-encoder), lexical overlap; combined rule |
 | `decision` | sufficiency, confidence, action | quality-based sufficiency (no source-count rule), weighted heuristic confidence, ordered decision rules |
 | `ingestion` | evolving data | idempotent upserts, re-embedding on change, KB versions archived, runtime intent registration |
+| `api/v1/corpus` | make retrieval inspectable | read-only SQL views of the corpus (counts, `pg_indexes`, rows with provenance and an embedding preview), raw semantic / lexical / hybrid retrieval through the same retriever the pipeline uses, request log |
+| `static/` | agent console | plain HTML/CSS/JS served by FastAPI (no build step, no extra container): resolve flow, citation-to-source linking, knowledge-base browser, retrieval playground, metrics/drift drawer; all API text is HTML-escaped before rendering |
 | `monitoring` | system health | metrics (latency percentiles, decision mix, groundedness, fallback rate, feedback), drift report (unknown-intent rate, intent-mix TVD, nearest-neighbour similarity) |
 
 ### 3.1 Database schema
@@ -87,6 +90,7 @@ REST over JSON, versioned under `/api/v1`; full reference with examples and erro
 | GET | `/health` | DB connectivity, models loaded, LLM configured or fallback, corpus size |
 | GET | `/metrics` | volume, decision mix, latency p50/p95/p99, groundedness, citation quality, fallback rate, feedback |
 | GET | `/monitoring/drift` | recent vs baseline: unknown-intent rate, intent-mix TVD (size-aware threshold), nearest-neighbour similarity, alerts |
+| GET | `/corpus/stats`, `/corpus/tickets[/{id}]`, `/corpus/kb[/{id}]`, `/corpus/search`, `/requests` | read-only knowledge-base views used by the console to show what RAG retrieves from |
 
 Design choices: one synchronous resolve call (the agent is waiting, p50 1–5 s, so no job queue is needed at this
 scale); Pydantic models validate size limits (complaint 10–5,000 chars, batch ≤ 5,000 tickets); every response

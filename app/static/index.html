@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resolve · Support Ticket Resolution Assistant</title>
+  <meta name="description" content="Paste a customer complaint; get a cited, validated resolution drafted from past tickets and KB articles." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23ea262a'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7m7 0 6 4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+</head>
+<body data-state="idle" data-view="console">
+  <!-- Thin red geometric line-work (draws itself in) -->
+  <svg class="lines" id="lines" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g class="lines__group">
+      <path pathLength="1" d="M0 120 H1600" />
+      <path pathLength="1" d="M1010 120 V1000" />
+      <path pathLength="1" d="M1215 120 V1000" />
+      <path pathLength="1" d="M1010 310 H1215" />
+      <path pathLength="1" d="M1010 520 H1600" />
+      <path pathLength="1" d="M0 120 L640 760" />
+      <path pathLength="1" d="M1015 125 L1600 710" />
+      <path pathLength="1" d="M1220 125 L1600 505" />
+      <path pathLength="1" d="M1010 310 L1400 700" />
+      <path pathLength="1" d="M1215 520 L1600 905" />
+    </g>
+  </svg>
+
+  <header class="nav">
+    <a class="brand" href="/" aria-label="Resolve home">
+      <span class="brand__word">Resolve</span><span class="brand__notch" aria-hidden="true"></span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <button class="nav__link is-active" data-view-link="console" type="button">Agent console</button>
+      <button class="nav__link" data-view-link="kb" type="button">Knowledge base</button>
+      <button class="nav__link" id="openInsights" type="button">Insights</button>
+      <a class="nav__link" href="/docs" target="_blank" rel="noopener">API docs<span class="ext" aria-hidden="true">↗</span></a>
+    </nav>
+    <div class="status" id="status" title="Service health">
+      <span class="status__dot"></span><span class="status__text">connecting…</span>
+    </div>
+  </header>
+
+  <main class="stage view view--console" id="viewConsole">
+    <!-- ============ STATE 1 · IDLE ============ -->
+    <section class="hero" id="hero" aria-labelledby="heroTitle">
+      <h1 class="hero__title" id="heroTitle">
+        <span class="hero__line" data-split>Resolve any</span>
+        <span class="hero__line" data-split>ticket.</span>
+      </h1>
+      <p class="hero__sub" id="heroSub">
+        Paste a customer complaint. Get a cited, validated resolution drafted from past tickets and KB articles.
+      </p>
+    </section>
+
+    <section class="card card--input" id="inputCard" aria-label="Complaint input">
+      <form id="complaintForm" class="composer" autocomplete="off">
+        <label class="sr-only" for="complaint">Customer complaint</label>
+        <textarea id="complaint" name="complaint" rows="1" maxlength="5000"
+          placeholder="Paste the customer's complaint…"></textarea>
+        <button class="send" id="sendBtn" type="submit" aria-label="Resolve complaint">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+        </button>
+      </form>
+      <div class="composer__meta">
+        <span id="charCount">0 / 5000</span>
+        <span class="hint">Ctrl + Enter to resolve</span>
+      </div>
+      <div class="examples" id="examples" aria-label="Example complaints"></div>
+    </section>
+
+    <!-- ============ STATE 2 · SEARCHING ============ -->
+    <section class="card card--search" id="searchCard" aria-live="polite" aria-label="Searching">
+      <div class="scene">
+        <div class="node node--bot">
+          <svg class="bot" viewBox="0 0 120 120" aria-hidden="true">
+            <line class="bot__antenna" x1="60" y1="8" x2="60" y2="24" />
+            <circle class="bot__antenna-tip" cx="60" cy="8" r="5" />
+            <rect class="bot__head" x="16" y="24" width="88" height="76" rx="22" />
+            <g class="bot__eyes">
+              <ellipse cx="44" cy="58" rx="7" ry="9" />
+              <ellipse cx="76" cy="58" rx="7" ry="9" />
+            </g>
+            <path class="bot__mouth" d="M46 80 Q60 90 74 80" />
+            <rect class="bot__scan" x="16" y="24" width="88" height="6" rx="3" />
+          </svg>
+          <span class="node__label">AI assistant</span>
+        </div>
+
+        <div class="link link--one">
+          <svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 H300" /></svg>
+          <span class="link__label" id="linkLabel">searching past queries</span>
+          <span class="packet"></span>
+        </div>
+
+        <div class="node node--folder">
+          <svg class="folder" viewBox="0 0 120 100" aria-hidden="true">
+            <path class="folder__back" d="M10 22 a8 8 0 0 1 8-8 h26 l10 10 h48 a8 8 0 0 1 8 8 v52 a8 8 0 0 1-8 8 H18 a8 8 0 0 1-8-8z" />
+            <rect class="folder__paper" x="24" y="30" width="72" height="44" rx="4" />
+            <path class="folder__front" d="M10 40 a6 6 0 0 1 6-6 h88 a6 6 0 0 1 6 6 l-4 44 a8 8 0 0 1-8 8 H22 a8 8 0 0 1-8-8z" />
+          </svg>
+          <span class="node__label" id="corpusLabel">past tickets</span>
+        </div>
+
+        <div class="link link--two">
+          <svg viewBox="0 0 160 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 H160" /></svg>
+          <span class="packet packet--late"></span>
+        </div>
+
+        <div class="node node--stack">
+          <div class="stack" id="ticketStack" aria-label="Past ticket list"></div>
+          <span class="node__label">past ticket list</span>
+        </div>
+      </div>
+
+      <ol class="stages" id="stages">
+        <li data-stage="embed"><span class="stages__dot"></span><span class="stages__name">Reading the complaint</span><span class="stages__ms"></span></li>
+        <li data-stage="understand_retrieve"><span class="stages__dot"></span><span class="stages__name">Understanding &amp; searching history</span><span class="stages__ms"></span></li>
+        <li data-stage="generate"><span class="stages__dot"></span><span class="stages__name">Drafting a cited resolution</span><span class="stages__ms"></span></li>
+        <li data-stage="validate"><span class="stages__dot"></span><span class="stages__name">Checking every step against its sources</span><span class="stages__ms"></span></li>
+        <li data-stage="decide"><span class="stages__dot"></span><span class="stages__name">Deciding: resolve, review or escalate</span><span class="stages__ms"></span></li>
+      </ol>
+      <div class="progress"><span class="progress__bar" id="progressBar"></span></div>
+    </section>
+
+    <!-- ============ STATE 3 · RESULT ============ -->
+    <section class="card card--result" id="resultCard" aria-label="Resolution">
+      <div class="result__top">
+        <div class="result__complaint">
+          <span class="eyebrow">Complaint</span>
+          <p id="rComplaint" class="quote"></p>
+          <div class="chips" id="rChips"></div>
+        </div>
+        <aside class="verdict" id="rVerdict">
+          <div class="ring" id="rRing">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring__track" cx="60" cy="60" r="52" />
+              <circle class="ring__value" id="rRingValue" cx="60" cy="60" r="52" pathLength="100" />
+            </svg>
+            <div class="ring__label"><strong id="rScore">0</strong><span>confidence</span></div>
+          </div>
+          <div class="stamp" id="rStamp">—</div>
+          <p class="verdict__reason" id="rReason"></p>
+        </aside>
+      </div>
+
+      <div class="flags" id="rFlags"></div>
+
+      <div class="result__body">
+        <div class="response">
+          <div class="section-head">
+            <span class="eyebrow">Response with citations</span>
+            <span class="meta" id="rGenerator"></span>
+          </div>
+          <ol class="steps" id="rSteps"></ol>
+          <p class="summary" id="rSummary"></p>
+          <div class="breakdown" id="rBreakdown"></div>
+        </div>
+
+        <div class="citations">
+          <div class="section-head">
+            <span class="eyebrow">Citation list</span>
+            <span class="meta" id="rSourceCount"></span>
+          </div>
+          <div class="sources" id="rSources" tabindex="0" aria-label="Sources (scrollable)"></div>
+        </div>
+      </div>
+
+      <footer class="result__footer">
+        <div class="timeline" id="rTimeline" aria-label="Latency by stage"></div>
+        <div class="feedback" id="rFeedback">
+          <span>Rate this draft</span>
+          <div class="rate" role="radiogroup" aria-label="Rating 1 to 5"></div>
+        </div>
+        <button class="btn btn--ghost" id="newBtn" type="button">
+          <span>New complaint</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ============ KNOWLEDGE BASE (what RAG retrieves from) ============ -->
+  <main class="stage view view--kb" id="viewKb" aria-labelledby="kbTitle">
+    <section class="kb-hero">
+      <h1 class="kb-hero__title" id="kbTitle"><span class="hero__line" data-split>Knowledge base</span></h1>
+      <p class="hero__sub">The PostgreSQL + pgvector data every answer is retrieved from: browse it, query it, and see what each
+        retrieval method returns.</p>
+    </section>
+
+    <section class="tiles" id="kbTiles" aria-label="Database statistics"></section>
+
+    <section class="kb-grid">
+      <div class="card kb-card">
+        <div class="section-head"><span class="eyebrow">Tickets by category</span><span class="meta" id="kbCatMeta"></span></div>
+        <div class="bars" id="kbCats"></div>
+      </div>
+      <div class="card kb-card">
+        <div class="section-head"><span class="eyebrow">How retrieval is configured</span></div>
+        <dl class="kv" id="kbConfig"></dl>
+        <div class="section-head section-head--sub"><span class="eyebrow">Indexes in the database</span></div>
+        <ul class="indexes" id="kbIndexes"></ul>
+      </div>
+    </section>
+
+    <section class="card kb-tabs-card">
+      <div class="tabs" role="tablist" aria-label="Knowledge base views">
+        <button class="tab is-active" role="tab" data-tab="playground" type="button">Retrieval playground</button>
+        <button class="tab" role="tab" data-tab="tickets" type="button">Tickets</button>
+        <button class="tab" role="tab" data-tab="kb" type="button">KB articles</button>
+        <button class="tab" role="tab" data-tab="requests" type="button">Request log</button>
+        <span class="tabs__ink" id="tabInk"></span>
+      </div>
+
+      <div class="tabpanel is-active" data-panel="playground">
+        <form class="searchbar" id="playForm">
+          <input id="playQuery" type="text" maxlength="1000" placeholder="Type any complaint text to see what the database returns…" />
+          <button class="btn btn--red" type="submit">Search database</button>
+        </form>
+        <p class="muted small">No LLM involved: these are the raw candidates each method pulls from PostgreSQL. Hover a row to
+          see the same document across methods.</p>
+        <div class="compare" id="playResults"></div>
+      </div>
+
+      <div class="tabpanel" data-panel="tickets">
+        <div class="searchbar searchbar--inline">
+          <input id="ticketQuery" type="text" maxlength="200" placeholder="Filter tickets by id or text…" />
+          <select id="ticketCategory" aria-label="Category"><option value="">All categories</option></select>
+        </div>
+        <div class="table-wrap"><table class="table" id="ticketTable"></table></div>
+        <div class="pager" id="ticketPager"></div>
+      </div>
+
+      <div class="tabpanel" data-panel="kb">
+        <div class="searchbar searchbar--inline">
+          <input id="kbQuery" type="text" maxlength="200" placeholder="Filter KB articles…" />
+        </div>
+        <div class="table-wrap"><table class="table" id="kbTable"></table></div>
+      </div>
+
+      <div class="tabpanel" data-panel="requests">
+        <p class="muted small">Every resolution is logged (complaint stored PII-redacted) with the sources it retrieved.</p>
+        <div class="table-wrap"><table class="table" id="reqTable"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Database record slide-over -->
+  <aside class="drawer drawer--record" id="record" aria-hidden="true" aria-label="Database record">
+    <div class="drawer__panel">
+      <div class="drawer__head">
+        <h2 id="recordTitle">Record</h2>
+        <button class="icon-btn" data-close="record" type="button" aria-label="Close">✕</button>
+      </div>
+      <div id="recordBody" class="drawer__body"></div>
+    </div>
+  </aside>
+
+  <!-- Insights slide-over -->
+  <aside class="drawer" id="insights" aria-hidden="true" aria-label="Insights">
+    <div class="drawer__panel">
+      <div class="drawer__head">
+        <h2>Insights</h2>
+        <button class="icon-btn" data-close="insights" type="button" aria-label="Close">✕</button>
+      </div>
+      <div id="insightsBody" class="drawer__body"><p class="muted">Loading…</p></div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="alert"></div>
+
+  <script src="/static/js/app.js" defer></script>
+</body>
+</html>

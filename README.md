@@ -60,6 +60,11 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 * **Evidence-derived confidence and decisions**: RESOLVE / REVIEW / ESCALATE from retrieval relevance, citation
   quality, groundedness and understanding confidence. Never LLM self-assessment.
 * **Evolving data**: incremental, idempotent ingestion; KB versioning; runtime registration of new ticket classes.
+* **Web console** at http://localhost:8000: paste a complaint and watch retrieval, drafting and validation happen;
+  every citation opens the actual database row. A **Knowledge base** view shows the live PostgreSQL + pgvector corpus
+  (counts, indexes, any ticket or KB article with its stored embedding) and a retrieval playground that runs semantic,
+  lexical and hybrid search side by side, so you can see that answers come from retrieved data. No build step: plain
+  HTML/CSS/JS served by the API.
 * **Operations**: health, metrics (latency percentiles, decision mix, groundedness, fallback rate, agent feedback),
   drift monitoring (unknown-intent rate, nearest-neighbour similarity, intent-mix shift), structured JSON logs with
   request ids, audit log of every resolution.
@@ -131,6 +136,26 @@ cited, with no LLM involved. The response's `resolution.generator` field says wh
 > If C: is short on space, set Docker Desktop → Settings → Resources → Advanced → *Disk image location* to another drive.
 > On an 8 GB machine, cap the Docker/WSL VM so Windows keeps headroom: `%USERPROFILE%\.wslconfig` with `[wsl2]` / `memory=3GB` (Postgres + API fit comfortably).
 
+## Web console
+
+Open **http://localhost:8000** once the stack is up.
+
+| | |
+|---|---|
+| ![Console: complaint input](docs/images/console-idle.png) | ![Console: retrieval in progress](docs/images/console-searching.png) |
+| **1. Paste a complaint** (or click an example). | **2. Search:** the assistant reads the complaint and pulls similar past tickets and KB articles; the stage list fills in with the real per-stage timings when the response arrives. |
+| ![Console: cited resolution](docs/images/console-result.png) | ![Knowledge base and retrieval playground](docs/images/knowledge-base.png) |
+| **3. Result:** the complaint, its understanding, the confidence and decision, steps with clickable citations and a per-step support badge (hover for the similarity/NLI signals), and the scrollable citation list with semantic/lexical ranks. | **Knowledge base:** live counts, category mix, retrieval configuration, the ANN/GIN indexes as defined in Postgres, and the retrieval playground (no LLM). Tabs browse tickets, KB articles and the request log. |
+
+"Open in database" on any citation, playground hit or table row opens the stored record, including its provenance
+and the first values of its 384-dimensional embedding:
+
+![Stored ticket row with its embedding](docs/images/database-record.png)
+
+Deep links for demos: `/?q=<complaint>` runs a complaint, `/?view=kb&play=<text>` runs the playground,
+`/?record=ticket:TKT-000090` opens a row, `/?insights=1` opens metrics and drift. Add `&static=1` to skip animations.
+The console also respects the OS "reduce motion" setting.
+
 ## Local development (without Docker for the API)
 
 ```bash
@@ -150,13 +175,13 @@ uvicorn app.main:app --reload
 ## Tests and quality
 
 ```bash
-pytest --cov=app                 # 69 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
+pytest --cov=app                 # 73 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
 pytest -m db                     # DB integration tests only (needs the database running)
 black --check . && flake8 && mypy app scripts evaluation experiments tests
 locust -f tests/load/locustfile.py --host http://localhost:8000   # optional interactive load test
 ```
 
-Current status: 69 passed, black / flake8 / mypy clean (coverage below).
+Current status: 73 passed, black / flake8 / mypy clean (coverage below).
 
 ## Evaluations and experiments
 
@@ -180,7 +205,8 @@ Every script writes its raw output to `experiments/results/*.json`. The numbers 
 
 ```
 app/
-  api/v1/          routes, request/response models, service container
+  api/v1/          routes, request/response models, service container, corpus (read-only knowledge-base views)
+  static/          web console: index.html, css/app.css, js/app.js (no build step)
   core/            database, LLM provider abstraction, prompts, logging
   models/          internal dataclasses, embedding service
   services/        understanding, retrieval, generation, validation, decision, ingestion, pipeline, monitoring
@@ -195,7 +221,7 @@ evaluation/        metrics, understanding/retrieval/generation/system evals, key
                    build_human_eval_sheet, human_eval_analysis
 experiments/       E1-E3, evolving classes, results/*.json (raw output of every number in the docs)
 tests/             unit/ (offline), integration/ (API with in-memory container; DB tests marked `db`), load/locustfile.py
-docs/              api.md, setup.md, deployment.md, troubleshooting.md
+docs/              api.md, setup.md, deployment.md, troubleshooting.md, images/ (console screenshots)
 migrations/        SQL schema
 Dockerfile, docker-compose.yml, requirements.txt, requirements-dev.txt, pyproject.toml, setup.cfg, LICENSE (MIT)
 ```
@@ -211,6 +237,10 @@ Dockerfile, docker-compose.yml, requirements.txt, requirements-dev.txt, pyprojec
 | GET | `/api/v1/health` | DB, models, LLM status, corpus size |
 | GET | `/api/v1/metrics` | volume, decision mix, latency p50/p95/p99, groundedness, fallback rate, feedback |
 | GET | `/api/v1/monitoring/drift` | unknown-intent rate, intent-mix shift, nearest-neighbour similarity, alerts |
+| GET | `/api/v1/corpus/stats` · `/corpus/tickets[/{id}]` · `/corpus/kb[/{id}]` | read-only knowledge-base views: counts, indexes, rows with provenance and embedding preview |
+| GET | `/api/v1/corpus/search?q=` | raw retrieval without the LLM: semantic vs lexical vs hybrid results side by side |
+| GET | `/api/v1/requests` | recent resolutions (PII-redacted) with the sources each one retrieved |
+| GET | `/` | web console |
 
 ## License
 

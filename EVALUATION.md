@@ -372,7 +372,7 @@ empty; values match an independent computation on a synthetic fill).
 
 | Check | Result |
 |---|---|
-| Unit + API + DB integration tests (`pytest`) | 69 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Unit + API + DB integration tests (`pytest`) | 73 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 83% |
 | `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 66 files) | clean |
 | Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |

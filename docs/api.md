@@ -100,6 +100,23 @@ accuracy / coverage, LLM fallback rate, mean agent feedback. Omit `hours` for al
 Recent window vs everything before it: unknown-intent rate, intent distribution and its total-variation distance,
 mean nearest-neighbour similarity, escalation rate, plus `alerts` when thresholds (`DRIFT_*` settings) are crossed.
 
+## Knowledge-base views (read-only)
+
+These endpoints exist so that the web console (and a reviewer) can see the data retrieval runs on. They never write.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /corpus/stats` | ticket / KB / request counts, embedding model and dimension, category and provenance mix, ANN and GIN index definitions from `pg_indexes`, PostgreSQL and pgvector versions, retrieval configuration (RRF weights, lexical query mode, top-k, KB slots, reranking) |
+| `GET /corpus/tickets?q=&category=&limit=20&offset=0` | `{"total", "items": [...]}`; `q` is a case-insensitive substring match on id, complaint or resolution; `limit` at most 100 |
+| `GET /corpus/tickets/{ticket_id}` | the full row: labels, provenance (`source`, `label_source`, `verified`, `split`), `metadata`, and `embedding` = `{"dims", "l2_norm", "preview": [first 24 values]}`; 404 if unknown |
+| `GET /corpus/kb?q=&limit=50&offset=0` | KB articles |
+| `GET /corpus/kb/{article_id}` | the full article incl. tags, version, number of archived versions and embedding preview; 404 if unknown |
+| `GET /corpus/search?q=&k=8` | raw retrieval without the LLM: `results.semantic`, `results.lexical`, `results.hybrid`, each a ranked list of `{rank, id, type, title, excerpt, relevance (cosine), score (fused), semantic_rank, lexical_rank}`; `q` 3-1,000 chars, `k` at most 20; KB minimum slots are off here so each method is shown unaltered |
+| `GET /requests?limit=20` | recent resolutions from the audit log: PII-redacted complaint, understanding, retrieved sources, decision, confidence, groundedness, generator, latency |
+
+`POST /tickets/resolve` sources also carry `semantic_rank` and `lexical_rank` (null when a method did not return
+that document), which the console shows on each citation.
+
 ## Errors
 
 All errors are JSON. Every response, including errors, carries an `x-request-id` header; quote it when reporting

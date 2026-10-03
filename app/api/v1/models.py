@@ -39,6 +39,8 @@ class SourceResponse(BaseModel):
     title: str | None = None
     excerpt: str
     relevance_score: float
+    semantic_rank: int | None = None  # rank in the pgvector candidate list (None = not retrieved semantically)
+    lexical_rank: int | None = None  # rank in the full-text candidate list (None = no lexical match)
 
 
 class ClaimValidationResponse(BaseModel):

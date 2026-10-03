@@ -122,3 +122,42 @@ async def test_metadata_filter_restricts_tickets_and_kb(services):
     assert any(i.document.doc_type == "ticket" for i in result.items)
     assert any(i.document.doc_type == "kb_article" for i in result.items)
     assert all(i.document.metadata["category"] == "billing_dispute" for i in result.items)
+
+
+async def test_corpus_endpoints_expose_the_knowledge_base(services):
+    from types import SimpleNamespace
+
+    from fastapi import FastAPI
+    from httpx import ASGITransport, AsyncClient
+
+    from app.api.v1.corpus import router as corpus_router
+    from app.api.v1.dependencies import get_container
+
+    sf, _, retriever, _ = services
+    app = FastAPI()
+    app.include_router(corpus_router)
+    app.dependency_overrides[get_container] = lambda: SimpleNamespace(
+        embedder=retriever.embedder, pipeline=SimpleNamespace(retrieval=SimpleNamespace(retriever=retriever))
+    )
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as c:
+        stats = (await c.get("/api/v1/corpus/stats")).json()
+        assert stats["tickets"]["total"] >= 2000 and stats["embedding"]["dims"] == 384
+        assert any("ivfflat" in i["definition"] for i in stats["indexes"])
+
+        page = (await c.get("/api/v1/corpus/tickets", params={"q": "LOS", "limit": 5})).json()
+        assert page["total"] > 0 and len(page["items"]) <= 5
+        tid = page["items"][0]["ticket_id"]
+        ticket = (await c.get(f"/api/v1/corpus/tickets/{tid}")).json()
+        assert ticket["embedding"]["dims"] == 384 and abs(ticket["embedding"]["l2_norm"] - 1) < 0.01
+        assert (await c.get("/api/v1/corpus/tickets/NOPE-1")).status_code == 404
+
+        kb = (await c.get("/api/v1/corpus/kb")).json()
+        art = (await c.get(f"/api/v1/corpus/kb/{kb['items'][0]['article_id']}")).json()
+        assert art["type"] == "kb_article" and art["embedding"]["dims"] == 384
+
+        res = (await c.get("/api/v1/corpus/search", params={"q": "red LOS light on the fibre box", "k": 5})).json()
+        assert set(res["results"]) == {"semantic", "lexical", "hybrid"}
+        assert all(len(v) <= 5 for v in res["results"].values()) and res["results"]["hybrid"]
+
+        log = (await c.get("/api/v1/requests", params={"limit": 3})).json()
+        assert isinstance(log, list)
