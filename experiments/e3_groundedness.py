@@ -28,6 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from app.config import settings  # noqa: E402
 from app.models.embeddings import get_embedding_service  # noqa: E402
 from app.models.schemas import Document  # noqa: E402
 from app.services.validation import GroundednessChecker, GroundednessThresholds, NLIModel, decide_support  # noqa: E402
@@ -35,10 +36,12 @@ from evaluation.data import PROCESSED_DIR, load_eval, read_jsonl, save_result  #
 from evaluation.metrics import binary_prf  # noqa: E402
 
 GRID = {
-    "sim": [0.4, 0.5, 0.6, 0.7, 0.8],
+    # Widened after the switch to all-mpnet-base-v2, whose optimum hit the old grid edges (sim 0.4, contradiction
+    # 0.9); both embedding models were re-tuned on this grid so their results stay comparable.
+    "sim": [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8],
     "entail": [0.3, 0.5, 0.7, 0.9],
     "lexical": [0.3, 0.4, 0.5, 0.6, 0.7],
-    "contradiction": [0.5, 0.7, 0.9],
+    "contradiction": [0.5, 0.7, 0.9, 0.95, 0.98],
 }
 
 
@@ -145,7 +148,7 @@ def main() -> None:
     items += verbatim_items()
     scenarios = sorted({it["scenario_id"] for it in items})
     dev_sc = set(scenarios[::2])
-    embedder = get_embedding_service()
+    embedder = get_embedding_service(settings.VALIDATION_EMBEDDING_MODEL)  # the model validation uses
     nli = NLIModel(args.nli_model)
     output: dict[str, Any] = {
         "nli_model": args.nli_model,

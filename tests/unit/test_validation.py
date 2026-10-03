@@ -105,3 +105,34 @@ def test_contradiction_aggregation_modes(embedder, sources):
     mx = GroundednessChecker(embedder, ScriptedNLI(), T, contradiction_agg="max", use_quote=False)
     assert top.score(claim, [sources[1]])["contradiction"] < 0.5  # most similar premise is the 5 GHz step
     assert mx.score(claim, [sources[1]])["contradiction"] == 0.95  # v1 picks up an unrelated premise
+
+
+def test_source_embeddings_are_cached_across_requests(embedder, fake_nli, sources):
+    class CountingEmbedder:
+        def __init__(self, inner):
+            self.inner, self.calls = inner, 0
+
+        def encode(self, texts, **kw):
+            self.calls += 1
+            return self.inner.encode(texts, **kw)
+
+    counting = CountingEmbedder(embedder)
+    checker = GroundednessChecker(counting, fake_nli)  # type: ignore[arg-type]
+    claim = "Enable the 5 GHz band and connect nearby devices to it."
+    checker.score(claim, sources[:2])
+    first = counting.calls  # 1 claim + 2 sources
+    checker.score(claim, sources[:2])  # new request, same sources: only the claim is encoded
+    assert first == 3 and counting.calls == first + 1
+
+
+def test_source_cache_invalidates_on_text_change_and_is_bounded(embedder, fake_nli, sources):
+    from app.models.schemas import Document
+
+    checker = GroundednessChecker(embedder, fake_nli)
+    checker.source_cache_size = 2
+    checker.score("Update the router firmware.", sources)  # 3 sources, cache keeps the 2 most recent
+    assert len(checker._source_cache) == 2
+    edited = Document(sources[1].id, sources[1].text + " Reboot the router afterwards.", sources[1].metadata)
+    before = len(checker._source_cache)
+    checker.score("Update the router firmware.", [edited])
+    assert len(checker._source_cache) == before  # new entry for the edited text, oldest evicted

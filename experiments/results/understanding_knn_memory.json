@@ -10,33 +10,33 @@
   "understanding": {
     "n": 500,
     "intent": {
-      "accuracy": 0.724,
-      "macro_f1": 0.7233,
-      "false_unknown_rate": 0.026,
-      "accuracy_when_not_unknown": 0.7433,
+      "accuracy": 0.89,
+      "macro_f1": 0.889,
+      "false_unknown_rate": 0.01,
+      "accuracy_when_not_unknown": 0.899,
       "per_class_f1": {
-        "account_management": 0.6667,
-        "billing_dispute": 0.8085,
-        "connectivity_issue": 0.6612,
-        "hardware_problem": 0.6357,
-        "outage_report": 0.8296,
-        "plan_change": 0.5278,
-        "service_activation": 0.7805,
-        "speed_issue": 0.7455,
-        "technical_support": 0.8545
+        "account_management": 0.8864,
+        "billing_dispute": 0.9394,
+        "connectivity_issue": 0.8793,
+        "hardware_problem": 0.8633,
+        "outage_report": 0.9254,
+        "plan_change": 0.7692,
+        "service_activation": 0.8315,
+        "speed_issue": 0.9167,
+        "technical_support": 0.9899
       }
     },
     "products": {
-      "micro_precision": 0.6888,
-      "micro_recall": 0.745,
-      "micro_f1": 0.7158,
-      "exact_match": 0.558,
-      "primary_product_recall": 0.786
+      "micro_precision": 0.7697,
+      "micro_recall": 0.8633,
+      "micro_f1": 0.8138,
+      "exact_match": 0.66,
+      "primary_product_recall": 0.898
     },
     "severity": {
-      "accuracy": 0.784,
-      "within_one_level": 0.93,
-      "macro_f1": 0.7679,
+      "accuracy": 0.884,
+      "within_one_level": 0.97,
+      "macro_f1": 0.8761,
       "confusion_matrix": {
         "labels": [
           "low",
@@ -46,28 +46,28 @@
         ],
         "matrix": [
           [
-            105,
-            8,
+            115,
             4,
-            2
+            0,
+            0
           ],
           [
-            6,
-            150,
-            13,
+            2,
+            159,
+            8,
             15
           ],
           [
-            7,
-            10,
-            59,
-            31
+            0,
+            1,
+            80,
+            26
           ],
           [
             0,
-            7,
-            5,
-            78
+            0,
+            2,
+            88
           ]
         ]
       }
@@ -107,18 +107,18 @@
     }
   },
   "latency_ms": {
-    "mean": 266.4,
-    "p95": 319.1
+    "mean": 409.2,
+    "p95": 552.7
   },
   "novel_intent_before_ingestion": {
     "n": 60,
-    "flagged_unknown_rate": 0.05,
+    "flagged_unknown_rate": 0.0167,
     "predicted_distribution": {
-      "outage_report": 15,
-      "billing_dispute": 16,
-      "connectivity_issue": 25,
-      "unknown_intent": 3,
-      "speed_issue": 1
+      "connectivity_issue": 12,
+      "billing_dispute": 20,
+      "outage_report": 20,
+      "unknown_intent": 1,
+      "service_activation": 7
     }
   },
   "unknown_threshold_sweep_on_dev": [
@@ -126,263 +126,264 @@
       "min_confidence": 0.0,
       "min_similarity": 0.0,
       "dev_false_unknown_rate": 0.0,
-      "dev_accuracy": 0.7286,
+      "dev_accuracy": 0.8894,
       "novel_detection_rate": 0.0
     },
     {
       "min_confidence": 0.0,
       "min_similarity": 0.4,
       "dev_false_unknown_rate": 0.0,
-      "dev_accuracy": 0.7286,
+      "dev_accuracy": 0.8894,
       "novel_detection_rate": 0.0
     },
     {
       "min_confidence": 0.0,
       "min_similarity": 0.5,
-      "dev_false_unknown_rate": 0.0251,
-      "dev_accuracy": 0.7035,
-      "novel_detection_rate": 0.0833
+      "dev_false_unknown_rate": 0.005,
+      "dev_accuracy": 0.8844,
+      "novel_detection_rate": 0.0
     },
     {
       "min_confidence": 0.0,
       "min_similarity": 0.55,
-      "dev_false_unknown_rate": 0.0905,
-      "dev_accuracy": 0.6683,
-      "novel_detection_rate": 0.1833
+      "dev_false_unknown_rate": 0.0402,
+      "dev_accuracy": 0.8492,
+      "novel_detection_rate": 0.0
     },
     {
       "min_confidence": 0.0,
       "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.2462,
-      "dev_accuracy": 0.5779,
-      "novel_detection_rate": 0.3333
+      "dev_false_unknown_rate": 0.1206,
+      "dev_accuracy": 0.7688,
+      "novel_detection_rate": 0.0167
     },
     {
       "min_confidence": 0.0,
       "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.4673,
-      "dev_accuracy": 0.4322,
-      "novel_detection_rate": 0.6333
+      "dev_false_unknown_rate": 0.3266,
+      "dev_accuracy": 0.598,
+      "novel_detection_rate": 0.2667
     },
     {
       "min_confidence": 0.35,
       "min_similarity": 0.0,
-      "dev_false_unknown_rate": 0.0251,
-      "dev_accuracy": 0.7186,
-      "novel_detection_rate": 0.05
+      "dev_false_unknown_rate": 0.005,
+      "dev_accuracy": 0.8894,
+      "novel_detection_rate": 0.0167
     },
     {
       "min_confidence": 0.35,
       "min_similarity": 0.4,
-      "dev_false_unknown_rate": 0.0251,
-      "dev_accuracy": 0.7186,
-      "novel_detection_rate": 0.05
+      "dev_false_unknown_rate": 0.005,
+      "dev_accuracy": 0.8894,
+      "novel_detection_rate": 0.0167
     },
     {
       "min_confidence": 0.35,
       "min_similarity": 0.5,
-      "dev_false_unknown_rate": 0.0503,
-      "dev_accuracy": 0.6935,
-      "novel_detection_rate": 0.1333
+      "dev_false_unknown_rate": 0.0101,
+      "dev_accuracy": 0.8844,
+      "novel_detection_rate": 0.0167
     },
     {
       "min_confidence": 0.35,
       "min_similarity": 0.55,
+      "dev_false_unknown_rate": 0.0452,
+      "dev_accuracy": 0.8492,
+      "novel_detection_rate": 0.0167
+    },
+    {
+      "min_confidence": 0.35,
+      "min_similarity": 0.6,
+      "dev_false_unknown_rate": 0.1256,
+      "dev_accuracy": 0.7688,
+      "novel_detection_rate": 0.0333
+    },
+    {
+      "min_confidence": 0.35,
+      "min_similarity": 0.65,
+      "dev_false_unknown_rate": 0.3266,
+      "dev_accuracy": 0.598,
+      "novel_detection_rate": 0.2833
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.0,
+      "dev_false_unknown_rate": 0.0302,
+      "dev_accuracy": 0.8744,
+      "novel_detection_rate": 0.0333
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.4,
+      "dev_false_unknown_rate": 0.0302,
+      "dev_accuracy": 0.8744,
+      "novel_detection_rate": 0.0333
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.5,
+      "dev_false_unknown_rate": 0.0352,
+      "dev_accuracy": 0.8693,
+      "novel_detection_rate": 0.0333
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.55,
+      "dev_false_unknown_rate": 0.0704,
+      "dev_accuracy": 0.8342,
+      "novel_detection_rate": 0.0333
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.6,
+      "dev_false_unknown_rate": 0.1407,
+      "dev_accuracy": 0.7638,
+      "novel_detection_rate": 0.05
+    },
+    {
+      "min_confidence": 0.45,
+      "min_similarity": 0.65,
+      "dev_false_unknown_rate": 0.3367,
+      "dev_accuracy": 0.593,
+      "novel_detection_rate": 0.2833
+    },
+    {
+      "min_confidence": 0.55,
+      "min_similarity": 0.0,
       "dev_false_unknown_rate": 0.1106,
-      "dev_accuracy": 0.6583,
+      "dev_accuracy": 0.8392,
       "novel_detection_rate": 0.2333
     },
     {
-      "min_confidence": 0.35,
-      "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.2563,
-      "dev_accuracy": 0.5678,
-      "novel_detection_rate": 0.35
-    },
-    {
-      "min_confidence": 0.35,
-      "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.4774,
-      "dev_accuracy": 0.4221,
-      "novel_detection_rate": 0.6333
-    },
-    {
-      "min_confidence": 0.45,
-      "min_similarity": 0.0,
-      "dev_false_unknown_rate": 0.0905,
-      "dev_accuracy": 0.6884,
-      "novel_detection_rate": 0.1333
-    },
-    {
-      "min_confidence": 0.45,
+      "min_confidence": 0.55,
       "min_similarity": 0.4,
-      "dev_false_unknown_rate": 0.0905,
-      "dev_accuracy": 0.6884,
-      "novel_detection_rate": 0.1333
+      "dev_false_unknown_rate": 0.1106,
+      "dev_accuracy": 0.8392,
+      "novel_detection_rate": 0.2333
     },
     {
-      "min_confidence": 0.45,
+      "min_confidence": 0.55,
       "min_similarity": 0.5,
-      "dev_false_unknown_rate": 0.1156,
-      "dev_accuracy": 0.6633,
-      "novel_detection_rate": 0.2167
+      "dev_false_unknown_rate": 0.1106,
+      "dev_accuracy": 0.8392,
+      "novel_detection_rate": 0.2333
     },
     {
-      "min_confidence": 0.45,
+      "min_confidence": 0.55,
       "min_similarity": 0.55,
-      "dev_false_unknown_rate": 0.1658,
-      "dev_accuracy": 0.6332,
-      "novel_detection_rate": 0.3
+      "dev_false_unknown_rate": 0.1407,
+      "dev_accuracy": 0.809,
+      "novel_detection_rate": 0.2333
     },
     {
-      "min_confidence": 0.45,
+      "min_confidence": 0.55,
       "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.3015,
-      "dev_accuracy": 0.5477,
+      "dev_false_unknown_rate": 0.206,
+      "dev_accuracy": 0.7437,
+      "novel_detection_rate": 0.25
+    },
+    {
+      "min_confidence": 0.55,
+      "min_similarity": 0.65,
+      "dev_false_unknown_rate": 0.3769,
+      "dev_accuracy": 0.5879,
       "novel_detection_rate": 0.4
     },
     {
-      "min_confidence": 0.45,
-      "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.5075,
-      "dev_accuracy": 0.407,
-      "novel_detection_rate": 0.65
-    },
-    {
-      "min_confidence": 0.55,
+      "min_confidence": 0.65,
       "min_similarity": 0.0,
       "dev_false_unknown_rate": 0.206,
-      "dev_accuracy": 0.6281,
+      "dev_accuracy": 0.7688,
       "novel_detection_rate": 0.4833
     },
     {
-      "min_confidence": 0.55,
+      "min_confidence": 0.65,
       "min_similarity": 0.4,
       "dev_false_unknown_rate": 0.206,
-      "dev_accuracy": 0.6281,
+      "dev_accuracy": 0.7688,
       "novel_detection_rate": 0.4833
     },
     {
-      "min_confidence": 0.55,
+      "min_confidence": 0.65,
       "min_similarity": 0.5,
-      "dev_false_unknown_rate": 0.2312,
-      "dev_accuracy": 0.603,
-      "novel_detection_rate": 0.55
+      "dev_false_unknown_rate": 0.206,
+      "dev_accuracy": 0.7688,
+      "novel_detection_rate": 0.4833
     },
     {
-      "min_confidence": 0.55,
+      "min_confidence": 0.65,
       "min_similarity": 0.55,
-      "dev_false_unknown_rate": 0.2714,
-      "dev_accuracy": 0.5779,
+      "dev_false_unknown_rate": 0.2362,
+      "dev_accuracy": 0.7387,
+      "novel_detection_rate": 0.4833
+    },
+    {
+      "min_confidence": 0.65,
+      "min_similarity": 0.6,
+      "dev_false_unknown_rate": 0.3015,
+      "dev_accuracy": 0.6734,
+      "novel_detection_rate": 0.5
+    },
+    {
+      "min_confidence": 0.65,
+      "min_similarity": 0.65,
+      "dev_false_unknown_rate": 0.4523,
+      "dev_accuracy": 0.5276,
+      "novel_detection_rate": 0.6333
+    },
+    {
+      "min_confidence": 0.75,
+      "min_similarity": 0.0,
+      "dev_false_unknown_rate": 0.3116,
+      "dev_accuracy": 0.6784,
+      "novel_detection_rate": 0.5833
+    },
+    {
+      "min_confidence": 0.75,
+      "min_similarity": 0.4,
+      "dev_false_unknown_rate": 0.3116,
+      "dev_accuracy": 0.6784,
+      "novel_detection_rate": 0.5833
+    },
+    {
+      "min_confidence": 0.75,
+      "min_similarity": 0.5,
+      "dev_false_unknown_rate": 0.3116,
+      "dev_accuracy": 0.6784,
+      "novel_detection_rate": 0.5833
+    },
+    {
+      "min_confidence": 0.75,
+      "min_similarity": 0.55,
+      "dev_false_unknown_rate": 0.3317,
+      "dev_accuracy": 0.6583,
+      "novel_detection_rate": 0.5833
+    },
+    {
+      "min_confidence": 0.75,
+      "min_similarity": 0.6,
+      "dev_false_unknown_rate": 0.392,
+      "dev_accuracy": 0.598,
       "novel_detection_rate": 0.6
     },
     {
-      "min_confidence": 0.55,
-      "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.3668,
-      "dev_accuracy": 0.5126,
-      "novel_detection_rate": 0.65
-    },
-    {
-      "min_confidence": 0.55,
+      "min_confidence": 0.75,
       "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.5427,
-      "dev_accuracy": 0.3869,
-      "novel_detection_rate": 0.8
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.0,
-      "dev_false_unknown_rate": 0.3769,
-      "dev_accuracy": 0.5226,
-      "novel_detection_rate": 0.6833
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.4,
-      "dev_false_unknown_rate": 0.3769,
-      "dev_accuracy": 0.5226,
-      "novel_detection_rate": 0.6833
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.5,
-      "dev_false_unknown_rate": 0.392,
-      "dev_accuracy": 0.5075,
-      "novel_detection_rate": 0.75
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.55,
-      "dev_false_unknown_rate": 0.4171,
-      "dev_accuracy": 0.4925,
-      "novel_detection_rate": 0.8
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.4975,
-      "dev_accuracy": 0.4322,
-      "novel_detection_rate": 0.8333
-    },
-    {
-      "min_confidence": 0.65,
-      "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.6382,
-      "dev_accuracy": 0.3266,
-      "novel_detection_rate": 0.9
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.0,
-      "dev_false_unknown_rate": 0.5075,
-      "dev_accuracy": 0.4171,
-      "novel_detection_rate": 0.8
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.4,
-      "dev_false_unknown_rate": 0.5075,
-      "dev_accuracy": 0.4171,
-      "novel_detection_rate": 0.8
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.5,
       "dev_false_unknown_rate": 0.5176,
-      "dev_accuracy": 0.407,
-      "novel_detection_rate": 0.8667
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.55,
-      "dev_false_unknown_rate": 0.5427,
-      "dev_accuracy": 0.392,
-      "novel_detection_rate": 0.9
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.6,
-      "dev_false_unknown_rate": 0.608,
-      "dev_accuracy": 0.3417,
-      "novel_detection_rate": 0.9333
-    },
-    {
-      "min_confidence": 0.75,
-      "min_similarity": 0.65,
-      "dev_false_unknown_rate": 0.7236,
-      "dev_accuracy": 0.2513,
-      "novel_detection_rate": 0.95
+      "dev_accuracy": 0.4724,
+      "novel_detection_rate": 0.7
     }
   ],
   "novel_intent_after_ingestion": {
     "n": 60,
-    "accuracy_roaming_issue": 0.85,
+    "accuracy_roaming_issue": 0.8833,
     "predicted_distribution": {
-      "outage_report": 5,
-      "roaming_issue": 51,
-      "connectivity_issue": 4
+      "roaming_issue": 53,
+      "connectivity_issue": 5,
+      "outage_report": 1,
+      "unknown_intent": 1
     },
-    "in_distribution_intent_accuracy_after": 0.682
+    "in_distribution_intent_accuracy_after": 0.888
   }
 }

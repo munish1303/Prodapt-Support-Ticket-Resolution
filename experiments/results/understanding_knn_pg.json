@@ -1,0 +1,124 @@
+{
+  "config": {
+    "index": "pg",
+    "classifier": "knn",
+    "knn_k": 15,
+    "min_confidence": 0.35,
+    "min_similarity": 0.4,
+    "severity_sentiment_bump": -1.0
+  },
+  "understanding": {
+    "n": 500,
+    "intent": {
+      "accuracy": 0.892,
+      "macro_f1": 0.8917,
+      "false_unknown_rate": 0.01,
+      "accuracy_when_not_unknown": 0.901,
+      "per_class_f1": {
+        "account_management": 0.8864,
+        "billing_dispute": 0.9323,
+        "connectivity_issue": 0.887,
+        "hardware_problem": 0.8571,
+        "outage_report": 0.9394,
+        "plan_change": 0.7848,
+        "service_activation": 0.8315,
+        "speed_issue": 0.9167,
+        "technical_support": 0.9899
+      }
+    },
+    "products": {
+      "micro_precision": 0.77,
+      "micro_recall": 0.865,
+      "micro_f1": 0.8148,
+      "exact_match": 0.662,
+      "primary_product_recall": 0.9
+    },
+    "severity": {
+      "accuracy": 0.886,
+      "within_one_level": 0.97,
+      "macro_f1": 0.8784,
+      "confusion_matrix": {
+        "labels": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ],
+        "matrix": [
+          [
+            116,
+            3,
+            0,
+            0
+          ],
+          [
+            3,
+            158,
+            8,
+            15
+          ],
+          [
+            0,
+            1,
+            81,
+            25
+          ],
+          [
+            0,
+            0,
+            2,
+            88
+          ]
+        ]
+      }
+    },
+    "sentiment": {
+      "accuracy": 0.79,
+      "macro_f1": 0.7415,
+      "confusion_matrix": {
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "matrix": [
+          [
+            213,
+            36,
+            0
+          ],
+          [
+            20,
+            144,
+            8
+          ],
+          [
+            0,
+            41,
+            38
+          ]
+        ]
+      },
+      "pred_distribution": {
+        "negative": 233,
+        "neutral": 221,
+        "positive": 46
+      }
+    }
+  },
+  "latency_ms": {
+    "mean": 367.9,
+    "p95": 512.1
+  },
+  "novel_intent_before_ingestion": {
+    "n": 60,
+    "flagged_unknown_rate": 0.0167,
+    "predicted_distribution": {
+      "connectivity_issue": 12,
+      "billing_dispute": 20,
+      "outage_report": 20,
+      "unknown_intent": 1,
+      "service_activation": 7
+    }
+  }
+}

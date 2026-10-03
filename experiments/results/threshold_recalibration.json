@@ -1,0 +1,76 @@
+{
+  "old_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "new_model": "sentence-transformers/all-mpnet-base-v2",
+  "n_complaints": {
+    "dev": 199,
+    "novel": 60
+  },
+  "medians": {
+    "nearest_similarity": {
+      "old_median": 0.648,
+      "new_median": 0.6799
+    },
+    "top1_relevance": {
+      "old_median": 0.6114,
+      "new_median": 0.6271
+    },
+    "top5_mean_relevance": {
+      "old_median": 0.5899,
+      "new_median": 0.6011
+    }
+  },
+  "thresholds": {
+    "EVIDENCE_MIN_TOP_RELEVANCE": {
+      "statistic": "top1_relevance",
+      "old_value": 0.35,
+      "old_percentile": 0.0,
+      "new_by_percentile": null,
+      "new_by_qq_line": 0.4176,
+      "qq_line": {
+        "slope": 0.8374,
+        "intercept": 0.1245
+      },
+      "method": "qq_line (outside observed range)",
+      "new_value": 0.42
+    },
+    "EVIDENCE_MIN_AVG_RELEVANCE": {
+      "statistic": "top5_mean_relevance",
+      "old_value": 0.4,
+      "old_percentile": 0.0077,
+      "new_by_percentile": null,
+      "new_by_qq_line": 0.4519,
+      "qq_line": {
+        "slope": 0.857,
+        "intercept": 0.1091
+      },
+      "method": "qq_line (outside observed range)",
+      "new_value": 0.45
+    },
+    "CONF_RETRIEVAL_NORMALISER": {
+      "statistic": "top5_mean_relevance",
+      "old_value": 0.8,
+      "old_percentile": 1.0,
+      "new_by_percentile": null,
+      "new_by_qq_line": 0.7947,
+      "qq_line": {
+        "slope": 0.857,
+        "intercept": 0.1091
+      },
+      "method": "qq_line (outside observed range)",
+      "new_value": 0.79
+    },
+    "DRIFT_LOW_SIMILARITY_ALERT": {
+      "statistic": "nearest_similarity",
+      "old_value": 0.45,
+      "old_percentile": 0.0039,
+      "new_by_percentile": null,
+      "new_by_qq_line": 0.5084,
+      "qq_line": {
+        "slope": 0.8706,
+        "intercept": 0.1166
+      },
+      "method": "qq_line (outside observed range)",
+      "new_value": 0.51
+    }
+  }
+}

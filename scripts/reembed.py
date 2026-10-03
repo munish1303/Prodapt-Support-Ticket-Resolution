@@ -124,7 +124,8 @@ async def missing_counts(conn) -> tuple[int, int]:
     return int(t), int(k)
 
 
-async def reembed_missing(batch_size: int) -> int:
+async def reembed_missing(batch_size: int, max_seconds: float | None = None) -> bool:
+    """Re-embed rows with missing vectors. Returns False if it stopped early on the time budget."""
     from app.models.embeddings import get_embedding_service
 
     embedder = get_embedding_service()
@@ -150,6 +151,9 @@ async def reembed_missing(batch_size: int) -> int:
                 )
         done += len(rows)
         print(f"tickets re-embedded: {done} ({time.perf_counter() - started:.0f}s)", flush=True)
+        if max_seconds is not None and time.perf_counter() - started > max_seconds:
+            print("time budget reached; run again to continue (progress is committed)", flush=True)
+            return False
     async with get_engine().begin() as conn:
         rows = (
             await conn.execute(text("SELECT article_id, title, content FROM kb_articles WHERE embedding IS NULL"))
@@ -162,7 +166,7 @@ async def reembed_missing(batch_size: int) -> int:
                     {"v": to_pgvector(v), "id": r[0]},
                 )
             print(f"KB articles re-embedded: {len(rows)}", flush=True)
-    return done + len(rows)
+    return True
 
 
 async def main() -> None:
@@ -170,6 +174,9 @@ async def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--max-minutes", type=float, default=None, help="stop after this long (resumable), e.g. to fit a job slot"
+    )
     args = parser.parse_args()
     try:
         if args.dry_run:
@@ -194,7 +201,9 @@ async def main() -> None:
             return
         if sum(missing):
             print(f"re-embedding with {settings.EMBEDDING_MODEL}: {missing[0]} tickets, {missing[1]} KB articles")
-            await reembed_missing(args.batch_size)
+            budget = args.max_minutes * 60 if args.max_minutes else None
+            if not await reembed_missing(args.batch_size, budget):
+                return
         await build_indexes()
         async with get_engine().begin() as conn:
             await _set_meta(conn, "reembed_complete", "true")

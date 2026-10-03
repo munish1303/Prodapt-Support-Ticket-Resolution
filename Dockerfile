@@ -22,7 +22,6 @@ RUN for i in 1 2 3 4 5; do \
       python -c "\
 from sentence_transformers import SentenceTransformer, CrossEncoder; \
 from transformers import pipeline; \
-SentenceTransformer('sentence-transformers/all-mpnet-base-v2'); \
 SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2'); \
 CrossEncoder('cross-encoder/nli-deberta-v3-small'); \
 CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2'); \
@@ -30,8 +29,18 @@ pipeline('sentiment-analysis', model='cardiffnlp/twitter-roberta-base-sentiment-
       echo "model download attempt $i failed; retrying in 20s"; sleep 20; \
     done; exit 1
 
-COPY . .
-RUN chmod +x scripts/docker_entrypoint.sh && useradd --create-home appuser && chown -R appuser /app /models
+# Embedding model (Experiment 4). A separate layer so the models above stay cached when it changes.
+RUN for i in 1 2 3 4 5; do \
+      python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-mpnet-base-v2')" && exit 0; \
+      echo "model download attempt $i failed; retrying in 20s"; sleep 20; \
+    done; exit 1
+
+# The app runs as a non-root user. /models stays root-owned: the user only needs to read it (HF_HUB_OFFLINE=1 at
+# runtime), and a recursive chown would copy the whole model directory into a new layer on every rebuild
+# (that duplication once grew Docker's disk by ~15 GB). Only the small app tree is owned by the user.
+RUN useradd --create-home appuser
+COPY --chown=appuser:appuser . .
+RUN chmod +x scripts/docker_entrypoint.sh
 USER appuser
 
 EXPOSE 8000

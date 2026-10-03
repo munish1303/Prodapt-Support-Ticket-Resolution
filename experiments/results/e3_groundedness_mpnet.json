@@ -11,7 +11,7 @@
   "test_scenarios": 20,
   "configs": {
     "v1_chunk_max": {
-      "score_ms_per_claim_full_nli": 502.5,
+      "score_ms_per_claim_full_nli": 955.0,
       "methods": {
         "similarity": {
           "tuned_thresholds": {
@@ -24,13 +24,13 @@
             "contradiction": 0.7
           },
           "test_tuned": {
-            "precision": 0.4255,
-            "recall": 1.0,
-            "f1": 0.597,
-            "accuracy": 0.46,
-            "tp": 40,
-            "fp": 54,
-            "fn": 0,
+            "precision": 0.427,
+            "recall": 0.95,
+            "f1": 0.5891,
+            "accuracy": 0.47,
+            "tp": 38,
+            "fp": 51,
+            "fn": 2,
             "contradiction_recall": 0.0,
             "supported_flagged_contradicted": 0
           },
@@ -38,7 +38,7 @@
           "test_subsets": {
             "paraphrase": {
               "n": 40,
-              "false_alarm_rate": 0.95,
+              "false_alarm_rate": 0.875,
               "flagged_contradicted": 0
             },
             "verbatim": {
@@ -53,7 +53,7 @@
             },
             "contradicted": {
               "n": 20,
-              "detection_rate": 1.0,
+              "detection_rate": 0.9,
               "flagged_contradicted": 0
             }
           }
@@ -206,28 +206,28 @@
       },
       "mean_signals_by_kind": {
         "paraphrase": {
-          "semantic": 0.4746,
+          "semantic": 0.494,
           "entailment": 0.2749,
           "contradiction": 0.1092,
           "lexical": 0.4851,
           "quoted": 0.0
         },
         "unsupported": {
-          "semantic": 0.243,
+          "semantic": 0.2862,
           "entailment": 0.0035,
           "contradiction": 0.1157,
           "lexical": 0.1427,
           "quoted": 0.0
         },
         "contradicted": {
-          "semantic": 0.5618,
+          "semantic": 0.5864,
           "entailment": 0.0021,
           "contradiction": 0.6548,
           "lexical": 0.4147,
           "quoted": 0.0
         },
         "verbatim": {
-          "semantic": 0.5597,
+          "semantic": 0.5749,
           "entailment": 0.0581,
           "contradiction": 0.459,
           "lexical": 1.0,
@@ -236,7 +236,7 @@
       }
     },
     "v2_sentence_topsim_quote": {
-      "score_ms_per_claim_full_nli": 406.1,
+      "score_ms_per_claim_full_nli": 1025.2,
       "methods": {
         "similarity": {
           "tuned_thresholds": {
@@ -249,12 +249,12 @@
             "contradiction": 0.7
           },
           "test_tuned": {
-            "precision": 0.7812,
+            "precision": 0.7353,
             "recall": 0.625,
-            "f1": 0.6944,
-            "accuracy": 0.78,
+            "f1": 0.6757,
+            "accuracy": 0.76,
             "tp": 25,
-            "fp": 7,
+            "fp": 9,
             "fn": 15,
             "contradiction_recall": 0.0,
             "supported_flagged_contradicted": 0
@@ -263,7 +263,7 @@
           "test_subsets": {
             "paraphrase": {
               "n": 40,
-              "false_alarm_rate": 0.175,
+              "false_alarm_rate": 0.225,
               "flagged_contradicted": 0
             },
             "verbatim": {
@@ -273,12 +273,12 @@
             },
             "unsupported": {
               "n": 20,
-              "detection_rate": 1.0,
+              "detection_rate": 0.95,
               "flagged_contradicted": 0
             },
             "contradicted": {
               "n": 20,
-              "detection_rate": 0.25,
+              "detection_rate": 0.3,
               "flagged_contradicted": 0
             }
           }
@@ -346,7 +346,7 @@
             "tp": 39,
             "fp": 8,
             "fn": 1,
-            "contradiction_recall": 0.7,
+            "contradiction_recall": 0.75,
             "supported_flagged_contradicted": 0
           },
           "test_tuned_weak_as_supported": null,
@@ -364,51 +364,51 @@
             "unsupported": {
               "n": 20,
               "detection_rate": 0.95,
-              "flagged_contradicted": 4
+              "flagged_contradicted": 5
             },
             "contradicted": {
               "n": 20,
               "detection_rate": 1.0,
-              "flagged_contradicted": 14
+              "flagged_contradicted": 15
             }
           }
         },
         "multi": {
           "tuned_thresholds": {
-            "sim": 0.6,
-            "sim_weak": 0.44999999999999996,
-            "entail": 0.3,
-            "entail_weak": 0.15,
+            "sim": 0.2,
+            "sim_weak": 0.05000000000000002,
+            "entail": 0.5,
+            "entail_weak": 0.25,
             "lexical": 0.5,
             "lexical_weak": 0.3,
-            "contradiction": 0.5
+            "contradiction": 0.9
           },
           "test_tuned": {
-            "precision": 0.8667,
-            "recall": 0.975,
-            "f1": 0.9176,
-            "accuracy": 0.93,
-            "tp": 39,
-            "fp": 6,
-            "fn": 1,
+            "precision": 0.9048,
+            "recall": 0.95,
+            "f1": 0.9268,
+            "accuracy": 0.94,
+            "tp": 38,
+            "fp": 4,
+            "fn": 2,
             "contradiction_recall": 0.7,
             "supported_flagged_contradicted": 0
           },
           "test_tuned_weak_as_supported": {
-            "precision": 0.9737,
-            "recall": 0.925,
-            "f1": 0.9487,
-            "accuracy": 0.96,
-            "tp": 37,
-            "fp": 1,
-            "fn": 3,
+            "precision": 1.0,
+            "recall": 0.85,
+            "f1": 0.9189,
+            "accuracy": 0.94,
+            "tp": 34,
+            "fp": 0,
+            "fn": 6,
             "contradiction_recall": 0.7,
             "supported_flagged_contradicted": 0
           },
           "test_subsets": {
             "paraphrase": {
               "n": 40,
-              "false_alarm_rate": 0.15,
+              "false_alarm_rate": 0.1,
               "flagged_contradicted": 0
             },
             "verbatim": {
@@ -418,8 +418,8 @@
             },
             "unsupported": {
               "n": 20,
-              "detection_rate": 1.0,
-              "flagged_contradicted": 4
+              "detection_rate": 0.95,
+              "flagged_contradicted": 2
             },
             "contradicted": {
               "n": 20,
@@ -431,28 +431,28 @@
       },
       "mean_signals_by_kind": {
         "paraphrase": {
-          "semantic": 0.672,
-          "entailment": 0.7766,
-          "contradiction": 0.0513,
+          "semantic": 0.6797,
+          "entailment": 0.7762,
+          "contradiction": 0.024,
           "lexical": 0.4851,
           "quoted": 0.0
         },
         "unsupported": {
-          "semantic": 0.3293,
-          "entailment": 0.0678,
-          "contradiction": 0.2168,
+          "semantic": 0.359,
+          "entailment": 0.0694,
+          "contradiction": 0.3087,
           "lexical": 0.1427,
           "quoted": 0.0
         },
         "contradicted": {
-          "semantic": 0.6162,
-          "entailment": 0.0013,
-          "contradiction": 0.5072,
+          "semantic": 0.6326,
+          "entailment": 0.0017,
+          "contradiction": 0.5731,
           "lexical": 0.4147,
           "quoted": 0.0
         },
         "verbatim": {
-          "semantic": 0.9044,
+          "semantic": 0.8932,
           "entailment": 0.9719,
           "contradiction": 0.0043,
           "lexical": 1.0,

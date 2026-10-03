@@ -3,7 +3,7 @@
 Every generated step is a claim. For each claim we check:
 1. Citation validity  - cited source numbers exist.
 2. Groundedness       - is the claim supported by the sources it cites? Three signals:
-     semantic   max cosine(claim, source chunk)                  (settings.EMBEDDING_MODEL)
+     semantic   max cosine(claim, source chunk)                  (settings.VALIDATION_EMBEDDING_MODEL)
      entailment max P(entailment | source chunk => claim)         (NLI cross-encoder)
      lexical    fraction of the claim's content words in source   (stemmed tokens)
    NLI also gives P(contradiction), which lets us flag claims that contradict a source.
@@ -18,7 +18,10 @@ Deviations from the plan's pseudo-code (see ARCHITECTURE.md):
 
 from __future__ import annotations
 
+import hashlib
 import re
+import threading
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -157,6 +160,10 @@ class GroundednessChecker:
         self.premise_unit = premise_unit or settings.NLI_PREMISE_UNIT
         self.contradiction_agg = contradiction_agg or settings.NLI_CONTRADICTION_AGG
         self.use_quote = settings.GROUNDED_USE_QUOTE_MATCH if use_quote is None else use_quote
+        # Cross-request cache of (units, unit embeddings, normalised text) per source text (bounded LRU).
+        self._source_cache: OrderedDict[tuple[str, str], tuple] = OrderedDict()
+        self._source_cache_lock = threading.Lock()
+        self.source_cache_size = settings.VALIDATION_SOURCE_CACHE_SIZE
 
     def _units(self, text: str) -> list[str]:
         if self.premise_unit == "chunk":
@@ -175,8 +182,7 @@ class GroundednessChecker:
         for src in sources:
             key = (src.id, self.premise_unit)
             if key not in cache:
-                units = self._units(src.text)
-                cache[key] = (units, self.embedder.encode(units), normalise_for_quote(src.text))
+                cache[key] = self._source_entry(src.text)
             units, unit_vecs, norm_src = cache[key]
             if self.use_quote and len(norm_claim) >= MIN_QUOTE_CHARS and norm_claim in norm_src:
                 best["quoted"] = 1.0
@@ -194,6 +200,22 @@ class GroundednessChecker:
                 top = max(range(len(premises)), key=lambda i: premises[i][0])
                 best["contradiction"] = probs[top].get("contradiction", 0.0)
         return {k: round(v, 4) for k, v in best.items()}
+
+    def _source_entry(self, text: str) -> tuple:
+        key = (self.premise_unit, hashlib.sha1(text.encode("utf-8")).hexdigest())
+        with self._source_cache_lock:
+            hit = self._source_cache.get(key)
+            if hit is not None:
+                self._source_cache.move_to_end(key)
+                return hit
+        units = self._units(text)
+        entry = (units, self.embedder.encode(units), normalise_for_quote(text))
+        if self.source_cache_size > 0:
+            with self._source_cache_lock:
+                self._source_cache[key] = entry
+                while len(self._source_cache) > self.source_cache_size:
+                    self._source_cache.popitem(last=False)
+        return entry
 
     def check_claim(
         self, claim: str, sources: list[Document], method: str = "multi", _cache: dict | None = None
