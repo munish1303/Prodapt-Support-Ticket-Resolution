@@ -28,6 +28,11 @@ memory=3GB
 then `wsl --shutdown` and restart Docker Desktop. PostgreSQL plus the API container fit in 3 GB. Run heavy jobs
 (evaluations, image builds) one at a time.
 
+**`failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine … The system cannot find the file specified`.**
+Docker Desktop is not running (it does not auto-start by default). Start Docker Desktop, wait until it reports the
+engine is running, then re-run `docker compose up -d`. To avoid this, enable Settings → General → *Start Docker
+Desktop when you sign in*.
+
 **`docker: command not found` in Git Bash after installing Docker Desktop.**
 Per-user installs put the CLI in `%LOCALAPPDATA%\Programs\DockerDesktop\resources\bin`; open a new terminal or add it
 to `PATH`. If `docker version` shows no server, start Docker Desktop (first start may need the licence prompt).
