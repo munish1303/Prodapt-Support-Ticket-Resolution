@@ -103,7 +103,6 @@ class ResolutionPipeline:
         decision: DecisionService,
         session_factory=None,
         db_breaker: CircuitBreaker | None = None,
-        db_timeout_s: float | None = None,
     ):
         self.embedder = embedder
         self.understanding = understanding
@@ -119,10 +118,12 @@ class ResolutionPipeline:
             failure_types=DB_FAILURES,
             half_open_max_calls=2,  # understanding + retrieval of one request
         )
-        self.db_timeout_s = settings.DB_STAGE_TIMEOUT_S if db_timeout_s is None else db_timeout_s
 
     async def _db_stage(self, fn: Callable[[], Awaitable[T]]) -> T:
-        return await self.db_breaker.call(lambda: asyncio.wait_for(fn(), timeout=self.db_timeout_s))
+        # The breaker counts database failures of the stage. Timeouts live on the database queries themselves
+        # (DB_QUERY_TIMEOUT_S in PgNeighbourIndex / HybridRetriever), so slow model inference under CPU load is
+        # never mistaken for a database outage.
+        return await self.db_breaker.call(fn)
 
     async def process(
         self, complaint: str, metadata_filters: dict | None = None, record: bool = True
@@ -239,7 +240,7 @@ class ResolutionPipeline:
             else:
                 try:
                     result.request_id = await asyncio.wait_for(
-                        self._record(complaint, result), timeout=self.db_timeout_s
+                        self._record(complaint, result), timeout=settings.DB_QUERY_TIMEOUT_S
                     )
                 except Exception:  # monitoring must never break the request path
                     logger.exception("failed to record resolution request")

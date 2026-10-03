@@ -237,6 +237,10 @@ class PgNeighbourIndex:
         self.session_factory = session_factory
 
     async def nearest(self, embedding: np.ndarray, k: int) -> list[Neighbour]:
+        # Bounded so a hung database fails fast (TimeoutError) instead of stalling the request.
+        return await asyncio.wait_for(self._nearest(embedding, k), timeout=settings.DB_QUERY_TIMEOUT_S)
+
+    async def _nearest(self, embedding: np.ndarray, k: int) -> list[Neighbour]:
         vec = to_pgvector(embedding)
         async with self.session_factory() as session:
             await session.execute(text(f"SET LOCAL ivfflat.probes = {int(settings.IVFFLAT_PROBES)}"))

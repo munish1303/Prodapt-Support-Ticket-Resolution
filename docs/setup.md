@@ -52,7 +52,7 @@ the same name. The most useful ones:
 | `DECISION_RESOLVE_THRESHOLD` / `DECISION_REVIEW_THRESHOLD` | `0.75` / `0.55` | provisional decision thresholds |
 | `GROUNDED_*`, `EVIDENCE_*`, `CONF_W_*` | see config | validation, sufficiency and confidence weights (all provisional) |
 | `DRIFT_*` | see config | drift alert thresholds |
-| `DB_STAGE_TIMEOUT_S` | `10` | understanding/retrieval queries slower than this count as a database failure |
+| `DB_QUERY_TIMEOUT_S` | `10` | k-NN, retrieval and audit-log queries slower than this fail and count as a database failure (model inference is not timed) |
 | `DB_CIRCUIT_FAILURE_THRESHOLD` / `DB_CIRCUIT_RECOVERY_S` | `5` / `30` | consecutive database failures before the circuit opens; seconds before a trial call |
 
 ## 5. Run

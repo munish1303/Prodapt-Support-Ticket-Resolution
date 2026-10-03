@@ -1,72 +1,72 @@
 {
   "summary": {
     "generator": "qwen/qwen3.8-27b",
-    "n": 52,
-    "n_planned": 52,
-    "n_novel": 4,
+    "n": 100,
+    "n_planned": 100,
+    "n_novel": 8,
     "match_threshold": 0.6,
     "metrics": {
-      "citation_accuracy": 0.9615,
-      "citation_coverage": 0.9615,
-      "groundedness": 0.9551,
-      "reference_step_recall": 0.726,
-      "step_precision": 0.5958,
-      "n_steps": 4.6538,
-      "kb_retrieved": 0.7308,
-      "intent_correct": 0.6538,
-      "confidence": 0.8474
+      "citation_accuracy": 0.95,
+      "citation_coverage": 0.95,
+      "groundedness": 0.9418,
+      "reference_step_recall": 0.765,
+      "step_precision": 0.626,
+      "n_steps": 4.54,
+      "kb_retrieved": 0.78,
+      "intent_correct": 0.69,
+      "confidence": 0.8436
     },
     "generation_errors": 0,
-    "drafts_with_contradiction": 2,
+    "drafts_with_contradiction": 3,
     "decisions": {
-      "RESOLVE": 39,
-      "REVIEW": 8,
-      "ESCALATE": 5
+      "RESOLVE": 76,
+      "REVIEW": 15,
+      "ESCALATE": 9
     },
     "quality_by_decision": {
       "RESOLVE": {
-        "n": 39,
-        "mean_reference_step_recall": 0.7949,
-        "mean_groundedness": 1.0
+        "n": 76,
+        "mean_reference_step_recall": 0.8322,
+        "mean_groundedness": 0.9974
       },
       "REVIEW": {
-        "n": 8,
-        "mean_reference_step_recall": 0.7188,
-        "mean_groundedness": 1.0
+        "n": 15,
+        "mean_reference_step_recall": 0.7667,
+        "mean_groundedness": 0.9944
       },
       "ESCALATE": {
-        "n": 5,
-        "mean_reference_step_recall": 0.2,
-        "mean_groundedness": 0.5333
+        "n": 9,
+        "mean_reference_step_recall": 0.1944,
+        "mean_groundedness": 0.3852
       }
     },
-    "confidence_quality_auc": 0.8021,
+    "confidence_quality_auc": 0.8444,
     "latency_ms": {
-      "p50": 5481,
-      "p95": 15362,
+      "p50": 6365,
+      "p95": 16721,
       "max": 185551
     },
     "stage_latency_ms_mean": {
-      "embed": 43,
-      "understand_retrieve": 305,
-      "generate": 6142,
-      "validate": 3532,
+      "embed": 52,
+      "understand_retrieve": 333,
+      "generate": 4559,
+      "validate": 3937,
       "decide": 0
     },
     "novel_intent_decisions": {
-      "REVIEW": 1,
-      "ESCALATE": 2,
-      "RESOLVE": 1
+      "REVIEW": 2,
+      "ESCALATE": 3,
+      "RESOLVE": 3
     },
-    "novel_intent_empty_drafts": 1,
+    "novel_intent_empty_drafts": 2,
     "novel_intent_generation_errors": 0,
     "llm_judge_mean": {
-      "relevance": 4.019,
-      "completeness": 3.942,
-      "specificity": 3.865,
-      "correctness": 4.058
+      "relevance": 4.21,
+      "completeness": 4.13,
+      "specificity": 4.03,
+      "correctness": 4.26
     },
-    "llm_judge_n": 52,
+    "llm_judge_n": 100,
     "llm_judge_model": "openai/gpt-oss-120b"
   },
   "rows": [
@@ -2369,6 +2369,2104 @@
         "correctness": 5,
         "reasoning": "The draft directly addresses the red LOS issue, covers all reference steps, adds clear actionable details, and includes no incorrect advice."
       }
+    },
+    {
+      "id": "GEN-0053",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.6,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9333,
+      "decision": "REVIEW",
+      "latency_ms": 10862,
+      "stage_ms": {
+        "embed": 60,
+        "understand_retrieve": 2071,
+        "generate": 1025,
+        "validate": 7703,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the customer's account for an expired promotional discount to confirm the root cause of the price increase. [2][3][4][5][7]",
+        "Explain to the customer that the introductory promotional offer has ended and the plan has reverted to the standard price. [2][3][4][5][7]",
+        "Offer the customer current retention deals or a cheaper plan that matches their usage to address the cost increase. [2][4][5][7]",
+        "Confirm whether the customer received the end-of-offer notification and note this confirmation on the account. [4][7]",
+        "If the issue is not resolved by the above steps, escalate the ticket to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's bill increase is likely due to the expiration of an introductory promotional discount, reverting the plan to its standard price. The resolution involves verifying the discount status, explaining the change, and offering retention deals or a cheaper plan.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 4,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft addresses the price increase issue, covers all reference steps, and adds a reasonable escalation step. It is mostly complete and specific, though the extra escalation isn\u2019t required by the reference."
+      }
+    },
+    {
+      "id": "GEN-0054",
+      "citation_accuracy": 0.0,
+      "citation_coverage": 0.0,
+      "groundedness": 0.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 0,
+      "kb_retrieved": 0.0,
+      "intent_correct": 1.0,
+      "confidence": 0.3406,
+      "decision": "ESCALATE",
+      "latency_ms": 1290,
+      "stage_ms": {
+        "embed": 54,
+        "understand_retrieve": 851,
+        "generate": 383,
+        "validate": 0,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [],
+      "summary": "The provided sources do not address a complaint about being debited twice for a subscription in the same billing cycle. The available sources cover failed direct debits, charges after cancellation, and evening broadband congestion, none of which match the specific issue of duplicate billing.",
+      "claim_status": [],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 1,
+        "correctness": 1,
+        "reasoning": "The draft provides no steps, so it fails to address the issue, lacks necessary actions, offers no concrete guidance, and cannot be evaluated for correctness."
+      }
+    },
+    {
+      "id": "GEN-0055",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.7368,
+      "decision": "REVIEW",
+      "latency_ms": 3377,
+      "stage_ms": {
+        "embed": 53,
+        "understand_retrieve": 219,
+        "generate": 535,
+        "validate": 2568,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify the account holder's identity. [1][2][4][5][8]",
+        "Check the plan's maximum lines and shared data options. [1][2][4][5][8]",
+        "Add the new line and send a SIM or eSIM. [1][4][5][8]",
+        "Explain the monthly cost change on the next bill. [8]"
+      ],
+      "summary": "The customer wants to add a partner's mobile number to their shared family plan. The standard resolution is to verify identity, check plan eligibility, add the line, and explain the billing impact.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft mirrors the reference fix, covering identity verification, plan capacity check, line addition, and cost explanation, thus fully relevant, complete, and correct. Steps are clear but slightly generic, hence a modest specificity score."
+      }
+    },
+    {
+      "id": "GEN-0056",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 0.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8444,
+      "decision": "RESOLVE",
+      "latency_ms": 16703,
+      "stage_ms": {
+        "embed": 150,
+        "understand_retrieve": 327,
+        "generate": 625,
+        "validate": 15600,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Place the router upright in a ventilated spot, ensuring it is not in a cabinet or on top of other electronics to prevent overheating. [5]",
+        "Check the router's event log for thermal or power-related restarts to confirm the root cause of the spontaneous reboots. [5]",
+        "Update the router's firmware to the latest version. [5][6]",
+        "If the reboots continue after the firmware update, replace the router and its power adapter. [6]"
+      ],
+      "summary": "The customer's router is likely overheating or experiencing a power supply failure, causing it to repeatedly restart. The resolution involves improving ventilation, checking logs, updating firmware, and replacing hardware if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the overheating router issue, includes all key steps from the reference, provides clear actionable instructions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0057",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9372,
+      "decision": "RESOLVE",
+      "latency_ms": 9728,
+      "stage_ms": {
+        "embed": 49,
+        "understand_retrieve": 252,
+        "generate": 814,
+        "validate": 8613,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray, and restart the device to ensure proper contact. [1][2][4][5][6][7]",
+        "Test the SIM in another phone to determine whether the issue is with the SIM card or the handset. [1][2][4][5][6][7]",
+        "If the SIM fails in other phones, issue a replacement SIM while keeping the same phone number. [2][4][5][6][7]",
+        "If the SIM works in another phone, refer the handset for repair to address a potential SIM tray or reader issue. [4][5][7]",
+        "If the issue persists after these steps, escalate the case to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's handset is not detecting the SIM card despite it being inserted and cleaned. The recommended resolution involves reseating the SIM, testing it in another device to isolate the fault, and either replacing the SIM or repairing the handset based on the test results.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the SIM-not\u2011detected issue, covers all key actions from the reference (power\u2011off, reseat, test in another phone, replace SIM or repair handset) and adds a sensible escalation step. Steps are clear, actionable, and accurate."
+      }
+    },
+    {
+      "id": "GEN-0058",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.9121,
+      "decision": "RESOLVE",
+      "latency_ms": 2187,
+      "stage_ms": {
+        "embed": 142,
+        "understand_retrieve": 443,
+        "generate": 685,
+        "validate": 916,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8. [8]",
+        "Flush the DNS cache on the device (ipconfig /flushdns on Windows). [8]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8. [8]",
+        "Restart the router after changing DNS settings. [8]",
+        "If the issue persists, escalate to second-line support with the results of each step. [8]"
+      ],
+      "summary": "The customer's symptoms (pinging an IP works, but typing a web address fails) match a DNS resolution failure, not a NAT/gaming issue. The provided sources contain a specific KB article for this exact scenario, which outlines the necessary DNS troubleshooting steps.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft addresses the DNS problem, includes all required steps (ping test, flush DNS, change router DNS, restart router) and adds a reasonable escalation note. Steps are clear, actionable, and accurate."
+      }
+    },
+    {
+      "id": "GEN-0059",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.7776,
+      "decision": "RESOLVE",
+      "latency_ms": 1368,
+      "stage_ms": {
+        "embed": 40,
+        "understand_retrieve": 192,
+        "generate": 523,
+        "validate": 612,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify the account holder's identity. [1][4][5][6][8]",
+        "Check the plan's maximum lines and shared data options. [1][4][5][6][8]",
+        "Add the new line and send a SIM or eSIM. [4][5][6][8]",
+        "Explain the monthly cost change on the next bill. [8]"
+      ],
+      "summary": "The customer wants to add a partner's mobile to a shared plan, which requires verifying the account holder, checking plan eligibility, adding the line, and explaining the cost change.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses adding a partner's line, includes all required steps matching the reference, and provides clear actionable actions, though the wording is slightly less detailed."
+      }
+    },
+    {
+      "id": "GEN-0060",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9468,
+      "decision": "RESOLVE",
+      "latency_ms": 9111,
+      "stage_ms": {
+        "embed": 51,
+        "understand_retrieve": 1036,
+        "generate": 667,
+        "validate": 7355,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the customer's data usage against the plan's fair-usage allowance in the account to confirm if the limit has been reached. [1][2][3][4][5][6][8]",
+        "Explain to the customer that speeds are reduced after the allowance is reached until the bill cycle resets. [1][2][3][4][5][6][8]",
+        "Offer a data add-on or a higher-allowance plan to the customer. [1][2][3][4][6][8]",
+        "Set up usage alerts so the customer is notified at 80% of the allowance. [1][3][6][8]"
+      ],
+      "summary": "The customer is experiencing mobile data throttling because they have reached their plan's fair-usage allowance. The resolution involves confirming the usage, explaining the policy, and offering options to increase the allowance or set up alerts.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the slowdown issue, includes all key steps from the reference, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0061",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9161,
+      "decision": "REVIEW",
+      "latency_ms": 9374,
+      "stage_ms": {
+        "embed": 92,
+        "understand_retrieve": 210,
+        "generate": 3790,
+        "validate": 5280,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Advise the customer to keep clear of the fallen overhead cable and not touch it for safety. [1][2][3][5][6][7]",
+        "Raise an urgent line damage fault for field repair to address the physical damage to the overhead line plant. [1][2][3][5][6][7]",
+        "Offer a mobile hotspot to the customer to maintain connectivity until the line is repaired. [1][3][6][7]",
+        "Follow up with the customer the next day to confirm the field repair has been completed and service is restored. [5]"
+      ],
+      "summary": "The customer's broadband outage is due to physical damage to the overhead line plant from bad weather. The resolution involves ensuring safety, raising an urgent field repair fault, and providing a temporary mobile hotspot until the line is fixed.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the fallen overhead wire issue, includes all required actions (safety advice, urgent fault raise, hotspot provision) and adds a reasonable follow\u2011up step. All steps are clear, actionable and correct."
+      }
+    },
+    {
+      "id": "GEN-0062",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8701,
+      "decision": "RESOLVE",
+      "latency_ms": 2457,
+      "stage_ms": {
+        "embed": 42,
+        "understand_retrieve": 291,
+        "generate": 824,
+        "validate": 1299,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Fit a microfilter on every phone socket that has a phone or device plugged in. [1][2][5][7]",
+        "Connect the modem to the master socket using the test socket to bypass internal wiring. [1][2][5][7]",
+        "Run a remote line test from the support system to check for noise and line faults. [1][2][3][7]",
+        "If the line test fails, book an engineer visit to repair the line. [1][2][3][7]",
+        "If the issue persists after completing the above steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's broadband drops when the phone rings, which is typically caused by electrical noise on the copper line due to a missing microfilter or faulty internal extension wiring. The steps involve fitting microfilters, bypassing internal wiring, running a line test, and potentially booking an engineer visit.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the line noise problem, includes all key steps from the reference (microfilters, test socket, remote line test, engineer booking) and adds a reasonable escalation step. The instructions are clear, actionable, and correct."
+      }
+    },
+    {
+      "id": "GEN-0063",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.911,
+      "decision": "RESOLVE",
+      "latency_ms": 9823,
+      "stage_ms": {
+        "embed": 123,
+        "understand_retrieve": 506,
+        "generate": 699,
+        "validate": 8493,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray, and restart the device [1][2][3][4][5][6][7].",
+        "Test the SIM in another phone to isolate whether the issue is with the SIM or the handset [1][2][3][4][5][6][7].",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number [2][3][4][7].",
+        "If the SIM works in another phone, refer the handset for repair [3][7].",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step [7]."
+      ],
+      "summary": "The customer's phone is not detecting the SIM card, which is a common hardware issue that can be resolved by reseating the SIM or replacing it if it is faulty. If the SIM works in another phone, the handset's SIM reader is likely the problem and requires repair.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the SIM detection issue, includes all key steps from the reference and adds a sensible escalation step, with clear, actionable instructions and no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0064",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8995,
+      "decision": "RESOLVE",
+      "latency_ms": 10977,
+      "stage_ms": {
+        "embed": 48,
+        "understand_retrieve": 243,
+        "generate": 874,
+        "validate": 9810,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify the email client's IMAP settings are configured to use the server mail.example-telco.com on port 993 with SSL enabled. [1][2][3][5][6][7]",
+        "Verify the email client's SMTP settings are configured to use the server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled. [1][2][3][5][6][7]",
+        "If authentication continues to fail after verifying the server settings, reset the email password from the account portal. [7]",
+        "If the issue remains unresolved after completing the previous steps, escalate the ticket to second-line support and include the results of each step performed. [7]"
+      ],
+      "summary": "The complaint matches the typical symptoms of incorrect IMAP/SMTP server settings, port, or authentication. The provided sources do not address the customer's inability to watch content in the evenings, as that issue is outside the scope of the email service.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 4,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft addresses the email client configuration issue with concrete server/port settings and password reset, matching the reference. It adds an escalation step, which is acceptable, and provides correct, actionable guidance."
+      }
+    },
+    {
+      "id": "GEN-0065",
+      "citation_accuracy": 0.0,
+      "citation_coverage": 0.0,
+      "groundedness": 0.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 0,
+      "kb_retrieved": 0.0,
+      "intent_correct": 1.0,
+      "confidence": 0.3924,
+      "decision": "ESCALATE",
+      "latency_ms": 2401,
+      "stage_ms": {
+        "embed": 197,
+        "understand_retrieve": 936,
+        "generate": 1266,
+        "validate": 0,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [],
+      "summary": "The provided sources do not address the specific issue of outgoing email messages being stuck in the outbox. The sources cover broadband outages, planned maintenance, OTP delivery, and number porting, but none contain resolution steps for email sending failures.",
+      "claim_status": [],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 1,
+        "correctness": 1,
+        "reasoning": "The draft provides no steps, so it fails to address the issue, lacks necessary actions, is not specific, and cannot be judged correct."
+      }
+    },
+    {
+      "id": "GEN-0066",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8268,
+      "decision": "RESOLVE",
+      "latency_ms": 1673,
+      "stage_ms": {
+        "embed": 56,
+        "understand_retrieve": 174,
+        "generate": 566,
+        "validate": 875,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify the current account holder or the bereavement documentation. [2][3][4][7]",
+        "Collect the new holder's identity and payment details. [1][2][3][4][5][7]",
+        "Complete the transfer of ownership without interrupting service. [1][2][3][4][7]",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step. [3]"
+      ],
+      "summary": "The complaint is a standard change-of-account-holder request, which is addressed by verifying the current holder, collecting the new holder's identity and payment details, and completing the transfer without interrupting service.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 4,
+        "specificity": 3,
+        "correctness": 5,
+        "reasoning": "The draft addresses the request to change the account holder, includes all required steps, adds an unnecessary escalation step, and the steps are generic but correct."
+      }
+    },
+    {
+      "id": "GEN-0067",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.938,
+      "decision": "RESOLVE",
+      "latency_ms": 2764,
+      "stage_ms": {
+        "embed": 48,
+        "understand_retrieve": 223,
+        "generate": 1724,
+        "validate": 767,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased. [1][2][3][5][6][7]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit. [1][2][3][5][6][7]",
+        "Explain any legitimate final pro-rata charges or notice-period fees. [1][2][4][5][6][7]",
+        "Confirm the account is closed and send written confirmation. [2][4][6][7]",
+        "If these steps do not resolve the issue, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is being charged after cancelling their service. The resolution involves verifying the cancellation date, crediting any post-cancellation charges, cancelling the direct debit, and confirming the account closure in writing.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft addresses the billing complaint directly, includes all required steps from the reference and adds a sensible escalation step. The actions are correct and mostly concrete, though phrasing is slightly generic."
+      }
+    },
+    {
+      "id": "GEN-0068",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8044,
+      "decision": "RESOLVE",
+      "latency_ms": 20261,
+      "stage_ms": {
+        "embed": 66,
+        "understand_retrieve": 250,
+        "generate": 11386,
+        "validate": 8558,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Enable UPnP in the router settings. [4][6][7]",
+        "Assign a reserved IP address to the console in the router's DHCP settings. [2][4][6][7]",
+        "Forward the game's required ports to the console's reserved IP address. [2][4][6][7]",
+        "Restart the console and re-test the NAT type to confirm the issue is resolved. [2][4][6][7]",
+        "If the issue persists, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The complaint describes a strict NAT issue preventing online multiplayer, which is resolved by enabling UPnP, reserving an IP, and forwarding ports. The steps are drawn from the KB article and multiple resolved tickets.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft covers all required actions from the reference, adds a sensible escalation note, and provides clear, correct steps to fix the NAT/network issue."
+      }
+    },
+    {
+      "id": "GEN-0069",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9019,
+      "decision": "RESOLVE",
+      "latency_ms": 6988,
+      "stage_ms": {
+        "embed": 51,
+        "understand_retrieve": 226,
+        "generate": 776,
+        "validate": 5933,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray, and restart the device. [1][2][3][4][5][6][7]",
+        "Test the SIM in another phone to isolate whether the issue is with the SIM or the handset. [1][2][3][4][5][6][7]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number. [1][2][4][7]",
+        "If the SIM works in another phone, refer the handset for repair. [1][7]",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's handset is not detecting the SIM card. The standard resolution involves reseating the SIM, testing it in another device to isolate the fault, and either replacing the SIM or repairing the handset based on the test results.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the SIM-not\u2011detected issue, covers all steps from the reference fix and adds a sensible escalation step. All actions are accurate, concrete, and complete."
+      }
+    },
+    {
+      "id": "GEN-0070",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8921,
+      "decision": "RESOLVE",
+      "latency_ms": 1771,
+      "stage_ms": {
+        "embed": 42,
+        "understand_retrieve": 215,
+        "generate": 705,
+        "validate": 807,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side. [1][2][3][4][5][6][7]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet. [1][2][3][4][5][6][7]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold. [2][5]",
+        "Enable QoS on the router to prioritise video calls during peak hours. [2][5]",
+        "If these steps do not resolve the issue, escalate to second-line support with the results of each step. [2]"
+      ],
+      "summary": "The customer is experiencing slow broadband at peak evening hours, which is typically caused by network congestion at the local exchange or cabinet backhaul. The resolution involves confirming the issue with speed tests, checking for congestion, and applying network-side or router-side mitigations.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the download slowdown, includes all required steps from the reference fix, provides clear actionable instructions, and adds a sensible escalation step without introducing any incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0071",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8106,
+      "decision": "RESOLVE",
+      "latency_ms": 6027,
+      "stage_ms": {
+        "embed": 52,
+        "understand_retrieve": 501,
+        "generate": 4354,
+        "validate": 1118,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the contract end date and downgrade eligibility [1][2][3][4][5][7]",
+        "Explain the downgrade options available now and from the contract end date [1][2][3][4][5][7]",
+        "Offer usage-matched add-on removal or retention discounts to reduce cost [2][3][4][7]",
+        "Schedule the downgrade for the earliest eligible date if the customer agrees [3][7]"
+      ],
+      "summary": "The customer wants to lower their package cost during the minimum contract term. The resolution involves checking eligibility, explaining options, offering cost-reduction measures like add-on removal or discounts, and scheduling the change if possible.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the request to lower the package, includes all necessary steps identical to the reference, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0072",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 0.8,
+      "reference_step_recall": 0.25,
+      "step_precision": 0.2,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.7698,
+      "decision": "RESOLVE",
+      "latency_ms": 13732,
+      "stage_ms": {
+        "embed": 43,
+        "understand_retrieve": 290,
+        "generate": 702,
+        "validate": 12695,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Forget the saved network on the smart TV and reconnect using the new password. [1][2][3][4][5][6][7]",
+        "Set the router's security mode to WPA2/WPA3 mixed so the smart TV can join the network. [1][2][3][4][5][6][7]",
+        "Check the router's MAC filter or blocked devices list to ensure the smart TV is not blocked. [1][2][3][4][5][6][7]",
+        "Update the smart TV's network drivers or firmware if the issue persists. [3][6][7]",
+        "If the issue is not resolved after these steps, escalate to second-line support with the results of each step. [6]"
+      ],
+      "summary": "The smart TV is likely unable to connect due to a stale network profile or lack of WPA3 support. The resolution involves resetting the network on the TV, adjusting the router's security mode, and checking for MAC filtering.",
+      "claim_status": [
+        "supported",
+        "weakly_supported",
+        "supported",
+        "weakly_supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the TV's WPA3 issue, includes all reference steps plus a sensible escalation, provides clear actionable instructions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0073",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9385,
+      "decision": "RESOLVE",
+      "latency_ms": 13500,
+      "stage_ms": {
+        "embed": 40,
+        "understand_retrieve": 247,
+        "generate": 3957,
+        "validate": 9254,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased to determine if the billing was processed incorrectly. [1][3][4][6][7]",
+        "If the customer was billed past the cancellation date, credit the charges and cancel the direct debit. [1][3][4][6][7]",
+        "Explain any legitimate final pro-rata charges or notice-period fees to the customer. [1][3][4][5][6][7]",
+        "Confirm the account is closed and send written confirmation to the customer. [3][4][5][6][7]",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step. [6]"
+      ],
+      "summary": "The customer is being charged after closing their account. The resolution involves verifying the cancellation date, crediting any incorrect charges, explaining legitimate fees, and confirming the account closure in writing.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the billing after cancellation, includes all key steps from the reference and adds a sensible escalation step. Steps are clear enough to act on, and no incorrect advice is given."
+      }
+    },
+    {
+      "id": "GEN-0074",
+      "citation_accuracy": 0.0,
+      "citation_coverage": 0.0,
+      "groundedness": 0.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 0,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.3024,
+      "decision": "ESCALATE",
+      "latency_ms": 1039,
+      "stage_ms": {
+        "embed": 45,
+        "understand_retrieve": 343,
+        "generate": 649,
+        "validate": 0,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [],
+      "summary": "The provided sources do not address a physical cable disconnection or a missing link light on a cable socket; they only cover strict NAT/port forwarding for gaming and a red LOS light on a fiber ONT, neither of which matches the reported symptoms.",
+      "claim_status": [],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 1,
+        "correctness": 1,
+        "reasoning": "The draft provides no steps, so it fails to address the problem, lacks necessary actions, offers no concrete guidance, and cannot be judged correct."
+      }
+    },
+    {
+      "id": "GEN-0075",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8063,
+      "decision": "REVIEW",
+      "latency_ms": 7612,
+      "stage_ms": {
+        "embed": 59,
+        "understand_retrieve": 340,
+        "generate": 698,
+        "validate": 6514,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify the customer's identity using security questions to confirm they are the legitimate account holder. [2][4][5][7]",
+        "Unlock the customer's online account to remove the lockout status. [2][4][5][7]",
+        "Send a new password reset link to the customer's registered email address. [2][4][5][7]",
+        "Check if the customer's recovery email or mobile number is outdated and update it if necessary to ensure future reset links are delivered. [7]",
+        "If the account remains locked or the reset link still does not arrive after the above steps, escalate the issue to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is locked out of their online account and unable to receive a password reset link. The resolution involves verifying identity, unlocking the account, sending a new reset link, and updating recovery details if needed.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the login/reset problem, covers all key actions from the reference (identity verification, unlocking, sending reset link, updating recovery info) and adds a sensible escalation step, all described concretely and correctly."
+      }
+    },
+    {
+      "id": "GEN-0076",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9081,
+      "decision": "RESOLVE",
+      "latency_ms": 8868,
+      "stage_ms": {
+        "embed": 55,
+        "understand_retrieve": 301,
+        "generate": 785,
+        "validate": 7725,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Enable UPnP in the router settings to allow the router to automatically open the necessary ports for gaming. [2][3][5][6][7]",
+        "Assign a reserved IP address to the console in the router's DHCP settings to ensure it always receives the same local IP. [2][3][5][6][7]",
+        "Forward the game's required ports to the console's reserved IP address in the router's port forwarding settings. [2][3][5][7]",
+        "Restart the console and re-test the NAT type to confirm the restrictive network warning is resolved. [2][3][7]",
+        "If the issue persists after these steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The restrictive network warning and party chat failure are caused by strict NAT settings on the router. The resolution involves enabling UPnP, reserving an IP for the console, and forwarding the necessary game ports.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the NAT/port issue, includes all required steps (UPnP, reserved IP, port forwarding, restart) and adds a sensible escalation note. Steps are clear, accurate, and match the reference fix."
+      }
+    },
+    {
+      "id": "GEN-0077",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 4,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.817,
+      "decision": "RESOLVE",
+      "latency_ms": 1817,
+      "stage_ms": {
+        "embed": 35,
+        "understand_retrieve": 252,
+        "generate": 647,
+        "validate": 881,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it. [3][4]",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end. [3][4]",
+        "Check the outage map for a fibre fault in the area. [3]",
+        "If the LOS stays red, raise a fibre fault and dispatch a field engineer. [3]"
+      ],
+      "summary": "The customer's issue of no WAN connection on a new glass (fibre) connection is likely due to a fibre fault or physical connection issue at the ONT. The steps provided address the physical fibre connection and escalate to a field engineer if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 2,
+        "completeness": 2,
+        "specificity": 3,
+        "correctness": 3,
+        "reasoning": "The draft addresses physical cable checks, which is not the main issue; the reference requires checking provisioning and ONT registration. It omits key provisioning steps, so completeness is low. The steps given are concrete, giving it moderate specificity. The advice isn\u2019t harmful but isn\u2019t the correct solution, so correctness is moderate."
+      }
+    },
+    {
+      "id": "GEN-0078",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 0.9167,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 6,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8028,
+      "decision": "REVIEW",
+      "latency_ms": 8950,
+      "stage_ms": {
+        "embed": 157,
+        "understand_retrieve": 700,
+        "generate": 782,
+        "validate": 7309,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the network status page for any mobile mast outages near the customer's postcode to determine if the issue is an area-wide outage. [2][4][7]",
+        "If a mast outage is confirmed, share the incident reference and the estimated restoration time with the customer. [2][4][7]",
+        "If no outage is found, check the coverage map for the customer's address to investigate potential poor indoor mobile coverage. [3][6]",
+        "Enable Wi-Fi Calling on the handset so calls and data can route over the customer's home broadband as a workaround. [3][4][6][7]",
+        "Ensure the phone software and carrier settings are up to date to rule out device-level configuration issues. [6]",
+        "If the issue persists and Wi-Fi Calling is not possible, offer an indoor signal booster or femtocell, or escalate to second-line support with the results of the previous steps. [6][7]"
+      ],
+      "summary": "The customer is experiencing a loss of mobile network, which could be due to an area-wide mast outage or poor indoor coverage. The resolution involves checking for outages, enabling Wi-Fi Calling, and updating device settings.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "weakly_supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 2,
+        "completeness": 2,
+        "specificity": 3,
+        "correctness": 2,
+        "reasoning": "The draft does not address the primary cause suggested by the reference (SIM or handset issues) and instead suggests network\u2011outage checks and Wi\u2011Fi calling, which are not directly relevant. It omits key steps like reseating the SIM and testing it in another device, so completeness is low. The steps listed are fairly concrete, giving it moderate specificity, but they are not the correct actions for the described problem, reducing correctness."
+      }
+    },
+    {
+      "id": "GEN-0079",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.5,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8925,
+      "decision": "REVIEW",
+      "latency_ms": 6499,
+      "stage_ms": {
+        "embed": 40,
+        "understand_retrieve": 198,
+        "generate": 694,
+        "validate": 5565,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange to identify if the overnight outages are due to scheduled network maintenance. [1][2][3][4][5][6][7]",
+        "Confirm the specific maintenance window and the expected completion date with the customer. [1][2][3][4][5][6][7]",
+        "Sign the customer up for maintenance notifications to keep them informed about future scheduled outages. [1][3][4][7]",
+        "If the issue is not resolved by the above steps, escalate the ticket to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing recurring overnight broadband outages, which are typically caused by planned network maintenance. The resolution involves checking the maintenance schedule, confirming the completion date, and enrolling the customer in maintenance notifications.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly tackles the nightly outage complaint with appropriate steps matching the reference fix and adds a reasonable escalation step. All actions are correct, though they are somewhat generic, hence a slightly lower specificity score."
+      }
+    },
+    {
+      "id": "GEN-0080",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9048,
+      "decision": "RESOLVE",
+      "latency_ms": 2196,
+      "stage_ms": {
+        "embed": 39,
+        "understand_retrieve": 200,
+        "generate": 627,
+        "validate": 1328,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange. [1][2][3][4][5][6][7]",
+        "Confirm the maintenance window and expected completion date. [1][2][3][4][5][6][7]",
+        "Sign the customer up for maintenance notifications. [1][4][5][7]",
+        "If the issue persists after confirming the maintenance schedule, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's overnight broadband outages are likely due to planned network maintenance windows. The agent should verify the maintenance schedule, confirm the completion date, and enroll the customer in maintenance notifications.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 4,
+        "completeness": 3,
+        "specificity": 3,
+        "correctness": 4,
+        "reasoning": "The draft addresses the likely cause (maintenance) and adds a reasonable escalation step, so it\u2019s relevant and mostly correct. It includes all reference steps plus extra, making it slightly less concise. The actions are generic rather than detailed, reducing specificity and completeness slightly."
+      }
+    },
+    {
+      "id": "GEN-0081",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9067,
+      "decision": "RESOLVE",
+      "latency_ms": 3322,
+      "stage_ms": {
+        "embed": 51,
+        "understand_retrieve": 176,
+        "generate": 1463,
+        "validate": 1630,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Identify the third-party service and its start date from the billing detail [1][2][3][5][6][7]",
+        "Cancel the subscription and apply a premium services bar on the line [1][2][3][4][5][6][7]",
+        "Raise a refund request for the disputed third-party charges [2][3][4][5][6][7]",
+        "Advise the customer to enable spending controls for children's phones [2][3][5][7]"
+      ],
+      "summary": "The complaint matches unrecognised third-party and premium SMS charges, which are resolved by identifying the service, cancelling it with a premium services bar, and requesting a refund.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft mirrors the reference fix exactly, covering all necessary steps with clear, actionable instructions and no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0082",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9007,
+      "decision": "RESOLVE",
+      "latency_ms": 1520,
+      "stage_ms": {
+        "embed": 48,
+        "understand_retrieve": 199,
+        "generate": 574,
+        "validate": 698,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify both transactions in the payments ledger and confirm they are for the same invoice. [2][4][6][7]",
+        "Raise a refund for the duplicate payment to the original payment method. [1][2][4][6][7]",
+        "Tell the customer refunds take 5-7 working days to appear. [1][2][6][7]",
+        "Offer a goodwill credit if the customer incurred bank charges. [1][2][6][7]"
+      ],
+      "summary": "The customer's complaint matches the standard duplicate payment scenario, which is resolved by verifying the transactions, issuing a refund to the original payment method, and offering a goodwill credit for any bank charges.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft fully addresses the duplicate charge issue, includes all necessary actions, provides clear actionable steps, and matches the reference fix without errors."
+      }
+    },
+    {
+      "id": "GEN-0083",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.6,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.87,
+      "decision": "RESOLVE",
+      "latency_ms": 4425,
+      "stage_ms": {
+        "embed": 45,
+        "understand_retrieve": 275,
+        "generate": 628,
+        "validate": 3476,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication to ensure it is current and accurate. [2][7]",
+        "If the registered mobile number is outdated, update the number after verifying the customer's identity. [2][7]",
+        "Check the handset for any SMS blocking or spam filtering that might be preventing the verification message from arriving. [2][7]",
+        "Offer email or authenticator-app verification as an alternative method to complete the login process. [2][7]",
+        "If the issue persists after these steps, escalate the ticket to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing a failure to receive a one-time passcode (OTP) for account login. The resolution involves verifying the registered mobile number, checking for SMS blocking, and offering alternative verification methods.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly tackles the missing verification SMS, covers all reference steps and adds a reasonable escalation step. The actions are clear and accurate, though wording could be slightly more concrete."
+      }
+    },
+    {
+      "id": "GEN-0084",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8478,
+      "decision": "RESOLVE",
+      "latency_ms": 6062,
+      "stage_ms": {
+        "embed": 46,
+        "understand_retrieve": 190,
+        "generate": 760,
+        "validate": 5064,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied to the customer's line. [1][2][3][4][5][7]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile. [1][2][3][4][5][7]",
+        "Run a line check to confirm the synced speed matches the new tier. [1][2][4][5][7]",
+        "If the profile is not applied, escalate the issue to provisioning. [1][4][5][7]",
+        "If the issue persists after the above steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's complaint matches the 'Speed upgrade not applied' scenario, where the new speed profile has not been applied or the router has not re-synced. The resolution involves confirming the profile, restarting the router, running a line check, and escalating if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the speed tier issue, includes all required steps from the reference and adds a logical escalation step, with clear actionable instructions and no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0085",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.924,
+      "decision": "REVIEW",
+      "latency_ms": 9004,
+      "stage_ms": {
+        "embed": 49,
+        "understand_retrieve": 217,
+        "generate": 3562,
+        "validate": 5175,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the port request status and any rejection reason in the system [1][3][4][5][7].",
+        "Verify the PAC or porting code is valid, unexpired, and matches the customer's number [1][3][4][5][6][7].",
+        "Resubmit the port request with corrected details if the code or account information was found to be mismatched or expired [1][4][6][7].",
+        "Inform the customer that the port will complete within one working day of a valid request [7].",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step [7]."
+      ],
+      "summary": "The customer's mobile number porting is delayed or failed, likely due to a mismatched or expired porting code. The resolution involves checking the port request status, verifying the PAC code, resubmitting with corrected details, and escalating if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the porting issue, covers all required actions from the reference, adds a sensible escalation step, provides clear actionable instructions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0086",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.5,
+      "n_steps": 6,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8156,
+      "decision": "RESOLVE",
+      "latency_ms": 10577,
+      "stage_ms": {
+        "embed": 43,
+        "understand_retrieve": 181,
+        "generate": 4862,
+        "validate": 5490,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the customer's account for an expired promotional discount that may have caused the price increase [1][2][5][6].",
+        "Explain that the introductory offer has ended and the plan has returned to the standard price [1][2][5][6].",
+        "Check the contract end date and downgrade eligibility to determine if a switch to a basic tier is possible now [3][4][7].",
+        "Explain the available downgrade options, including what can be done now and what will be available from the contract end date [3][4][7].",
+        "Offer the current retention deals, a cheaper plan that matches usage, or usage-matched add-on removal to reduce the monthly cost [1][3][6][7].",
+        "Schedule the downgrade for the earliest eligible date if the customer agrees [3][7]."
+      ],
+      "summary": "The customer wants to lower their monthly bill by switching to a basic tier. The resolution involves checking for expired discounts, explaining the current pricing, and evaluating downgrade eligibility based on the contract end date.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft addresses the customer's request to downgrade, covers all reference steps and adds relevant checks without harmful advice. Steps are actionable though some are less detailed, hence a slightly lower specificity."
+      }
+    },
+    {
+      "id": "GEN-0087",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8121,
+      "decision": "RESOLVE",
+      "latency_ms": 10427,
+      "stage_ms": {
+        "embed": 58,
+        "understand_retrieve": 266,
+        "generate": 4814,
+        "validate": 5288,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Set the phone's preferred network type to 5G/Auto in the mobile network settings. [1][3][4][8]",
+        "Install the latest carrier settings and phone software update. [1][3][4][8]",
+        "Check that the SIM is 5G-enabled and replace older SIMs if necessary. [1][3][8]",
+        "Confirm that 5G is provisioned on the account and that the handset model is supported. [3][8]",
+        "If the issue persists, escalate to second-line support with the results of each step. [8]"
+      ],
+      "summary": "The complaint describes a mobile device stuck on a slower network despite a faster plan, which aligns with the 'Phone stuck on 4G with a 5G plan' issue. The resolution steps focus on verifying handset settings, software, SIM, and account provisioning.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft addresses the 5G connectivity issue, covers all reference steps, provides clear actionable instructions, and adds a reasonable escalation step without introducing errors."
+      }
+    },
+    {
+      "id": "GEN-0088",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 5,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8307,
+      "decision": "RESOLVE",
+      "latency_ms": 9674,
+      "stage_ms": {
+        "embed": 52,
+        "understand_retrieve": 203,
+        "generate": 6540,
+        "validate": 2877,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied to the line. [1][2][3][4][6][7]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile. [1][2][3][4][6][7]",
+        "Run a line check to confirm the synced speed. [1][2][3][4][6][7]",
+        "If the profile is not applied, escalate to provisioning. [1][3][4][6][7]",
+        "If the issue persists after the above steps, escalate to second-line support with the results of each step. [1]"
+      ],
+      "summary": "The complaint matches the 'speed upgrade not applied' scenario for broadband, where the new speed profile has not been applied or the router has not re-synced. The standard resolution is to confirm the order, restart the router, run a line check, and escalate to provisioning if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 2,
+        "correctness": 1,
+        "reasoning": "The draft addresses router provisioning and line profiles, which do not match the customer's problem of a mobile phone not connecting to 5G. It omits the key steps from the reference (network type setting, carrier updates, SIM check, account provisioning). While the steps are concrete, they are irrelevant and potentially harmful, so correctness is low."
+      }
+    },
+    {
+      "id": "GEN-0089",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8908,
+      "decision": "RESOLVE",
+      "latency_ms": 11172,
+      "stage_ms": {
+        "embed": 45,
+        "understand_retrieve": 287,
+        "generate": 6854,
+        "validate": 3985,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses to the customer. [1][2][5][7]",
+        "Add the static IP add-on to the customer's account. [1][2][5][7]",
+        "Ask the customer to restart the router to receive the new static IP. [1][3][5][7]",
+        "Suggest dynamic DNS as a free alternative for reaching the NAS from outside. [3][5][7]"
+      ],
+      "summary": "The customer is requesting a static IP address for their NAS, which is a standard add-on for broadband accounts. The resolution involves explaining the IP types, adding the service, and having the customer restart their router.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft mirrors the reference fix, covering all necessary steps, directly addresses the customer's request for a permanent IP, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0090",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.6,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9405,
+      "decision": "RESOLVE",
+      "latency_ms": 8110,
+      "stage_ms": {
+        "embed": 50,
+        "understand_retrieve": 264,
+        "generate": 2309,
+        "validate": 5485,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication on the account to ensure it is current and correct. [1][2][3][4][5][6][7]",
+        "If the registered mobile number is outdated, update it after completing the required identity verification. [1][2][3][4][5][6][7]",
+        "Check the customer's handset for any SMS blocking or spam filtering that might be preventing the one-time passcode from being delivered. [2][4][7]",
+        "Offer email or authenticator-app verification as an alternative method to receive the login code. [2][4][7]",
+        "If the issue persists after completing the above steps, escalate the case to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is not receiving the one-time passcode for login, likely due to an outdated mobile number, SMS blocking, or a delivery delay. The resolution involves verifying the registered number, updating it if necessary, checking for SMS filtering, and offering alternative verification methods.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft addresses the missing verification SMS, covers all reference steps (checking number, updating it, offering alternatives, checking handset filters) and adds a sensible escalation step. The instructions are clear, actionable, and accurate."
+      }
+    },
+    {
+      "id": "GEN-0091",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9322,
+      "decision": "RESOLVE",
+      "latency_ms": 11393,
+      "stage_ms": {
+        "embed": 67,
+        "understand_retrieve": 403,
+        "generate": 9851,
+        "validate": 1070,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased. [1][2][3][4][5][6][7]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit. [1][2][3][4][5][6][7]",
+        "Explain any legitimate final pro-rata charges or notice-period fees. [1][2][3][4][5][6][7]",
+        "Confirm the account is closed and send written confirmation. [2][4][7]"
+      ],
+      "summary": "The customer is being charged after cancelling their subscription. The resolution involves verifying the cancellation and cessation dates, crediting any erroneous charges, cancelling the direct debit, and confirming the account closure in writing.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft mirrors the reference fix step\u2011by\u2011step, fully addresses the billing dispute, includes all necessary actions, provides concrete instructions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0092",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9341,
+      "decision": "RESOLVE",
+      "latency_ms": 4123,
+      "stage_ms": {
+        "embed": 48,
+        "understand_retrieve": 686,
+        "generate": 723,
+        "validate": 2664,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Activate voicemail on the line from the account system. [3][4][5][6][7]",
+        "Set call diversion on no answer to the voicemail number. [1][3][4][5][6][7]",
+        "Reset the voicemail PIN and send it to the customer by SMS. [1][3][5][6][7]",
+        "If the issue persists after these steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer's voicemail is not working, likely due to voicemail not being activated, call diversion not being set, or an unknown PIN. The standard resolution involves activating voicemail, setting call diversion, and resetting the PIN.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 4,
+        "specificity": 3,
+        "correctness": 5,
+        "reasoning": "The draft addresses the voicemail recording issue and includes all reference steps plus a harmless escalation note. It covers the needed actions but lacks detailed, concrete instructions, so specificity is moderate."
+      }
+    },
+    {
+      "id": "GEN-0093",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9276,
+      "decision": "RESOLVE",
+      "latency_ms": 3625,
+      "stage_ms": {
+        "embed": 59,
+        "understand_retrieve": 177,
+        "generate": 2357,
+        "validate": 1030,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Activate voicemail on the line from the account system. [1][2][4][5][7]",
+        "Set call diversion on no answer to the voicemail number. [1][2][3][4][5][7]",
+        "Reset the voicemail PIN and send it by SMS. [1][2][3][4][7]",
+        "If the issue persists after completing the above steps, escalate to second-line support with the results of each step. [4]"
+      ],
+      "summary": "The customer's voicemail issue is likely due to voicemail not being activated, call diversion not being set, or an unknown PIN. The standard resolution involves activating voicemail, setting call diversion, and resetting the PIN.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 4,
+        "correctness": 5,
+        "reasoning": "The draft directly tackles the voicemail recording issue, includes all required actions from the reference, and adds a reasonable escalation step. Steps are clear enough to follow, though they could be more detailed, and no incorrect advice is given."
+      }
+    },
+    {
+      "id": "GEN-0094",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8459,
+      "decision": "RESOLVE",
+      "latency_ms": 11829,
+      "stage_ms": {
+        "embed": 56,
+        "understand_retrieve": 360,
+        "generate": 9008,
+        "validate": 2403,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it [2][4][5][6][7].",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end [2][4][5][6][7].",
+        "Check the outage map for a fibre fault in the area [2][4][5][6][7].",
+        "If the LOS light stays red after the above steps, raise a fibre fault and dispatch a field engineer [4][7].",
+        "If the issue is not resolved by dispatching a field engineer, escalate to second-line support with the results of each step [7]."
+      ],
+      "summary": "The customer is experiencing a red LOS light on the fibre ONT, indicating a loss of optical signal. The resolution involves inspecting the fibre cable and connector, checking for local outages, and dispatching a field engineer if the issue persists.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the red LOS issue, includes all reference steps and adds logical escalation. The instructions are clear, actionable, and accurate."
+      }
+    },
+    {
+      "id": "GEN-0095",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.6,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9153,
+      "decision": "RESOLVE",
+      "latency_ms": 16706,
+      "stage_ms": {
+        "embed": 44,
+        "understand_retrieve": 162,
+        "generate": 10737,
+        "validate": 5761,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address to confirm if the issue is due to weak indoor coverage or distance from the mast. [1][2][3][4][5][6][7]",
+        "Enable Wi-Fi Calling on the handset so that calls route over the home broadband connection. [1][2][3][4][5][6][7]",
+        "Make sure the phone software and carrier settings are up to date. [1][2][3][4][7]",
+        "If Wi-Fi Calling is not possible, offer an indoor signal booster or femtocell. [1][2][3][4][7]",
+        "If the issue is not resolved by the above steps, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing poor indoor mobile coverage, which is a known issue often caused by building materials or distance from the mast. The standard resolution involves checking the coverage map, enabling Wi-Fi Calling, updating software, and offering a signal booster if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses indoor signal loss, includes all reference steps, adds a sensible escalation step, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0096",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 0.8,
+      "reference_step_recall": 0.75,
+      "step_precision": 0.6,
+      "n_steps": 5,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.7391,
+      "decision": "ESCALATE",
+      "latency_ms": 4849,
+      "stage_ms": {
+        "embed": 54,
+        "understand_retrieve": 199,
+        "generate": 968,
+        "validate": 3626,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 1,
+      "steps": [
+        "Check the coverage map for the customer's address to confirm if the issue is due to weak indoor coverage. [2][3][4][7]",
+        "Enable Wi-Fi Calling on the handset so calls route over the home broadband connection. [1][2][3][4][7]",
+        "Make sure the phone software and carrier settings are up to date. [1][3][4][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible. [3][4][7]",
+        "If the above steps do not resolve the issue, escalate to second-line support with the results of each step. [7]"
+      ],
+      "summary": "The customer is experiencing poor indoor mobile coverage, which is a common issue due to building materials or distance from the mast. The recommended resolution involves checking the coverage map, enabling Wi-Fi Calling, updating phone settings, and offering a signal booster if necessary.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "contradicted"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly tackles the indoor signal loss, includes all reference steps, adds a sensible escalation note, provides clear actionable actions, and contains no incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0097",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8333333333333334,
+      "n_steps": 6,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8349,
+      "decision": "RESOLVE",
+      "latency_ms": 7836,
+      "stage_ms": {
+        "embed": 70,
+        "understand_retrieve": 333,
+        "generate": 5964,
+        "validate": 1468,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable. [2][5][6][7]",
+        "Run the router's channel scan and move the 2.4 GHz radio to the least congested channel (1, 6 or 11). [2][5][6][7]",
+        "Enable the 5 GHz band and connect nearby devices to it. [2][5][6][7]",
+        "Move the router away from the TV, microwave and metal objects. [2][5][6][7]",
+        "Update the router firmware to the latest version. [2][5][6][7][8]",
+        "If the issue persists, check the router's event log for thermal or power-related restarts and escalate to second-line support with the results of each step. [7][8]"
+      ],
+      "summary": "The customer's issue is most likely caused by channel interference, as indicated by the recurring nighttime Wi-Fi dropouts and the router's proximity to a TV. The recommended steps address both the interference and potential overheating issues.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft covers all the reference steps, adds a sensible escalation step, and provides clear, actionable instructions without any incorrect advice."
+      }
+    },
+    {
+      "id": "GEN-0098",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.3333333333333333,
+      "n_steps": 6,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9045,
+      "decision": "RESOLVE",
+      "latency_ms": 17005,
+      "stage_ms": {
+        "embed": 67,
+        "understand_retrieve": 224,
+        "generate": 11900,
+        "validate": 4813,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Check that the 5G service flag is provisioned on the line and re-provision the 5G service if it is missing. [5][8]",
+        "Set the phone's preferred network type to 5G/Auto in the mobile network settings. [1][2][3][6][7]",
+        "Install the latest carrier settings and phone software update. [1][2][3][6][7]",
+        "Check that the SIM is 5G-enabled and replace older SIMs if necessary. [1][2][3][6][7]",
+        "Confirm that the handset model is supported for 5G. [1][3]",
+        "Ask the customer to restart the handset to refresh network registration. [8]"
+      ],
+      "summary": "The customer's 5G plan is active but not provisioned on the line, and the handset may also have 5G disabled or outdated settings. The resolution involves re-provisioning the service and updating the device settings.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 4,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft addresses the 5G provisioning issue and includes the core steps from the reference. It adds extra but relevant actions, all of which are concrete and correct, though the added steps are not strictly required for the minimal fix."
+      }
+    },
+    {
+      "id": "GEN-0099",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.75,
+      "n_steps": 4,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9127,
+      "decision": "RESOLVE",
+      "latency_ms": 11985,
+      "stage_ms": {
+        "embed": 46,
+        "understand_retrieve": 423,
+        "generate": 4851,
+        "validate": 6662,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Verify that the email client is configured to use the IMAP server mail.example-telco.com on port 993 with SSL enabled. [2][3][4][5][6][7]",
+        "Verify that the email client is configured to use the SMTP server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled. [2][3][4][5][6][7]",
+        "If authentication continues to fail, reset the email password from the account portal. [2][4][5]",
+        "If the issue persists after verifying settings and resetting the password, escalate to second-line support with the results of each step. [5]"
+      ],
+      "summary": "The complaint matches a recurring issue where email sending fails due to incorrect IMAP/SMTP server settings, port, or authentication. The standard resolution is to verify the specific server addresses, ports, and security protocols, and to reset the password if authentication fails.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 5,
+        "completeness": 5,
+        "specificity": 5,
+        "correctness": 5,
+        "reasoning": "The draft directly addresses the sending problem, includes all required configuration checks and password reset, adds a sensible escalation step, provides clear actionable settings, and aligns perfectly with the reference fix."
+      }
+    },
+    {
+      "id": "GEN-0100",
+      "citation_accuracy": 1.0,
+      "citation_coverage": 1.0,
+      "groundedness": 1.0,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
+      "n_steps": 6,
+      "kb_retrieved": 0.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8726,
+      "decision": "RESOLVE",
+      "latency_ms": 10066,
+      "stage_ms": {
+        "embed": 46,
+        "understand_retrieve": 203,
+        "generate": 6021,
+        "validate": 3794,
+        "decide": 0
+      },
+      "generation_error": null,
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS-related by pinging an IP address such as 8.8.8.8 from a connected device. [2][6]",
+        "Flush the DNS cache on the device (e.g., ipconfig /flushdns on Windows). [2][6]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8. [2][6]",
+        "Restart the router after changing the DNS settings. [6]",
+        "Set the router security mode to WPA2/WPA3 mixed so older devices can join. [1][3][4][5][7]",
+        "Check the router's MAC filter or blocked devices list. [1][3][4][5][7]"
+      ],
+      "summary": "The sources provide steps for two distinct issues: 'connected but no websites load' (DNS errors) and 'device can't join Wi-Fi after a password or security change'. The customer's complaint matches both symptoms (devices join but nothing loads, and the wifi name changed back to default indicating a reset). The provided steps address the DNS issue and the Wi-Fi security issue, but do not explicitly address the router reverting to default settings after a full reset.",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "judge": {
+        "relevance": 1,
+        "completeness": 1,
+        "specificity": 2,
+        "correctness": 2,
+        "reasoning": "The draft focuses on DNS troubleshooting and Wi\u2011Fi security settings, which do not address the core problem of no internet after a reset and the default SSID. The reference fix requires re\u2011entering PPPoE credentials, VLAN ID, and Wi\u2011Fi configuration, which the draft completely omits. While the steps are concrete, they are irrelevant and incomplete for this issue, and some advice (e.g., changing DNS) may be unnecessary but not harmful."
+      }
     }
   ],
   "novel_rows": [
@@ -2406,6 +4504,17 @@
       "generation_error": null
     },
     {
+      "id": "NOV-0004",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "connectivity_issue",
+      "n_steps": 4,
+      "groundedness": 0.75,
+      "max_relevance": 0.5602994582182013,
+      "confidence": 0.7258,
+      "generation_error": null
+    },
+    {
       "id": "NOV-0005",
       "decision": "ESCALATE",
       "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
@@ -2414,6 +4523,39 @@
       "groundedness": 0.0,
       "max_relevance": 0.49126768320405545,
       "confidence": 0.2742,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0006",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 4,
+      "groundedness": 1.0,
+      "max_relevance": 0.6283029009156923,
+      "confidence": 0.8282,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0007",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 0.9,
+      "max_relevance": 0.5819668931065802,
+      "confidence": 0.7844,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0008",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "speed_issue",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.48435032927404165,
+      "confidence": 0.2967,
       "generation_error": null
     }
   ]

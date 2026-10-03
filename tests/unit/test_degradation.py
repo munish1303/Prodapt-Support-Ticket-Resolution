@@ -10,13 +10,20 @@ from fastapi.testclient import TestClient
 
 from app.api.v1.dependencies import Container, set_container
 from app.api.v1.routes import router
+from app.config import settings
 from app.core.database import get_db
 from app.core.resilience import CircuitBreaker
 from app.models.schemas import RetrievalResult, RetrievedDocument
 from app.services.decision import ESCALATE, RESOLVE, REVIEW, DecisionService
 from app.services.generation import ExtractiveGenerator, GenerationService
 from app.services.pipeline import DB_FAILURES, RETRIEVAL_DOWN_REASON, VALIDATION_DOWN_REASON, ResolutionPipeline
-from app.services.understanding import InMemoryNeighbourIndex, UnderstandingService, load_taxonomy_files
+from app.services.retrieval import HybridRetriever
+from app.services.understanding import (
+    InMemoryNeighbourIndex,
+    PgNeighbourIndex,
+    UnderstandingService,
+    load_taxonomy_files,
+)
 from app.services.validation import GroundednessChecker, GroundednessThresholds, ValidationService
 
 COMPLAINT = "My wifi drops every evening around 8pm and I have restarted the router twice."
@@ -100,7 +107,6 @@ def build(parts, **overrides) -> ResolutionPipeline:
         p["validation"],
         DecisionService(),
         db_breaker=p.get("breaker"),
-        db_timeout_s=p.get("timeout", 5.0),
     )
 
 
@@ -120,10 +126,66 @@ async def test_retrieval_failure_escalates_without_calling_the_llm(parts):
     assert r.generation.generator == "none" and not r.generation.resolution_steps
 
 
-async def test_slow_database_counts_as_a_failure(parts):
-    slow = Retrieval(parts["sources"], delay=1.0)
-    r = await build(parts, retrieval=slow, timeout=0.05).process(COMPLAINT, record=False)
-    assert "retrieval_unavailable" in r.flags and r.decision.decision == ESCALATE
+class SlowSessions:
+    """Session factory whose queries hang, like a database that accepts connections but never answers."""
+
+    def __call__(self):
+        class Session:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *exc):
+                return False
+
+            async def execute(self, *a, **kw):
+                await asyncio.sleep(5)
+
+        return Session()
+
+
+async def test_database_queries_time_out(monkeypatch, embedder):
+    monkeypatch.setattr(settings, "DB_QUERY_TIMEOUT_S", 0.05)
+    with pytest.raises(TimeoutError):
+        await PgNeighbourIndex(SlowSessions()).nearest(embedder.encode(COMPLAINT), 5)
+    with pytest.raises(TimeoutError):
+        await HybridRetriever(SlowSessions(), embedder).retrieve(COMPLAINT, query_embedding=embedder.encode(COMPLAINT))
+
+
+async def test_query_timeouts_degrade_and_count_as_database_failures(parts):
+    class TimingOutUnderstanding:
+        async def analyze(self, complaint, embedding):
+            raise TimeoutError
+
+    breaker = CircuitBreaker("database", 2, 60, failure_types=DB_FAILURES, half_open_max_calls=2)
+    r = await build(
+        parts,
+        retrieval=Retrieval(parts["sources"], fail=TimeoutError()),
+        understanding=TimingOutUnderstanding(),
+        breaker=breaker,
+    ).process(COMPLAINT, record=False)
+    assert {"retrieval_unavailable", "understanding_unavailable"} <= set(r.flags) and r.decision.decision == ESCALATE
+    assert breaker.state == "open"  # two timeouts = two database failures
+
+
+async def test_slow_model_inference_is_not_a_database_failure(parts, monkeypatch):
+    # Regression: the timeout used to wrap the whole understanding stage, so CPU-bound sentiment inference on a
+    # busy (or cold) machine was reported as a database outage. Only database queries are timed now.
+    monkeypatch.setattr(settings, "DB_QUERY_TIMEOUT_S", 0.05)
+
+    class SlowCPUUnderstanding:
+        def __init__(self, inner):
+            self.inner = inner
+
+        async def analyze(self, complaint, embedding):
+            await asyncio.sleep(0.3)  # stands in for slow model inference, longer than the query timeout
+            return await self.inner.analyze(complaint, embedding)
+
+    breaker = CircuitBreaker("database", 1, 60, failure_types=DB_FAILURES, half_open_max_calls=2)
+    r = await build(parts, understanding=SlowCPUUnderstanding(parts["understanding"]), breaker=breaker).process(
+        COMPLAINT, record=False
+    )
+    assert "understanding_unavailable" not in r.flags and r.metadata.intent == "connectivity_issue"
+    assert breaker.state == "closed"
 
 
 async def test_open_circuit_skips_the_database_entirely(parts):

@@ -11,3 +11,4 @@ htmlcov/
 .vscode/
 *.checkpoint.jsonl
 data/external/
+~$*

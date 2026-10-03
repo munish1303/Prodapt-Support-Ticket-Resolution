@@ -13,16 +13,17 @@ reported as missed; the sections below explain each number.
 |---|---|:---:|---|
 | Intent classification macro-F1 > 0.75 | 0.723 (500 held-out complaints) | ✗ | §2.1 |
 | Product extraction F1 > 0.70 | 0.716 | ✓ | §2.1 |
-| Hybrid retrieval Recall@10 > 0.70 | 0.558 (capped Recall@10, E1 test split; plain Recall@10 is uninformative when a query has dozens of equally relevant tickets, §1.1) | ✗ | EXPERIMENTS.md E1 |
-| Citation accuracy > 0.90 | 0.962 (LLM, 52 cases); 1.000 (extractive) | ✓ | §4 |
-| Groundedness > 0.80 | 0.955 (LLM); E3 multi-method checker F1 0.918 | ✓ | §4, §5 |
-| P95 latency < 15 s (MVP) | 1.2 s without LLM (concurrency 1); 15.4 s with the free-tier LLM, driven by rate-limit waits | ✗ (with LLM, just) | §4.2, §6.1 |
+| Hybrid retrieval Recall@10 > 0.70 | 0.558 deployed (capped Recall@10, E1 test split; plain Recall@10 is uninformative when a query has dozens of equally relevant tickets, §1.1). E4: all-mpnet-base-v2 reaches 0.721 semantic-only; switch recommended, not yet deployed | ✗ (deployed) | EXPERIMENTS.md E1, E4 |
+| Citation accuracy > 0.90 | 0.950 (LLM, 100 cases; 1.000 on the 95 non-empty drafts, the 5 declines score 0); 1.000 (extractive) | ✓ | §4 |
+| Groundedness > 0.80 | 0.942 (LLM, 100 cases); E3 multi-method checker F1 0.918 | ✓ | §4, §5 |
+| P95 latency < 15 s (MVP) | 1.2 s without LLM (concurrency 1); 16.7 s with the free-tier LLM, driven by rate-limit waits | ✗ (with LLM) | §4.2, §6.1 |
 | Throughput > 5 req/s | ~1 req/s per worker on the laptop CPU, 0% errors at concurrency 8 | ✗ | §6.1 |
 | Test coverage > 70% | 88% of `app/` | ✓ | §7 |
-| Experiments 1-3 run, with decisions | E1, E2, E3 done (plus E4′ evolving classes) | ✓ | EXPERIMENTS.md |
+| Experiments 1-3 run, with decisions | E1, E2, E3 done; optional E4 (embeddings) and E5 (thresholds, on AI ratings) done; E4′ evolving classes | ✓ | EXPERIMENTS.md |
 
-The misses have known causes and next steps (§9): intent and recall are limited by k-NN over templated data
-(LLM intent classifier and query rewriting are the levers); throughput and latency by CPU inference in one worker
+The misses have known causes and next steps (§9): recall is limited by the embedding model (E4: all-mpnet-base-v2
+clears the target; switching needs a re-baseline) and intent by k-NN over the same embeddings (the LLM classifier
+is the other lever); throughput and latency by CPU inference in one worker
 and free-tier LLM limits (more workers, batched GPU inference, a paid LLM tier).
 
 ## 1. Data and methodology
@@ -263,41 +264,43 @@ for "contradictions" on verbatim-quoted steps, which exposed the NLI premise iss
 `experiments/results/generation_llm.json`. Generator `qwen/qwen3.8-27b`, judge `openai/gpt-oss-120b`
 (different model family, to reduce self-preference bias), Groq free tier.
 
-**Coverage: 52 of the 100 planned cases** (GEN-0001 to GEN-0052 of the fixed, pre-shuffled eval order; not a
-cherry-picked subset). The run hit Groq's free-tier cap of **200,000 tokens per day per model**: each draft costs
-about 1.8–2k tokens, so roughly 100 drafts per day, and the budget was partly spent on earlier aborted runs.
-Rate-limited cases were retried later (6 of the 52 ran in the API container), never scored as failures.
+**Coverage: all 100 planned cases** (GEN-0001 to GEN-0100, the fixed pre-shuffled eval order). The run spanned
+two days because Groq's free tier caps each model at **200,000 tokens per day** (about 100 drafts). Every
+rate-limited case was retried later rather than scored as a failure, and one case whose understanding stage hit an
+early version of the database timeout (ARCHITECTURE.md §6.1) was discarded and re-run, so no case was scored in a
+degraded state. The extractive generator ran on the same 100 complaints, so the comparison below is paired.
 
-| Metric (n = 52) | LLM | Extractive (same 52) | Δ, paired bootstrap |
+| Metric (n = 100, paired) | LLM | Extractive | Δ, paired bootstrap |
 |---|---:|---:|---|
-| Reference-step recall | 0.726 [95% CI 0.607–0.830] | 0.711 | +0.015 (p = 0.37, n.s.) |
-| **Step precision** | **0.596** | 0.531 | **+0.065 (p = 0.024)** |
-| Groundedness | 0.955 | 1.000 | −0.045 (extractive copies verbatim) |
-| Citation accuracy / coverage | 0.962 / 0.962 | 1.000 / 1.000 | |
-| Steps per draft | 4.65 | 5.00 | |
-| Drafts with a contradicted step | 2 | 0 | |
-| Empty drafts (LLM declined: sources don't address the complaint) | 2 | n/a | |
-| Decisions RESOLVE / REVIEW / ESCALATE | 39 / 8 / 5 | 42 / 9 / 1 | |
-| **Confidence AUROC (predicting a good draft)** | **0.802** | 0.751 (on all 100) | |
-| LLM-judge 1–5: relevance / completeness / specificity / correctness | 4.02 / 3.94 / 3.87 / 4.06 | n/a | directional only |
-| End-to-end latency p50 / p95 | 5.5 s / 15.4 s | 1.0 s / 1.5 s | |
-| Generation stage alone p50 / p95 | 0.97 s / 6.8 s | 0 | |
-| Mean stage latency: generate / validate | 6.1 s / 3.5 s | 0 / 0.8 s | |
+| Reference-step recall | 0.765 [95% CI 0.695-0.831] | 0.743 | +0.022 (p = 0.20, n.s.) |
+| **Step precision** | **0.626** | 0.560 | **+0.066 (p = 0.002)** |
+| Groundedness | 0.942 (0.991 over the 95 non-empty drafts) | 1.000 | -0.058 (extractive copies verbatim) |
+| Citation accuracy / coverage | 0.950 / 0.950 (every one of the 95 non-empty drafts cites validly; the 5 declined drafts score 0) | 1.000 / 1.000 | |
+| Steps per draft | 4.54 | 5.00 | |
+| Drafts with a contradicted step | 3 | 0 | |
+| Empty drafts (LLM declined: sources don't address the complaint) | 5 | n/a | |
+| Decisions RESOLVE / REVIEW / ESCALATE | 76 / 15 / 9 | 81 / 18 / 1 | |
+| **Confidence AUROC (predicting a good draft)** | **0.844** | 0.751 | |
+| LLM-judge 1-5: relevance / completeness / specificity / correctness | 4.21 / 4.13 / 4.03 / 4.26 | n/a | directional only |
+| End-to-end latency p50 / p95 | 6.4 s / 16.7 s | 1.0 s / 1.5 s | |
+| Generation stage alone p50 / p95 | 0.93 s / 9.9 s | 0 | |
+| Mean stage latency: generate / validate | 4.6 s / 3.9 s | 0 / 0.8 s | |
 
-Quality by decision (LLM): **RESOLVE 0.795** reference-step recall (n = 39), **REVIEW 0.719** (n = 8),
-**ESCALATE 0.200** (n = 5). The decision layer separates good drafts from bad ones much more sharply with the LLM
+Quality by decision (LLM): **RESOLVE 0.832** reference-step recall (n = 76), **REVIEW 0.767** (n = 15),
+**ESCALATE 0.194** (n = 9). The decision layer separates good drafts from bad ones much more sharply with the LLM
 than with extractive drafts, because the LLM declines or writes thin drafts when the evidence is poor, and
-validation and confidence pick that up.
+validation and confidence pick that up. (The first 52 cases, reported earlier, gave the same picture: recall tied,
+precision +0.065 with p = 0.024, AUROC 0.80; the full run tightens the estimates.)
 
 **Interpretation.**
 * On this dataset the LLM's value is **judgment and focus, not recall**: more precise drafts (fewer irrelevant
-  steps), occasional refusals when sources don't fit, and better-separated confidence. Recall is statistically tied
-  with the extractive generator. Extractive is a deliberately strong baseline here because historical resolutions are
+  steps), refusals when sources don't fit, and better-separated confidence. Recall is statistically tied with the
+  extractive generator. Extractive is a deliberately strong baseline here because historical resolutions are
   templated; on messier real tickets the abstractive advantage should grow, but that is untested.
-* Paraphrased LLM steps cost validation time (3.5 s vs 0.8 s mean): quoted steps skip NLI, paraphrases don't.
-* **Latency: p95 15.4 s is just over the plan's 15 s MVP target, as measured.** The tail is free-tier rate limiting:
-  generation alone has p50 0.97 s, but rate-limit retry waits push the mean to 6.1 s (max 186 s). On a paid tier the
-  expected end-to-end p95 is roughly retrieval + generation + validation ≈ 0.3 + 2–7 + 3.5 s. That is an estimate
+* Paraphrased LLM steps cost validation time (3.9 s vs 0.8 s mean): quoted steps skip NLI, paraphrases don't.
+* **Latency: p95 16.7 s misses the plan's 15 s MVP target, as measured.** The tail is free-tier rate limiting:
+  generation alone has p50 0.93 s, but rate-limit retry waits push its mean to 4.6 s (max 186 s). On a paid tier the
+  expected end-to-end p95 is roughly retrieval + generation + validation ≈ 0.3 + 2-10 + 4 s. That is an estimate
   from the measured stages, not a measurement.
 * LLM-judge scores are directional only (single judge, no human calibration).
 
@@ -331,8 +334,9 @@ declined 26 of 60, which the pipeline turns into ESCALATE ("insufficient evidenc
 unseen issue type fall by more than half (48% → 22%). It does not eliminate them: 13 drafts were still RESOLVEd,
 so the traffic-level intent-mix drift alert (E4′) remains necessary as the second line of defence.
 
-**Remaining gap:** Qwen covers 52 of the 100 generation cases (free-tier daily token cap); resumable with
-`python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 20`.
+**Remaining gap:** with Qwen, the novel-class set has 8 of 60 complaints so far (the daily cap was reached after
+the 100 generation cases); the 60-case novel analysis above therefore uses gpt-oss-20b. Resume with
+`python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 2`.
 
 ## 5. Groundedness validation (L1)
 
@@ -361,8 +365,8 @@ concurrency. One worker serialises CPU-bound inference (embedding, sentiment, NL
 queue. Server latency ≈ client latency, so the queue is inside the service, not the network. Scaling path, in
 order: more workers or pods behind a load balancer (each holds about 1.7 GB of models), then a batched inference service
 (GPU) for NLI and embeddings, which also cuts per-request latency. The plan's MVP target (P95 < 15 s) holds up to
-concurrency 8 on this laptop *without* the LLM. With the free-tier LLM (§4.2) end-to-end p95 is 15.4 s at
-concurrency 1, just over the target, driven by rate-limit waits.
+concurrency 8 on this laptop *without* the LLM. With the free-tier LLM (§4.2) end-to-end p95 is 16.7 s at
+concurrency 1, over the target, driven by rate-limit waits.
 
 ### 6.2 Monitoring and drift
 
@@ -396,20 +400,62 @@ runtime clue that should lower confidence; (2) sentence-level / late-interaction
 outvote the symptom sentence; (3) the LLM generator, which sees the evening-Wi-Fi KB article in its context and can
 decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on the cited sources.
 
-### 6.4 Human evaluation (prepared, awaiting ratings)
+### 6.4 Draft quality ratings (AI-rated stand-in; human ratings still open)
 
-The plan's Tier-2 human evaluation is set up but **not yet rated**, so no human results are reported.
-`data/evaluation/human_eval_sheet.xlsx` (built by `evaluation/build_human_eval_sheet.py`) holds 50 Qwen drafts
-(seed 7, both "declined" drafts included, shuffled). Each row has the complaint, the 8 sources the generator saw
-(re-retrieved with the production retriever, verified to reproduce the original run for all 50), the cited draft and
-the reference fix. The rater fills relevance / completeness / correctness (1–5), "safe to use as-is" and their own
-RESOLVE / REVIEW / ESCALATE. System outputs and LLM-judge scores sit on a hidden sheet to avoid anchoring.
+**What this is and is not.** The plan's Tier-2 human evaluation uses `data/evaluation/human_eval_sheet.xlsx`
+(built by `evaluation/build_human_eval_sheet.py`): 50 Qwen drafts drawn from the first 52 cases of §4.2 (seed 7,
+both "declined" drafts included,
+shuffled), each with the complaint, the 8 sources the generator saw (re-retrieved with the production retriever and
+verified to reproduce the original run), the cited draft and the reference fix; system outputs and LLM-judge scores
+sit on a hidden sheet. **No human has rated it yet.** The project owner asked for the sheet to be filled
+automatically, so the ratings below were produced by **an AI rater (Claude Opus 5.5), not a human**, in a separate
+copy, `data/evaluation/ai_eval_sheet.xlsx`, which states this on its first page. The rater read only the complaint,
+sources, draft and reference fix (blind to the hidden System sheet) and wrote a reason for every row. The blank
+human workbook is unchanged and remains the way to get real human judgements. Analysis:
+`python evaluation/human_eval_analysis.py --sheet data/evaluation/ai_eval_sheet.xlsx --rater "..."`
+→ `experiments/results/ai_rater_eval.json`.
 
-Once rated, `python evaluation/human_eval_analysis.py` reports: decision agreement and Cohen's kappa vs the system,
-precision of system RESOLVE, Spearman correlations validating the LLM judge, the heuristic confidence and the automatic
-reference-recall metric, confidence AUROC for "safe", and a RESOLVE-threshold sweep, the data Experiment 5
-(threshold tuning) needs. The workbook's Summary formulas were verified with the `formulas` engine (no errors when
-empty; values match an independent computation on a synthetic fill).
+| Measure (50 drafts, AI rater) | Result |
+|---|---|
+| Relevance / completeness / correctness (1-5, mean, 95% CI) | 4.10 [3.68, 4.48] / 4.14 [3.70, 4.52] / 4.00 [3.58, 4.36] |
+| Safe to use as-is | 72% (36 of 50) |
+| **Precision of system RESOLVE** (auto-resolved drafts the rater called safe) | **76%** (29 of 38) |
+| Rater correctness by system decision: RESOLVE / REVIEW / ESCALATE | 4.21 (n = 38) / 4.00 (n = 8) / 2.00 (n = 4) |
+| Heuristic confidence AUROC for "safe" | 0.81 |
+| Spearman: rater correctness vs heuristic confidence | 0.54 (p = 0.0001) |
+| Spearman: rater completeness vs automatic reference-step recall | 0.81 |
+| Spearman: rater correctness vs LLM-judge correctness | 0.92 |
+| Decision agreement with the system (3-way) / Cohen's kappa | 64% / 0.15 |
+
+Decision confusion (rows = rater, columns = system):
+
+| | system RESOLVE | system REVIEW | system ESCALATE |
+|---|---:|---:|---:|
+| rater RESOLVE | 29 | 6 | 1 |
+| rater REVIEW | 3 | 0 | 0 |
+| rater ESCALATE | 6 | 2 | 3 |
+
+**Findings.**
+* **The 9 unsafe auto-resolves are the "grounded but wrong" failure mode** (§4.1, §6.3), now with a measured rate:
+  6 are drafts for the wrong scenario (broadband speed-upgrade steps for a phone that never reaches 5G, DNS steps
+  for a factory-reset router, evening-congestion steps for a 100 Mbps bottleneck, failed-payment steps for a
+  duplicate charge that would take *another* payment from an overdrawn customer) and 3 mix the right fix with
+  steps from a neighbouring scenario. All 9 had confidence 0.81-0.89, the same range as good drafts, because they are
+  well grounded in the sources they cite; the sources are the wrong ones.
+* **Disagreement is mostly on the cautious side.** The system sent 8 drafts to REVIEW or ESCALATE that the rater
+  would send as-is: 6 REVIEWs, all with confidence above the RESOLVE threshold, so a policy rule (predicted critical
+  severity or an unrecognised intent; the stored run does not record which) made the call, plus 1 ESCALATE at low
+  confidence. Kappa is low because the policy rules and the rater use different criteria, not because the rankings
+  disagree (AUROC 0.81).
+* **The automatic signals track the AI rater**: reference-step recall (0.81) and the LLM judge (0.92) rank drafts
+  much like the rater does. This supports using them for regression testing, but it is AI agreeing with AI; it does
+  not replace human validation.
+* The 2 declined drafts were judged correct declines (no retrieved source covered a new connection awaiting
+  activation).
+
+**Caveats.** An AI rater may share blind spots with the LLM judge and the generator; the generator (Qwen) and judge
+(gpt-oss) are different model families from the rater, which limits self-preference but not shared biases. Treat
+these as provisional until a human rates the same 50 rows (the analysis then reports human-vs-AI agreement).
 
 ### 6.5 Outage drill: database stopped under a running API
 
@@ -419,25 +465,25 @@ included).
 
 | Phase | Response | Client time |
 |---|---|---:|
-| Healthy | 200, RESOLVE, 4 cited steps | 5.9 s |
-| Database stopped, requests 1-2 (circuit closed) | 200, ESCALATE "Knowledge base unavailable", flags `retrieval_unavailable`, `understanding_unavailable` | 10.1 s, 13.1 s |
+| Healthy | 200, RESOLVE, 4 cited steps | 8.4 s |
+| Database stopped, requests 1-2 (circuit closed) | 200, ESCALATE "Knowledge base unavailable", flags `retrieval_unavailable`, `understanding_unavailable` | 13.5 s, 10.0 s |
 | Request 3 (circuit opens after 5 database failures) | 200, ESCALATE | 3.4 s |
 | Requests 4-5 (circuit open) | 200, ESCALATE, database not touched | 0.05 s |
 | `/health` during the outage | `degraded`, `database_circuit: open` | |
-| Database back, circuit still open | 200, ESCALATE | 0.09 s |
-| After the 30 s recovery window | 200, RESOLVE, 4 cited steps; `/health` back to `healthy`, circuit `closed` | 1.8 s |
+| Database back, circuit still open | 200, ESCALATE | 0.10 s |
+| After the 30 s recovery window | 200, RESOLVE, 4 cited steps; `/health` back to `healthy`, circuit `closed` | 7.1 s |
 
 No request failed, nothing was resolved without evidence, and the service recovered by itself. The first requests
-of an outage are slow because each waits up to `DB_STAGE_TIMEOUT_S` (10 s) before the circuit opens; a lower timeout
+of an outage are slow because each waits up to `DB_QUERY_TIMEOUT_S` (10 s) before the circuit opens; a lower timeout
 trades that wait for more false alarms under load.
 
 ## 7. Engineering checks
 
 | Check | Result |
 |---|---|
-| Unit + API + DB integration tests (`pytest`) | 89 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Unit + API + DB integration tests (`pytest`) | 91 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 88% |
-| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 74 files) | clean |
+| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 75 files) | clean |
 | Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |
 | `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
 | Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |
@@ -452,9 +498,9 @@ trades that wait for more false alarms under load.
   intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
 * Intent macro-F1 (0.723) is below the plan's provisional 0.75 target; the LLM classifier
   (`INTENT_CLASSIFIER=llm`) has not been evaluated.
-* LLM generation evaluated on 52 of 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
-  gpt-oss-20b: free-tier daily caps (200k tokens/day on Groq, 20 requests/day on Gemini) prevented one model from
-  covering everything.
+* LLM generation evaluated on all 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
+  gpt-oss-20b (Qwen has 8 of them): free-tier daily caps (200k tokens/day on Groq, 20 requests/day on Gemini)
+  prevented one model from covering everything.
 * E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
 * One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
 * Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.80 LLM for predicting a good draft); the
@@ -474,11 +520,12 @@ trades that wait for more false alarms under load.
    consider a hybrid (k-NN unless the vote is split).
 5. **Throughput:** batched GPU inference for NLI and embeddings, then multiple workers; re-run the load test (target
    > 5 req/s) and re-run E2 on GPU to decide whether reranking (+0.052 P@5) becomes affordable.
-6. **Complete the LLM evaluation** on one model across all 100 + 60 cases on a paid tier (free tiers capped it at 52).
+6. **Complete the novel-class LLM run** with the deployed model (Qwen has 8 of 60; the 100 generation cases are done).
 7. **Real data:** re-run every evaluation on real (anonymised) tickets; the synthetic set fixes relevance labels but
    not linguistic variety.
-8. **Optional experiments not run:** E4 embedding models (e.g. all-mpnet-base-v2), E6 LLM temperature, E7 context
-   length, E8 caching.
+8. **Switch to all-mpnet-base-v2** (E4: +0.16 nDCG@10) with a full re-baseline: 768-d columns, re-embed,
+   re-tune E3 thresholds and sufficiency floors on the new cosine scale, re-run all evaluations.
+   Optional experiments not run: E6 LLM temperature, E7 context length (free-tier LLM quota), E8 caching.
 9. **Out-of-domain stress test** with the Hugging Face tickets (§1): measure how often the system RESOLVEs IT
    tickets it has no knowledge for, and whether the drift monitor alerts.
 

@@ -1,0 +1,137 @@
+{
+  "experiment": "E4 embedding model comparison",
+  "corpus": {
+    "tickets": 2043,
+    "kb_articles": 40
+  },
+  "queries": 200,
+  "ranking": "exact cosine top-20 in memory (isolates the embedding model)",
+  "results": {
+    "sentence-transformers/all-MiniLM-L6-v2": {
+      "dims": 384,
+      "metrics": {
+        "ndcg@10": 0.5543,
+        "mrr": 0.5995,
+        "p@5": 0.543,
+        "p@10": 0.5555,
+        "hit@1": 0.495,
+        "hit@5": 0.715,
+        "recall@10_capped": 0.5555,
+        "recall@20_capped": 0.5488,
+        "kb_recall@5": 0.015,
+        "kb_recall@10": 0.085
+      },
+      "query_encode_ms": {
+        "p50": 122.7,
+        "p95": 147.4
+      },
+      "corpus_encode_s": 116.8
+    },
+    "sentence-transformers/all-mpnet-base-v2": {
+      "dims": 768,
+      "metrics": {
+        "ndcg@10": 0.7155,
+        "mrr": 0.7517,
+        "p@5": 0.704,
+        "p@10": 0.7205,
+        "hit@1": 0.655,
+        "hit@5": 0.87,
+        "recall@10_capped": 0.7205,
+        "recall@20_capped": 0.719,
+        "kb_recall@5": 0.03,
+        "kb_recall@10": 0.085
+      },
+      "query_encode_ms": {
+        "p50": 237.0,
+        "p95": 319.6
+      },
+      "corpus_encode_s": 774.6
+    },
+    "BAAI/bge-small-en-v1.5": {
+      "dims": 384,
+      "metrics": {
+        "ndcg@10": 0.5013,
+        "mrr": 0.5514,
+        "p@5": 0.485,
+        "p@10": 0.5185,
+        "hit@1": 0.39,
+        "hit@5": 0.755,
+        "recall@10_capped": 0.5185,
+        "recall@20_capped": 0.527,
+        "kb_recall@5": 0.0,
+        "kb_recall@10": 0.0
+      },
+      "query_encode_ms": {
+        "p50": 148.2,
+        "p95": 184.6
+      },
+      "corpus_encode_s": 198.6
+    }
+  },
+  "significance_vs_baseline": {
+    "sentence-transformers/all-mpnet-base-v2": {
+      "ndcg@10": {
+        "diff": 0.1612,
+        "p_better": 0.0,
+        "p_worse": 1.0
+      },
+      "mrr": {
+        "diff": 0.1522,
+        "p_better": 0.0,
+        "p_worse": 1.0
+      },
+      "p@5": {
+        "diff": 0.161,
+        "p_better": 0.0,
+        "p_worse": 1.0
+      },
+      "hit@5": {
+        "diff": 0.155,
+        "p_better": 0.0,
+        "p_worse": 1.0
+      },
+      "recall@10_capped": {
+        "diff": 0.165,
+        "p_better": 0.0,
+        "p_worse": 1.0
+      },
+      "kb_recall@10": {
+        "diff": 0.0,
+        "p_better": 0.5545,
+        "p_worse": 0.519
+      }
+    },
+    "BAAI/bge-small-en-v1.5": {
+      "ndcg@10": {
+        "diff": -0.053,
+        "p_better": 0.9825,
+        "p_worse": 0.0175
+      },
+      "mrr": {
+        "diff": -0.0481,
+        "p_better": 0.9345,
+        "p_worse": 0.0655
+      },
+      "p@5": {
+        "diff": -0.058,
+        "p_better": 0.9845,
+        "p_worse": 0.0155
+      },
+      "hit@5": {
+        "diff": 0.04,
+        "p_better": 0.1295,
+        "p_worse": 0.898
+      },
+      "recall@10_capped": {
+        "diff": -0.037,
+        "p_better": 0.9345,
+        "p_worse": 0.0655
+      },
+      "kb_recall@10": {
+        "diff": -0.085,
+        "p_better": 1.0,
+        "p_worse": 0.0
+      }
+    }
+  }
+}

@@ -36,13 +36,15 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 | What | Result |
 |---|---|
 | Finding a highly relevant past ticket in the top 5 | keyword search (status quo) **40.5%** → hybrid retrieval **76.0%** |
+| Embedding model (E4) | all-mpnet-base-v2 beats the deployed MiniLM by +0.16 nDCG@10 (p < 0.001) and clears the 0.70 Recall@10 target; switch recommended, needs a re-baseline |
 | Hybrid vs semantic-only retrieval | MRR +0.057 (p = 0.0005); reranking adds +0.052 P@5 but +2.7 s on CPU, so kept off (E2) |
 | Groundedness check, F1 at catching unsupported/contradicted steps | **0.918** multi-method vs 0.694 similarity-only (E3) |
 | Understanding (500 complaints) | intent acc 0.724 · products F1 0.716 · severity acc 0.784 · sentiment acc 0.790 |
 | New ticket class, no retraining | 0% → **85%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
-| LLM drafts (Groq `qwen3.8-27b`, 52 cases) | groundedness 0.955 · RESOLVE drafts recover 79% of reference steps, ESCALATE 20% · confidence AUROC 0.80 |
+| LLM drafts (Groq `qwen3.8-27b`, all 100 cases) | groundedness 0.94 · step precision +0.066 vs extractive (p = 0.002) · RESOLVE drafts recover 83% of reference steps, ESCALATE 19% · confidence AUROC 0.84 |
+| Draft quality, 50 samples rated by an AI rater (Claude, blind to system outputs; **not human**) | 72% safe to use as-is; 76% of system RESOLVEs safe; confidence AUROC 0.81 for "safe"; the unsafe RESOLVEs are wrong-scenario drafts (EVALUATION.md §6.4) |
 | Unseen issue type (60 complaints) | confident wrong answers: 48% with extractive drafts → **22% with an LLM** that declines when sources don't fit |
-| Latency / load (1 worker, laptop CPU) | p50 1.0 s without LLM, 5.5 s with the free-tier LLM (p95 15.4 s, rate-limit waits) · ~1 req/s per worker, 0% errors at concurrency 8 |
+| Latency / load (1 worker, laptop CPU) | p50 1.0 s without LLM, 6.4 s with the free-tier LLM (p95 16.7 s, rate-limit waits) · ~1 req/s per worker, 0% errors at concurrency 8 |
 | Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
 | Deployment | `docker compose up --build` verified end to end on the dev machine (image 3.7 GB, ~41 s cold start, offline model loading) |
 
@@ -179,13 +181,13 @@ uvicorn app.main:app --reload
 ## Tests and quality
 
 ```bash
-pytest --cov=app                 # 89 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
+pytest --cov=app                 # 91 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
 pytest -m db                     # DB integration tests only (needs the database running)
 black --check . && flake8 && mypy app scripts evaluation experiments tests
 locust -f tests/load/locustfile.py --host http://localhost:8000   # optional interactive load test
 ```
 
-Current status: 89 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
+Current status: 91 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
 
 ## Evaluations and experiments
 
@@ -201,6 +203,8 @@ python experiments/evolving_classes.py --extractive        # new ticket class ar
 python evaluation/retrieval_eval.py                         # deployed retriever configuration
 python scripts/run_experiments.py                           # all of the above in a safe order (see --help)
 python evaluation/human_eval_analysis.py                    # after filling data/evaluation/human_eval_sheet.xlsx
+python evaluation/human_eval_analysis.py --sheet data/evaluation/ai_eval_sheet.xlsx --out experiments/results/ai_rater_eval.json --rater "AI"
+python experiments/e4_embeddings.py                         # E4: embedding models (downloads two extra models)
 ```
 
 Every script writes its raw output to `experiments/results/*.json`. The numbers quoted in the docs come from those files.

@@ -12,6 +12,7 @@ Reports, over rated rows only:
     and share of drafts auto-resolved (coverage). This is the input for Experiment 5 (threshold tuning).
 
 Usage: python evaluation/human_eval_analysis.py [--sheet path.xlsx] [--out experiments/results/human_eval.json]
+                                              [--rater "who rated"]   (recorded in the output; e.g. an AI rater)
 """
 
 from __future__ import annotations
@@ -99,7 +100,7 @@ def analyse(rows: list[dict]) -> dict:
             "n": len(dec),
             "agreement": round(sum(a == b for a, b in zip(h, s)) / len(dec), 4),
             "cohen_kappa": round(float(cohen_kappa_score(h, s, labels=DECISIONS)), 4) if len(set(h + s)) > 1 else None,
-            "confusion_rows_human_cols_system": {
+            "confusion_rows_rater_cols_system": {
                 "labels": DECISIONS,
                 "matrix": confusion_matrix(h, s, labels=DECISIONS).tolist(),
             },
@@ -110,13 +111,13 @@ def analyse(rows: list[dict]) -> dict:
         d: _ci([r["correctness"] for r in rows if r["system_decision"] == d]) for d in DECISIONS
     }
     out["validity"] = {
-        "human_correctness_vs_llm_judge_correctness": _spearman(
+        "rater_correctness_vs_llm_judge_correctness": _spearman(
             [r["correctness"] for r in rows], [r["judge_correctness"] for r in rows]
         ),
-        "human_correctness_vs_heuristic_confidence": _spearman(
+        "rater_correctness_vs_heuristic_confidence": _spearman(
             [r["correctness"] for r in rows], [r["confidence"] for r in rows]
         ),
-        "human_completeness_vs_auto_reference_recall": _spearman(
+        "rater_completeness_vs_auto_reference_recall": _spearman(
             [r["completeness"] for r in rows], [r["auto_recall"] for r in rows]
         ),
     }
@@ -142,11 +143,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sheet", default=str(EVAL_DIR / "human_eval_sheet.xlsx"))
     parser.add_argument("--out", default=str(RESULTS_DIR / "human_eval.json"))
+    parser.add_argument("--rater", default="human", help="who produced the ratings; stored in the output")
     args = parser.parse_args()
     rows = load(Path(args.sheet))
     if not rows:
         raise SystemExit("no rated rows yet: fill the yellow cells on the Ratings sheet first")
-    result = analyse(rows)
+    result = {"rater": args.rater, "sheet": Path(args.sheet).name, **analyse(rows)}
     Path(args.out).write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps({k: v for k, v in result.items() if k != "notes"}, indent=2))
     print(f"saved {args.out}")

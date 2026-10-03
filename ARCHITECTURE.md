@@ -198,6 +198,7 @@ confidence ≥ 0.75 → RESOLVE; ≥ 0.55 → REVIEW; else ESCALATE. All thresho
 | "Real-time agent UI" out of scope (API only) | Web console at `/` plus read-only knowledge-base endpoints (`/corpus/*`, `/requests`) | Added at the project owner's request so a reviewer can see what RAG retrieves from; plain HTML/CSS/JS served by the API, no extra service. The corpus endpoints are unauthenticated like the rest of this demo API and belong behind auth in production |
 | `POST /ingestion/tickets` | `POST /ingestion` | One idempotent endpoint accepts tickets and KB articles together |
 | Public dataset first, synthetic as augmentation (§12.1) | Scenario-based synthetic corpus only | Both suggested public datasets were measured and rejected for retrieval (EVALUATION.md §1): one is not support data, the other has few actionable answers and is not telecom |
+| Human evaluation of 50 drafts (Tier 2) | Same 50-row sheet rated by an AI rater (Claude), clearly labelled; the human sheet is unchanged and still open | The project owner asked for the sheet to be filled automatically; results are reported as AI ratings, never as human ones (EVALUATION.md §6.4) |
 | `circuitbreaker` package for DB calls | Small in-house breaker (`app/core/resilience.py`) around the two database stages | Needs async support, a per-request trial allowance and selective failure types; ~70 lines, fully unit-tested |
 
 ## 6. Production considerations
@@ -245,7 +246,7 @@ response (`app/services/pipeline.py`, tests in `tests/unit/test_degradation.py`)
 | Failure | What the agent gets | Flag |
 |---|---|---|
 | LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual | `llm_unavailable_extractive_fallback` |
-| Database down, slow (> `DB_STAGE_TIMEOUT_S`, 10 s) or circuit open | no LLM call; ESCALATE "Knowledge base unavailable" | `retrieval_unavailable` |
+| Database down, a query slower than `DB_QUERY_TIMEOUT_S` (10 s), or circuit open | no LLM call; ESCALATE "Knowledge base unavailable" | `retrieval_unavailable` |
 | Understanding fails | intent treated as unknown, so the decision is at most REVIEW; retrieval and drafting continue | `understanding_unavailable` |
 | Generator crashes | no draft; ESCALATE | `generation_error` |
 | Validation model fails | draft returned with every step marked `unverified`; never RESOLVE, REVIEW when sources are relevant | `validation_unavailable` |
@@ -253,11 +254,14 @@ response (`app/services/pipeline.py`, tests in `tests/unit/test_degradation.py`)
 | Audit-log write fails | logged, the response is still returned; skipped while the circuit is open; write failures don't trip the breaker (answering needs reads, not the log) | (none) |
 
 **Circuit breaker.** Understanding and retrieval queries run through one database breaker. After
-`DB_CIRCUIT_FAILURE_THRESHOLD` (5) consecutive database failures (connection errors, SQL errors, timeouts) it opens
+`DB_CIRCUIT_FAILURE_THRESHOLD` (5) consecutive database failures (connection errors, SQL errors, query timeouts) it opens
 and requests are escalated immediately instead of each waiting for a timeout and exhausting the pool. After
 `DB_CIRCUIT_RECOVERY_S` (30 s) two trial calls (one request) are let through; success closes it. Errors that are not
 database failures (bugs) still degrade the request but don't trip the breaker. `/health` reports
-`database_circuit` and turns `degraded` while it is open.
+`database_circuit` and turns `degraded` while it is open. The timeout is applied to the database round trips only
+(k-NN, retrieval, audit write), never to model inference, so a slow CPU cannot be mistaken for a database outage.
+An earlier version timed the whole understanding stage and did exactly that once during an evaluation run (cold
+start: sentiment model plus first connection); that case was discarded and re-run.
 
 ### 6.2 Deliberately not built (Tier 3), and when we would add it
 

@@ -1,28 +1,28 @@
-Outage drill: database container stopped while the API keeps serving (2026-10-03, docker compose stack on the dev laptop)
+Outage drill: database container stopped while the API keeps serving (2026-10-03T10:43Z, docker compose stack on the dev laptop)
 
 Procedure (bash, from support-assistant/):
   1. POST /api/v1/tickets/resolve with a billing complaint; GET /api/v1/health
   2. docker compose stop db; send 5 resolve requests; GET /api/v1/health
   3. docker compose start db; wait for pg_isready; send 1 request (circuit still open)
   4. wait 31 s (DB_CIRCUIT_RECOVERY_S = 30); send 1 request; GET /api/v1/health
-Settings: DB_STAGE_TIMEOUT_S=10, DB_CIRCUIT_FAILURE_THRESHOLD=5, DB_CIRCUIT_RECOVERY_S=30 (defaults).
+Settings: DB_QUERY_TIMEOUT_S=10, DB_CIRCUIT_FAILURE_THRESHOLD=5, DB_CIRCUIT_RECOVERY_S=30 (defaults).
 Complaint: "I was charged twice for this months bill, the same amount left my bank account two times."
 
 Output:
 == healthy
-HTTP 200 in 5.919992s -> RESOLVE | High-confidence, well-grounded resolution | [] | intent billing_dispute | steps 4
+HTTP 200 in 8.396459s -> RESOLVE | High-confidence, well-grounded resolution | [] | intent billing_dispute | steps 4
 health: healthy | database: connected | circuit: closed
 == database stopped
- Container support-assistant-db-1 Stopped
-req 1: HTTP 200 in 10.078658s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
-req 2: HTTP 200 in 13.136005s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
-req 3: HTTP 200 in 3.398169s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
-req 4: HTTP 200 in 0.045917s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
-req 5: HTTP 200 in 0.045543s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+ Container support-assistant-db-1 Stopped 
+req 1: HTTP 200 in 13.544845s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+req 2: HTTP 200 in 10.009157s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+req 3: HTTP 200 in 3.398037s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+req 4: HTTP 200 in 0.049461s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+req 5: HTTP 200 in 0.052259s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
 health: degraded | database: error: gaierror | circuit: open
 == database started
- Container support-assistant-db-1 Started
-while circuit still open: HTTP 200 in 0.085556s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
+ Container support-assistant-db-1 Started 
+while circuit still open: HTTP 200 in 0.103667s -> ESCALATE | Knowledge base unavailable (retrieval failed) - escalate to a human agent | ['understanding_unavailable', 'retrieval_unavailable', 'unknown_intent', 'low_confidence'] | intent unknown_intent | steps 0
 waiting 31 s for the recovery window...
-after recovery window: HTTP 200 in 1.818527s -> RESOLVE | High-confidence, well-grounded resolution | [] | intent billing_dispute | steps 4
+after recovery window: HTTP 200 in 7.121464s -> RESOLVE | High-confidence, well-grounded resolution | [] | intent billing_dispute | steps 4
 health: healthy | database: connected | circuit: closed

@@ -27,10 +27,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://support:support@localhost:5432/support"
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
-    # Graceful degradation (ARCHITECTURE.md §6.1): understanding and retrieval queries that take longer than this
-    # count as a database failure; after DB_CIRCUIT_FAILURE_THRESHOLD consecutive failures the circuit opens and
-    # requests are escalated immediately for DB_CIRCUIT_RECOVERY_S seconds instead of waiting on the database.
-    DB_STAGE_TIMEOUT_S: float = 10.0
+    # Graceful degradation (ARCHITECTURE.md §6.1): a k-NN, retrieval or audit-log query that takes longer than this
+    # fails with TimeoutError and counts as a database failure. Only the database round trips are timed, never model
+    # inference, so CPU load cannot masquerade as a database outage. After DB_CIRCUIT_FAILURE_THRESHOLD consecutive
+    # failures the circuit opens and requests are escalated immediately for DB_CIRCUIT_RECOVERY_S seconds.
+    DB_QUERY_TIMEOUT_S: float = 10.0
     DB_CIRCUIT_FAILURE_THRESHOLD: int = 5
     DB_CIRCUIT_RECOVERY_S: float = 30.0
 

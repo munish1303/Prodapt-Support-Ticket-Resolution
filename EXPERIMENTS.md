@@ -10,6 +10,8 @@ is documented.
 | E2 | Does cross-encoder reranking pay for its latency? | **Done** | +0.052 P@5 but +2.7 s on CPU, so kept **off** |
 | E3 | Does multi-method groundedness beat single signals? | **Done** (v2) | Multi-method v2: sentence premises + quote rule; F1 0.918 |
 | E4′ | Can the system absorb a new ticket class without retraining? | **Done** | Yes (85% after ingestion); added intent-mix drift alert |
+| E4 | Would a different embedding model retrieve better? | **Done** | all-mpnet-base-v2 is significantly better (+0.16 nDCG@10); switch recommended, deferred pending a re-baseline |
+| E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional) | Keep 0.75; 0.90 gives 100% precision at 42% coverage; the real fix is wrong-scenario detection |
 
 ---
 
@@ -273,8 +275,72 @@ the alert treated as a review trigger, not an automatic action.
 
 | Plan ID | Topic | Status |
 |---|---|---|
-| E4 | Embedding model comparison | not run |
-| E5 | Confidence threshold tuning | not run: needs human judgements. The 50-sample rating sheet and the analysis (incl. threshold sweep) are ready (EVALUATION.md §6.4) |
-| E6 | LLM temperature | not run |
-| E7 | Context length (top-k sources) | not run |
+| E4 | Embedding model comparison | done (section below) |
+| E5 | Confidence threshold tuning | done on AI ratings, provisional (section below) |
+| E6 | LLM temperature | not run: 4 temperatures × 25 cases = 100 extra LLM drafts (~350k tokens), about two days of the free Groq quota for the deployed model, which went to completing the main LLM evaluation |
+| E7 | Context length (top-k sources) | not run: same quota constraint (4 settings × 25 cases); E1's deployed-retriever numbers show the scenario's KB article is in the top 8 for most queries |
 | E8 | Caching | not run (Tier 3) |
+
+## E5: Confidence threshold tuning (plan §35.2), on AI ratings
+
+**Question.** What RESOLVE threshold balances precision (auto-resolved drafts that are safe) against coverage
+(share of drafts auto-resolved)?
+
+**Data.** (confidence, "safe to use as-is") pairs for the 50 drafts of the rating sheet, rated by an AI rater blind
+to system outputs (EVALUATION.md §6.4; `experiments/results/ai_rater_eval.json`, `resolve_threshold_sweep`).
+Coverage counts drafts at or above the threshold; policy rules (critical severity, unknown intent, injection) can
+still send some of them to REVIEW, so coverage is an upper bound on automation.
+
+| RESOLVE threshold | Coverage | Precision (safe) |
+|---:|---:|---:|
+| 0.55 - 0.65 | 96% | 75% |
+| 0.70 | 94% | 74% |
+| **0.75 (deployed)** | 92% | 76% |
+| 0.80 | 88% | 77% |
+| 0.85 | 68% | 82% |
+| 0.90 | 42% | 100% |
+
+Confidence AUROC for "safe" is 0.81, so the score does rank drafts, but precision only rises steeply above 0.85.
+
+**Decision.** Keep 0.75 as the deployed default for now. If precision matters more than automation, 0.90 is the
+setting this data supports (no unsafe draft auto-resolved, but fewer than half auto-resolved) and is a one-line
+config change (`DECISION_RESOLVE_THRESHOLD`). Not adopted yet because (1) the ratings are AI-generated and n = 50,
+so the precision estimates are wide; (2) the threshold treats the symptom: the unsafe auto-resolves are wrong-scenario
+drafts with confidence 0.81-0.89, well grounded in the wrong sources, which a threshold cannot separate from good
+drafts without discarding most of them. The structural fix is per-request wrong-scenario detection (EVALUATION.md
+§9, item 1). Re-run this sweep on human ratings before changing the production threshold.
+
+## E4: Embedding model comparison (plan §35.1)
+
+**Hypothesis.** A larger or newer embedding model retrieves better than all-MiniLM-L6-v2; the plan's rule is to keep
+MiniLM unless the improvement is significant.
+
+**Procedure.** `experiments/e4_embeddings.py` → `experiments/results/e4_embeddings.json`. Same corpus as production
+(2,043 tickets as "complaint resolution", 40 KB articles as "title\ncontent"), same 200 held-out queries and graded
+judgments as E1. Each model embeds corpus and queries; ranking is exact cosine top-20 in memory, which isolates the
+embedding model (no ivfflat approximation, no lexical fusion, no KB slots). Paired bootstrap against MiniLM.
+Latencies are on the CPU-limited container (2 cores), so compare them relatively.
+
+| Model | Dims | nDCG@10 | MRR | P@5 | Hit@5 | Recall@10 (capped) | Query encode p50 | Corpus encode |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| all-MiniLM-L6-v2 (deployed) | 384 | 0.554 | 0.600 | 0.543 | 0.715 | 0.555 | 123 ms | 117 s |
+| **all-mpnet-base-v2** | 768 | **0.716** | **0.752** | **0.704** | **0.870** | **0.721** | 237 ms | 775 s |
+| BAAI/bge-small-en-v1.5 | 384 | 0.501 | 0.551 | 0.485 | 0.755 | 0.518 | 148 ms | 199 s |
+
+* mpnet vs MiniLM: +0.161 nDCG@10, +0.152 MRR, +0.161 P@5, +0.155 Hit@5, +0.165 Recall@10, all p < 0.001 (one-sided
+  paired bootstrap, 2,000 resamples). It is the only configuration in this project whose capped Recall@10 clears the
+  plan's 0.70 target, and the gain is larger than anything hybrid fusion or reranking achieved (E1, E2).
+* bge-small vs MiniLM: significantly worse on nDCG@10 (-0.053, p = 0.018) and P@5 (-0.058, p = 0.016), slightly
+  better Hit@5 (+0.04, n.s.). Run without bge's optional query instruction, which may cost it some quality.
+* Exact in-memory MiniLM (nDCG@10 0.554) matches pgvector ivfflat in E1 (0.557): the ANN index costs nothing here.
+* Cost of mpnet: 2x dimensions (index and storage), about 2x query-encode and 6-7x corpus-encode time on CPU, and a
+  larger model in memory.
+
+**Decision.** By the plan's rule mpnet should replace MiniLM, and it is the recommended next change. It was **not
+switched in this submission**, because the switch is a re-baseline, not a config edit: the vector columns change to
+768 dimensions, the corpus is re-embedded and the ivfflat indexes rebuilt, and several thresholds were tuned on
+MiniLM's cosine scale (groundedness similarity in E3, evidence-sufficiency relevance floors, the confidence
+normaliser), so E3's threshold tuning and every downstream evaluation (understanding k-NN, E1, E2, the 100-case LLM
+run, about one day of free-tier LLM quota) must be re-run to keep the reported numbers consistent with what is
+deployed. Better semantic neighbours may also lift intent F1, which uses the same embeddings for k-NN.
+

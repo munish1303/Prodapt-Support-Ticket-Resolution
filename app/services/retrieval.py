@@ -148,7 +148,21 @@ class HybridRetriever:
         if query_embedding is None:
             query_embedding = await asyncio.to_thread(self.embedder.encode, query_text)
         qvec = to_pgvector(query_embedding)
+        # Only the database work is timed (not the embedding above): a hung database fails fast with TimeoutError.
+        return await asyncio.wait_for(
+            self._search(query_text, qvec, top_k, mode, metadata_filters, kb_min_slots),
+            timeout=settings.DB_QUERY_TIMEOUT_S,
+        )
 
+    async def _search(
+        self,
+        query_text: str,
+        qvec: str,
+        top_k: int,
+        mode: str,
+        metadata_filters: dict | None,
+        kb_min_slots: int,
+    ) -> RetrievalResult:
         limits = {"tickets": settings.RETRIEVAL_CANDIDATES_TICKETS, "kb_articles": settings.RETRIEVAL_CANDIDATES_KB}
         tasks = {}
         for table, limit in limits.items():
