@@ -35,18 +35,18 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 
 | What | Result |
 |---|---|
-| Finding a highly relevant past ticket in the top 5 | keyword search (status quo) **40.5%** → hybrid retrieval **76.0%** |
-| Embedding model (E4) | all-mpnet-base-v2 beats the deployed MiniLM by +0.16 nDCG@10 (p < 0.001) and clears the 0.70 Recall@10 target; switch recommended, needs a re-baseline |
-| Hybrid vs semantic-only retrieval | MRR +0.057 (p = 0.0005); reranking adds +0.052 P@5 but +2.7 s on CPU, so kept off (E2) |
-| Groundedness check, F1 at catching unsupported/contradicted steps | **0.918** multi-method vs 0.694 similarity-only (E3) |
-| Understanding (500 complaints) | intent acc 0.724 · products F1 0.716 · severity acc 0.784 · sentiment acc 0.790 |
-| New ticket class, no retraining | 0% → **85%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
-| LLM drafts (Groq `qwen3.8-27b`, all 100 cases) | groundedness 0.94 · step precision +0.066 vs extractive (p = 0.002) · RESOLVE drafts recover 83% of reference steps, ESCALATE 19% · confidence AUROC 0.84 |
-| Draft quality, 50 samples rated by an AI rater (Claude, blind to system outputs; **not human**) | 72% safe to use as-is; 76% of system RESOLVEs safe; confidence AUROC 0.81 for "safe"; the unsafe RESOLVEs are wrong-scenario drafts (EVALUATION.md §6.4) |
-| Unseen issue type (60 complaints) | confident wrong answers: 48% with extractive drafts → **22% with an LLM** that declines when sources don't fit |
-| Latency / load (1 worker, laptop CPU) | p50 1.0 s without LLM, 6.4 s with the free-tier LLM (p95 16.7 s, rate-limit waits) · ~1 req/s per worker, 0% errors at concurrency 8 |
+| Finding a highly relevant past ticket in the top 5 | keyword search (status quo) **40.5%** → hybrid retrieval **89.0%** |
+| Embedding model (E4, switched) | all-mpnet-base-v2 replaced all-MiniLM-L6-v2: retrieval nDCG@10 0.572 → **0.729**, Recall@10 0.558 → **0.726** (now above the 0.70 target), intent macro-F1 0.723 → **0.889** |
+| Hybrid vs semantic-only retrieval | nDCG@10 +0.014 (p = 0.0005), MRR +0.041 (p = 0.003) with weights 0.9/0.1 chosen on dev; reranking now adds only +0.010 P@5 for +2 s, so kept off (E2) |
+| Groundedness check, F1 at catching unsupported/contradicted steps | **0.918** multi-method vs 0.694 similarity-only (E3); validation keeps MiniLM: same quality as mpnet (0.927, n.s.) at 1/6 of the cost |
+| Understanding (500 complaints) | intent macro-F1 **0.889** · products F1 0.814 · severity acc 0.884 · sentiment acc 0.790 |
+| New ticket class, no retraining | 0% → **88%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
+| LLM drafts (Groq `qwen3.8-27b`, all 100 cases; **measured before the embedding switch**, re-run in progress) | groundedness 0.94 · step precision +0.066 vs extractive (p = 0.002) · RESOLVE drafts recover 83% of reference steps, ESCALATE 19% · confidence AUROC 0.84 |
+| Draft quality, 50 pre-switch drafts rated by an AI rater (Claude, blind to system outputs; **not human**) | 72% safe to use as-is; 76% of system RESOLVEs safe; confidence AUROC 0.81 for "safe"; the unsafe RESOLVEs are wrong-scenario drafts (EVALUATION.md §6.4) |
+| Unseen issue type (60 complaints) | confident wrong answers with extractive drafts: 52% (48% before the switch: better similarity makes unseen complaints look *more* familiar); **22% with an LLM** that declines when sources don't fit (pre-switch) |
+| Latency / load (1 worker, laptop CPU) | p50 0.9 s / p95 1.6 s without LLM · 1.34 req/s at concurrency 8 (0.84 before the switch, thanks to the validation cache), 0% errors · with the free-tier LLM: pre-switch p50 6.4 s / p95 16.7 s (rate-limit waits) |
 | Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
-| Deployment | `docker compose up --build` verified end to end on the dev machine (image 3.7 GB, ~41 s cold start, offline model loading) |
+| Deployment | `docker compose up --build` verified end to end on the dev machine (offline model loading; changing the embedding model re-embeds the corpus automatically on startup) |
 
 ## Features
 
@@ -100,7 +100,7 @@ ingestion). Details, design decisions and rejected alternatives: [ARCHITECTURE.m
 |---|---|
 | API | Python 3.11, FastAPI, Pydantic v2, uvicorn |
 | Database | PostgreSQL 16 + pgvector (ivfflat), PostgreSQL full-text search (tsvector, `ts_rank`), SQLAlchemy 2 async + asyncpg |
-| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (384-d) |
+| Embeddings | `sentence-transformers/all-mpnet-base-v2` (768-d) for retrieval and understanding (E4); `all-MiniLM-L6-v2` (384-d) for groundedness premise selection, where it is as accurate and 6x faster |
 | NLI (groundedness) | `cross-encoder/nli-deberta-v3-small` |
 | Sentiment | `cardiffnlp/twitter-roberta-base-sentiment-latest` |
 | Reranker (optional) | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
@@ -154,7 +154,7 @@ Open **http://localhost:8000** once the stack is up.
 | **3. Result:** the complaint, its understanding, the confidence and decision, steps with clickable citations and a per-step support badge (hover for the similarity/NLI signals), and the scrollable citation list with semantic/lexical ranks. | **Knowledge base:** live counts, category mix, retrieval configuration, the ANN/GIN indexes as defined in Postgres, and the retrieval playground (no LLM). Tabs browse tickets, KB articles and the request log. |
 
 "Open in database" on any citation, playground hit or table row opens the stored record, including its provenance
-and the first values of its 384-dimensional embedding:
+and the first values of its 768-dimensional embedding:
 
 ![Stored ticket row with its embedding](docs/images/database-record.png)
 

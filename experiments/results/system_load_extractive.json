@@ -8,73 +8,74 @@
       "tickets": 2043,
       "kb_articles": 40
     },
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "database_circuit": "closed"
   },
   "levels": [
     {
       "concurrency": 1,
-      "requests": 30,
-      "wall_s": 31.27,
-      "throughput_rps": 0.959,
+      "requests": 40,
+      "wall_s": 41.6,
+      "throughput_rps": 0.962,
       "error_rate": 0.0,
       "status_counts": {
-        "200": 30
+        "200": 40
       },
       "client_latency_ms": {
-        "p50": 1023,
-        "p95": 1232,
-        "p99": 1282
+        "p50": 1009,
+        "p95": 1541,
+        "p99": 1746
       },
       "server_latency_ms": {
-        "p50": 1004,
-        "p95": 1212
+        "p50": 985,
+        "p95": 1512
       },
       "generators": {
-        "extractive": 30
+        "extractive": 40
       }
     },
     {
       "concurrency": 4,
-      "requests": 30,
-      "wall_s": 36.25,
-      "throughput_rps": 0.828,
+      "requests": 40,
+      "wall_s": 33.27,
+      "throughput_rps": 1.202,
       "error_rate": 0.0,
       "status_counts": {
-        "200": 30
+        "200": 40
       },
       "client_latency_ms": {
-        "p50": 4614,
-        "p95": 5677,
-        "p99": 5752
+        "p50": 3172,
+        "p95": 4426,
+        "p99": 5269
       },
       "server_latency_ms": {
-        "p50": 4573,
-        "p95": 5627
+        "p50": 3146,
+        "p95": 4342
       },
       "generators": {
-        "extractive": 30
+        "extractive": 40
       }
     },
     {
       "concurrency": 8,
-      "requests": 30,
-      "wall_s": 35.76,
-      "throughput_rps": 0.839,
+      "requests": 40,
+      "wall_s": 29.95,
+      "throughput_rps": 1.336,
       "error_rate": 0.0,
       "status_counts": {
-        "200": 30
+        "200": 40
       },
       "client_latency_ms": {
-        "p50": 9253,
-        "p95": 10937,
-        "p99": 11103
+        "p50": 5200,
+        "p95": 9205,
+        "p99": 10567
       },
       "server_latency_ms": {
-        "p50": 9188,
-        "p95": 10887
+        "p50": 5152,
+        "p95": 9166
       },
       "generators": {
-        "extractive": 30
+        "extractive": 40
       }
     }
   ]

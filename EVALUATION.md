@@ -4,6 +4,11 @@ All numbers are copied from files in `experiments/results/` (and `data/evaluatio
 produced by the scripts named in each section. Where a run is incomplete (the LLM evaluation, capped by the
 free-tier daily token quota) the coverage is stated explicitly. Nothing is estimated.
 
+**Embedding model.** The system uses `all-mpnet-base-v2` for retrieval and understanding since Experiment 4 (it
+replaced `all-MiniLM-L6-v2`; groundedness validation keeps MiniLM, see EXPERIMENTS.md E3/E4). All numbers below are
+from the re-baselined mpnet system unless marked otherwise; the MiniLM results are kept for comparison in
+`experiments/results/minilm_baseline/` and quoted as "before".
+
 ## Plan targets vs measured
 
 The plan's provisional targets (IMPLEMENTATION_PLAN.md §4.2 / §40.2) against what was measured. Missed targets are
@@ -11,20 +16,19 @@ reported as missed; the sections below explain each number.
 
 | Target | Measured | Met | Where |
 |---|---|:---:|---|
-| Intent classification macro-F1 > 0.75 | 0.723 (500 held-out complaints) | ✗ | §2.1 |
-| Product extraction F1 > 0.70 | 0.716 | ✓ | §2.1 |
-| Hybrid retrieval Recall@10 > 0.70 | 0.558 deployed (capped Recall@10, E1 test split; plain Recall@10 is uninformative when a query has dozens of equally relevant tickets, §1.1). E4: all-mpnet-base-v2 reaches 0.721 semantic-only; switch recommended, not yet deployed | ✗ (deployed) | EXPERIMENTS.md E1, E4 |
-| Citation accuracy > 0.90 | 0.950 (LLM, 100 cases; 1.000 on the 95 non-empty drafts, the 5 declines score 0); 1.000 (extractive) | ✓ | §4 |
-| Groundedness > 0.80 | 0.942 (LLM, 100 cases); E3 multi-method checker F1 0.918 | ✓ | §4, §5 |
-| P95 latency < 15 s (MVP) | 1.2 s without LLM (concurrency 1); 16.7 s with the free-tier LLM, driven by rate-limit waits | ✗ (with LLM) | §4.2, §6.1 |
-| Throughput > 5 req/s | ~1 req/s per worker on the laptop CPU, 0% errors at concurrency 8 | ✗ | §6.1 |
+| Intent classification macro-F1 > 0.75 | **0.889** (500 held-out complaints; 0.723 before the embedding switch) | ✓ | §2.1 |
+| Product extraction F1 > 0.70 | 0.814 (0.716 before) | ✓ | §2.1 |
+| Hybrid retrieval Recall@10 > 0.70 | **0.726** (capped Recall@10, E1 test split; plain Recall@10 is uninformative when a query has dozens of equally relevant tickets, §1.1); 0.558 before the embedding switch | ✓ | EXPERIMENTS.md E1, E4 |
+| Citation accuracy > 0.90 | 1.000 (extractive); LLM 0.950 measured before the switch (1.000 on non-empty drafts), re-run in progress | ✓ | §4 |
+| Groundedness > 0.80 | 1.000 (extractive); LLM 0.942 before the switch; E3 multi-method checker F1 0.918 | ✓ | §4, §5 |
+| P95 latency < 15 s (MVP) | 1.5 s without LLM (concurrency 1); with the free-tier LLM 16.7 s before the switch (rate-limit waits), re-run in progress | ✗ (with LLM) | §4.2, §6.1 |
+| Throughput > 5 req/s | 1.0 req/s at concurrency 1, 1.34 req/s at concurrency 8 per worker on the laptop CPU, 0% errors | ✗ | §6.1 |
 | Test coverage > 70% | 88% of `app/` | ✓ | §7 |
 | Experiments 1-3 run, with decisions | E1, E2, E3 done; optional E4 (embeddings) and E5 (thresholds, on AI ratings) done; E4′ evolving classes | ✓ | EXPERIMENTS.md |
 
-The misses have known causes and next steps (§9): recall is limited by the embedding model (E4: all-mpnet-base-v2
-clears the target; switching needs a re-baseline) and intent by k-NN over the same embeddings (the LLM classifier
-is the other lever); throughput and latency by CPU inference in one worker
-and free-tier LLM limits (more workers, batched GPU inference, a paid LLM tier).
+The embedding switch (EXPERIMENTS.md E4) moved intent F1 and Recall@10 above their targets. The remaining misses,
+throughput and latency with the LLM, come from CPU inference in one worker and free-tier LLM rate limits; the levers
+are more workers, batched GPU inference and a paid LLM tier (§9).
 
 ## 1. Data and methodology
 
@@ -120,30 +124,34 @@ product share threshold 0.6; sentiment polarity thresholds −0.85 / 0.0; severi
 
 ### 2.1 Results on 500 held-out complaints
 
-| Field | Metric | Value | Plan target (provisional) |
-|---|---|---:|---:|
-| Intent | accuracy | **0.724** | |
-| | macro-F1 | **0.723** | > 0.75 (not met) |
-| | flagged unknown (false-unknown rate) | 0.026 | |
-| | accuracy when not flagged unknown | 0.743 | |
-| Products | micro precision / recall / F1 | 0.689 / 0.745 / **0.716** | |
-| | exact set match | 0.558 | |
-| | primary product recalled | 0.786 | |
-| Severity (4 levels) | accuracy | **0.784** | |
-| | macro-F1 | 0.768 | |
-| | within one level | 0.930 | |
-| Sentiment (3 classes) | accuracy | **0.790** | |
-| | macro-F1 | 0.742 | |
-| Latency | understanding per complaint (CPU, in-memory index) | mean 266 ms, p95 319 ms | |
+| Field | Metric | mpnet | before (MiniLM) | Plan target (provisional) |
+|---|---|---:|---:|---:|
+| Intent | accuracy | **0.890** | 0.724 | |
+| | macro-F1 | **0.889** | 0.723 | > 0.75 (met) |
+| | flagged unknown (false-unknown rate) | 0.010 | 0.026 | |
+| | accuracy when not flagged unknown | 0.899 | 0.743 | |
+| Products | micro precision / recall / F1 | 0.770 / 0.863 / **0.814** | 0.689 / 0.745 / 0.716 | > 0.70 (met) |
+| | exact set match | 0.660 | 0.558 | |
+| | primary product recalled | 0.898 | 0.786 | |
+| Severity (4 levels) | accuracy | **0.884** | 0.784 | |
+| | macro-F1 | 0.876 | 0.768 | |
+| | within one level | 0.970 | 0.930 | |
+| Sentiment (3 classes) | accuracy | **0.790** | 0.790 | |
+| | macro-F1 | 0.742 | 0.742 | |
+| Latency | understanding per complaint (CPU, in-memory index) | mean 409 ms, p95 553 ms | mean 266 ms, p95 319 ms | |
 
-Per-class intent F1: technical_support 0.855, outage_report 0.830, billing_dispute 0.809, service_activation
-0.781, speed_issue 0.746, account_management 0.667, connectivity_issue 0.661, hardware_problem 0.636,
-**plan_change 0.528**. The weak classes are the semantically overlapping ones: plan changes vs billing (both
-about price), hardware vs connectivity (a rebooting router *looks like* a dropping connection).
+`python evaluation/understanding_eval.py --index memory` (exact k-NN over the 2,043 corpus complaints; the same
+mode as the MiniLM run, so the comparison isolates the embedding model). Sentiment uses its own model and is
+unaffected. Latency rises because mpnet is a larger model (the mpnet run was also inside a 2-core container).
+
+Per-class intent F1 (mpnet; before in brackets): technical_support 0.990 (0.855), billing_dispute 0.939 (0.809),
+outage_report 0.925 (0.830), speed_issue 0.917 (0.746), account_management 0.886 (0.667), connectivity_issue 0.879
+(0.661), hardware_problem 0.863 (0.636), service_activation 0.832 (0.781), **plan_change 0.769** (0.528). Every
+class improved; the weakest are still the semantically overlapping ones (plan changes vs billing, both about price).
 
 Severity confusion (rows = true, cols = predicted; low/medium/high/critical):
-`[[105, 8, 4, 2], [6, 150, 13, 15], [7, 10, 59, 31], [0, 7, 5, 78]]`. The main error is high → critical (31),
-where urgency cues ("whole street", "no internet at all") override the neighbour-based base level.
+`[[115, 4, 0, 0], [2, 159, 8, 15], [0, 1, 80, 26], [0, 0, 2, 88]]`. The main error is still high → critical (26;
+31 before), where urgency cues ("whole street", "no internet at all") override the neighbour-based base level.
 
 ### 2.2 What changed during development, and why (all decided on the dev split)
 
@@ -162,30 +170,34 @@ label-definition mismatch, fixed by calibration rather than a different model.
 
 Dev-split sweep of the unknown-intent thresholds (selected rows; `unknown_threshold_sweep_on_dev` in the results file):
 
-| min vote share | min similarity | dev false-unknown | dev accuracy | novel complaints flagged |
-|---:|---:|---:|---:|---:|
-| 0.00 | 0.00 | 0.000 | 0.729 | 0.000 |
-| **0.35** | **0.40** | **0.025** | **0.719** | **0.050** |
-| 0.45 | 0.40 | 0.091 | 0.688 | 0.133 |
-| 0.55 | 0.40 | 0.206 | 0.628 | 0.483 |
-| 0.55 | 0.55 | 0.271 | 0.578 | 0.600 |
+| min vote share | min similarity | dev false-unknown | dev accuracy | novel complaints flagged | before (MiniLM): false-unknown / accuracy / novel |
+|---:|---:|---:|---:|---:|---|
+| 0.00 | 0.00 | 0.000 | 0.889 | 0.000 | 0.000 / 0.729 / 0.000 |
+| **0.35** | **0.40** | **0.005** | **0.889** | **0.017** | 0.025 / 0.719 / 0.050 |
+| 0.45 | 0.40 | 0.030 | 0.874 | 0.033 | 0.091 / 0.688 / 0.133 |
+| 0.55 | 0.40 | 0.111 | 0.839 | 0.233 | 0.206 / 0.628 / 0.483 |
+| 0.55 | 0.55 | 0.141 | 0.809 | 0.233 | 0.271 / 0.578 / 0.600 |
 
-**Finding: k-NN vote share is a weak novelty detector.** Roaming complaints sit close to real connectivity
-and billing tickets, so the vote is confident but wrong. Catching about half of them would wrongly flag about 21%
-of normal traffic. The chosen operating point favours accuracy on known classes; novel classes are meant to be
+Selection rule (unchanged): the highest dev accuracy among settings that flag some novel complaints with at most
+3% false unknowns. It selects 0.35 / 0.40 again, so the thresholds were kept after the switch.
+
+**Finding: k-NN vote share is a weak novelty detector**, and better embeddings made it weaker. Roaming complaints
+sit close to real connectivity and billing tickets, so the vote is confident but wrong; with mpnet they look even
+more familiar (catching a quarter of them would flag 11% of normal traffic). The chosen operating point favours accuracy on known classes; novel classes are meant to be
 caught downstream (low relevance/groundedness ⇒ ESCALATE; measured in §4 when run) and by the drift monitor.
 
 **Evolving classes, offline** (60 held-out roaming complaints):
 
 | | before the class exists | after registering `roaming_issue` + ingesting 221 wave-2 tickets |
 |---|---|---|
-| predicted `roaming_issue` | n/a | **85.0%** (51/60) |
-| flagged unknown | 5.0% (3/60) | 0% |
-| other predictions | connectivity 25, billing 16, outage 15, speed 1 | outage 5, connectivity 4 |
-| in-distribution intent accuracy (500 set) | 0.724 | 0.682 |
+| predicted `roaming_issue` | n/a | **88.3%** (53/60); 85.0% before the switch |
+| flagged unknown | 1.7% (1/60); 5.0% before | 1.7% |
+| other predictions | billing 20, outage 20, connectivity 12, service activation 7 | connectivity 5, outage 1 |
+| in-distribution intent accuracy (500 set) | 0.890 | **0.888** (0.724 → 0.682 before the switch) |
 
-No retraining or redeploy: the class becomes predictable from ingestion alone. **Cost:** in-distribution accuracy
-drops by 0.042 because roaming tickets now attract some mobile complaints of other classes. In production the new
+No retraining or redeploy: the class becomes predictable from ingestion alone. **Cost:** with mpnet, in-distribution
+accuracy barely moves (0.890 → 0.888); with MiniLM it dropped by 0.042 because roaming tickets attracted mobile
+complaints of other classes. In production the new
 class's tickets should be reviewed before ingestion, and the per-class F1 rechecked after.
 
 ## 3. Retrieval (L1) and baseline comparison (L3)
@@ -196,24 +208,27 @@ queries have dozens of equally relevant tickets, which makes plain Recall@10 uni
 
 **Results** (200 held-out queries; full table, CIs and significance tests in EXPERIMENTS.md E1):
 
-| Configuration | nDCG@10 | MRR | P@5 | Hit@5 |
-|---|---:|---:|---:|---:|
-| keyword baseline (today's practice) | 0.223 | 0.270 | 0.210 | 0.405 |
-| lexical, `plainto_tsquery` (AND) | 0.000 | 0.000 | 0.000 | 0.000 |
-| lexical, OR-of-terms FTS | 0.274 | 0.452 | 0.270 | 0.565 |
-| semantic (pgvector) | 0.557 | 0.600 | 0.545 | 0.715 |
-| **hybrid RRF 0.8:0.2 (weight chosen on dev)** | **0.572** | **0.657** | **0.561** | **0.760** |
-| hybrid + cross-encoder rerank (E2; disabled: +2.7 s) | 0.625 | 0.723 | 0.613 | 0.800 |
+| Configuration | nDCG@10 | MRR | P@5 | Hit@5 | Recall@10 (capped) |
+|---|---:|---:|---:|---:|---:|
+| keyword baseline (today's practice) | 0.221 | 0.270 | 0.208 | 0.405 | 0.197 |
+| lexical, `plainto_tsquery` (AND) | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 |
+| lexical, OR-of-terms FTS | 0.274 | 0.452 | 0.270 | 0.565 | 0.242 |
+| semantic (pgvector, mpnet) | 0.716 | 0.752 | 0.704 | 0.870 | 0.721 |
+| **hybrid RRF 0.9:0.1 (weight chosen on dev)** | **0.729** | **0.793** | **0.722** | **0.890** | **0.726** |
+| hybrid + cross-encoder rerank (E2; disabled: +2 s) | 0.736 | 0.803 | 0.732 | 0.895 | |
+| *before the embedding switch:* semantic (MiniLM) | 0.557 | 0.600 | 0.545 | 0.715 | 0.559 |
+| *before:* hybrid RRF 0.8:0.2 (MiniLM) | 0.572 | 0.657 | 0.561 | 0.760 | 0.558 |
 
 **Deployed configuration** (`python evaluation/retrieval_eval.py` → `experiments/results/retrieval_production.json`):
-the generator receives **8 sources** (`RETRIEVAL_TOP_K`) with 2 guaranteed KB slots. On the same 200 queries: MRR 0.657,
-P@5 0.561, Hit@5 0.760 (unchanged from E1's hybrid), and **the scenario's KB article is in the generator's context for
-77% of complaints, vs 19% without KB slots** (E1 hybrid, top 10). The slots trade two ticket positions for the canonical
-procedure. nDCG@10 (0.475) and P@10 are lower only because the list is 8 long with 2 KB positions. Latency p50 151 ms.
+the generator receives **8 sources** (`RETRIEVAL_TOP_K`) with 2 guaranteed KB slots. On the same 200 queries: MRR 0.794,
+P@5 0.722, Hit@5 0.890 (before: 0.657 / 0.561 / 0.760), and **the scenario's KB article is in the generator's context
+for 87% of complaints (77% before), vs 14% without KB slots** (E1 hybrid, top 10). The slots trade two ticket
+positions for the canonical procedure. nDCG@10 (0.593) and P@10 are lower than in E1 only because the list is 8 long
+with 2 KB positions. Latency p50 282 ms / p95 449 ms (2-core container).
 
 **Baseline comparison (L3):** keyword search finds a highly relevant ticket in the top 5 for 40.5% of complaints;
-the deployed hybrid retriever does for 76.0% (+0.355, p < 0.001). Hybrid's gain over semantic-only is significant
-but modest and concentrated at rank 1 (MRR +0.057, p = 0.0005).
+the deployed hybrid retriever does for 89.0% (+0.485, p < 0.001; 76.0% before the embedding switch). Hybrid's gain
+over semantic-only is significant but small (nDCG@10 +0.014, p = 0.0005; MRR +0.041, p = 0.003).
 
 ## 4. Generation and pipeline (L2)
 
@@ -228,27 +243,33 @@ LLM text and are not a substitute for human review).
 
 `experiments/results/generation_extractive.json` (100 held-out complaints + 60 novel-class complaints).
 
-| Metric | Value |
-|---|---:|
-| Citation accuracy / coverage | 1.000 / 1.000 |
-| Groundedness | 1.000 (steps are quoted verbatim from sources) |
-| Reference-step recall / step precision | 0.743 / 0.560 |
-| Steps per draft | 5.0 |
-| Scenario KB article among sources | 0.78 |
-| Intent correct (pipeline, pgvector ANN) | 0.69 |
-| Mean heuristic confidence | 0.871 |
-| Decisions (RESOLVE / REVIEW / ESCALATE) | 81 / 18 / 1 |
-| Confidence AUROC for predicting a good draft (step recall ≥ 0.5) | **0.751** |
-| End-to-end latency p50 / p95 / max | 1,014 / 1,464 / 4,109 ms |
-| Mean stage latency: embed / understand+retrieve / validate | 47 / 272 / 769 ms |
-| **Novel-class complaints (60): RESOLVE / REVIEW / ESCALATE** | **29 / 30 / 1** |
+| Metric | mpnet | before (MiniLM) |
+|---|---:|---:|
+| Citation accuracy / coverage | 1.000 / 1.000 | 1.000 / 1.000 |
+| Groundedness | 1.000 (steps are quoted verbatim from sources) | 1.000 |
+| Reference-step recall / step precision | **0.829** / **0.624** | 0.743 / 0.560 |
+| Steps per draft | 5.0 | 5.0 |
+| Scenario KB article among sources | 0.86 | 0.78 |
+| Intent correct (pipeline, pgvector ANN) | 0.88 | 0.69 |
+| Mean heuristic confidence | 0.899 | 0.871 |
+| Decisions (RESOLVE / REVIEW / ESCALATE) | 86 / 14 / 0 | 81 / 18 / 1 |
+| Confidence AUROC for predicting a good draft (step recall ≥ 0.5) | **0.891** | 0.751 |
+| End-to-end latency p50 / p95 / max | 908 / 1,585 / 2,531 ms | 1,014 / 1,464 / 4,109 ms |
+| Mean stage latency: embed / understand+retrieve / validate | 195 / 245 / 515 ms | 47 / 272 / 769 ms |
+| **Novel-class complaints (60): RESOLVE / REVIEW / ESCALATE** | **31 / 29 / 0** | 29 / 30 / 1 |
 
-Quality by decision: RESOLVE drafts recover 0.748 of reference steps, REVIEW 0.708. The confidence score ranks
-drafts better than chance (AUROC 0.75) but the RESOLVE/REVIEW gap is small: it is a useful but weak signal,
-as expected for an uncalibrated heuristic.
+Quality by decision: RESOLVE drafts recover 0.824 of reference steps, REVIEW 0.857 (REVIEW here comes from policy
+rules such as critical severity, not from weak drafts). Confidence now separates good from weak drafts much better
+(AUROC 0.89 vs 0.75), because better retrieval makes the relevance signals more informative.
+
+*Latency note.* With mpnet doing validation's sentence embeddings, validation took 4.9 s per request (mpnet is 6x
+slower than MiniLM on ~80 source sentences); a cross-request cache cut that to 3.0 s. Keeping MiniLM for validation
+(EXPERIMENTS.md E3: same quality) brought it to 0.5 s, so end-to-end latency stayed at MiniLM's level. All three runs
+produced identical quality numbers.
 
 **Finding: "grounded but wrong".** Half of the complaints about a ticket class the system has never seen
-(roaming) are RESOLVEd. The drafts are faithfully grounded, just in the wrong tickets: roaming complaints are
+(roaming) are RESOLVEd (31 of 60 with mpnet, 29 with MiniLM: better embeddings make unseen complaints look more
+familiar, not less). The drafts are faithfully grounded, just in the wrong tickets: roaming complaints are
 similar enough to mobile-connectivity tickets (cosine ≈ 0.7) to pass the relevance gate, and the extractive
 generator has no notion of "these sources don't answer this question". Groundedness verifies *draft ↔ sources*,
 not *sources ↔ complaint*. Mitigations: the LLM generator is instructed to return no steps when sources don't
@@ -260,6 +281,10 @@ nearest-neighbour similarity of incoming traffic.
 for "contradictions" on verbatim-quoted steps, which exposed the NLI premise issue fixed in E3 v2 (EXPERIMENTS.md).
 
 ### 4.2 LLM generator
+
+> **Measured before the embedding switch** (MiniLM retrieval). The 100-case re-run with the mpnet system is in
+> progress, limited by Groq's free-tier daily token quota; this section will be replaced by its results. Expect
+> better sources (KB article in context 87% vs 77%), so these numbers are a conservative reference.
 
 `experiments/results/generation_llm.json`. Generator `qwen/qwen3.8-27b`, judge `openai/gpt-oss-120b`
 (different model family, to reduce self-preference bias), Groq free tier.
@@ -344,29 +369,31 @@ See EXPERIMENTS.md E3. Held-out F1 for detecting not-supported claims (v2, multi
 (accuracy 0.930) vs 0.897 NLI only, 0.739 lexical only and 0.694 similarity only. False alarms: 0% on verbatim-quoted
 steps and 15% on paraphrased steps. The first version (chunk premises, max contradiction) scored 0.736 on the same
 set, with 40% false alarms on verbatim steps; the generation eval exposed this and drove the v2 design.
+After the embedding switch E3 was re-run with both embedding models on a widened grid: 0.918 with MiniLM (deployed
+for validation, thresholds unchanged) vs 0.927 with mpnet, a difference within noise at 6x the cost (E3, E4).
 
 ## 6. System health (L4)
 
 ### 6.1 Load test
 
-**Script:** `python evaluation/system_eval.py --url http://127.0.0.1:8000 --requests 30 --concurrency 1 4 8`
-→ `experiments/results/system_load_extractive.json`. One uvicorn worker on a 4-core laptop CPU (no GPU), API run
-with `LLM_PROVIDER=extractive` (the Groq daily quota was exhausted; LLM generation latency is reported separately
-in §4.2). 30 distinct held-out complaints per level.
+**Script:** `python evaluation/system_eval.py --url http://localhost:8000 --tag extractive` (40 requests per level,
+concurrency 1, 4, 8) → `experiments/results/system_load_extractive.json`. One uvicorn worker in the API container on
+the laptop CPU (no GPU), API run with `LLM_PROVIDER=extractive` so the free-tier LLM quota does not dominate; LLM
+generation latency is reported separately in §4.2. Distinct held-out complaints.
 
-| Concurrency | Throughput | Client latency p50 / p95 / p99 | Server latency p50 / p95 | Error rate |
-|---:|---:|---|---|---:|
-| 1 | 0.96 req/s | 1,023 / 1,232 / 1,282 ms | 1,004 / 1,212 ms | 0% |
-| 4 | 0.83 req/s | 4,614 / 5,677 / 5,752 ms | 4,573 / 5,627 ms | 0% |
-| 8 | 0.84 req/s | 9,253 / 10,937 / 11,103 ms | 9,188 / 10,887 ms | 0% |
+| Concurrency | Throughput | Client latency p50 / p95 / p99 | Server latency p50 / p95 | Error rate | before (MiniLM): throughput, p50 |
+|---:|---:|---|---|---:|---|
+| 1 | 0.96 req/s | 1,009 / 1,541 / 1,746 ms | 985 / 1,512 ms | 0% | 0.96 req/s, 1,023 ms |
+| 4 | 1.20 req/s | 3,172 / 4,426 / 5,269 ms | 3,146 / 4,342 ms | 0% | 0.83 req/s, 4,614 ms |
+| 8 | 1.34 req/s | 5,200 / 9,205 / 10,567 ms | 5,152 / 9,166 ms | 0% | 0.84 req/s, 9,253 ms |
 
-**Reading.** Zero errors under load, but throughput is flat at about 1 request/s and latency grows linearly with
-concurrency. One worker serialises CPU-bound inference (embedding, sentiment, NLI), so extra concurrent requests
-queue. Server latency ≈ client latency, so the queue is inside the service, not the network. Scaling path, in
-order: more workers or pods behind a load balancer (each holds about 1.7 GB of models), then a batched inference service
-(GPU) for NLI and embeddings, which also cuts per-request latency. The plan's MVP target (P95 < 15 s) holds up to
-concurrency 8 on this laptop *without* the LLM. With the free-tier LLM (§4.2) end-to-end p95 is 16.7 s at
-concurrency 1, over the target, driven by rate-limit waits.
+**Reading.** Zero errors under load. Throughput now rises a little with concurrency (1.34 vs 0.84 req/s at 8) because
+validation reuses cached sentence embeddings of sources that recur across requests; inference is still CPU-bound and
+serialised in one worker, so latency grows with concurrency. Server latency ≈ client latency: the queue is inside the
+service. Scaling path, in order: more workers or pods behind a load balancer (a process with all models measured
+~1.2 GB resident), then a batched inference service (GPU) for NLI and embeddings. The plan's MVP target (P95 < 15 s)
+holds up to concurrency 8 *without* the LLM. With the free-tier LLM (§4.2) end-to-end p95 was 16.7 s at concurrency
+1 before the switch, over the target, driven by rate-limit waits.
 
 ### 6.2 Monitoring and drift
 
@@ -496,14 +523,16 @@ trades that wait for more false alarms under load.
 * **"Grounded but wrong"** (§4.1, §6.3): validation checks draft ↔ sources, not sources ↔ complaint. When retrieval
   picks a semantically close but wrong scenario, the system can RESOLVE confidently. Mitigated at traffic level by the
   intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
-* Intent macro-F1 (0.723) is below the plan's provisional 0.75 target; the LLM classifier
-  (`INTENT_CLASSIFIER=llm`) has not been evaluated.
+* Intent macro-F1 is 0.889 after the embedding switch (0.723 before); the LLM classifier (`INTENT_CLASSIFIER=llm`)
+  has not been evaluated.
+* Better embeddings made unseen issue types look more familiar (novel-class RESOLVEs 29 → 31 of 60, extractive), so
+  the per-request novelty signal got weaker; the traffic-level intent-mix alert still fires (E4′).
 * LLM generation evaluated on all 100 cases with Qwen, 19 with Gemini, and the 60 novel-class cases with
   gpt-oss-20b (Qwen has 8 of them): free-tier daily caps (200k tokens/day on Groq, 20 requests/day on Gemini)
   prevented one model from covering everything.
 * E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
-* One worker sustains about 1 request/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
-* Heuristic confidence is uncalibrated (AUROC 0.75 extractive / 0.80 LLM for predicting a good draft); the
+* One worker sustains about 1-1.3 requests/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
+* Heuristic confidence is uncalibrated (AUROC 0.89 extractive after the switch, 0.84 LLM before it); the
   feedback endpoint collects the data needed to calibrate it.
 
 ## 9. Future work (prioritised by expected impact on the measured weaknesses)
@@ -516,15 +545,15 @@ trades that wait for more false alarms under load.
    symptom sentence; re-run E1.
 3. **Calibrate the confidence score** from the human ratings (§6.4) and the feedback endpoint (isotonic or Platt on
    "safe to use"); then run Experiment 5 to set RESOLVE/REVIEW thresholds for a target precision.
-4. **Intent:** evaluate the LLM classifier (`INTENT_CLASSIFIER=llm`) against k-NN (target macro-F1 > 0.75), and
-   consider a hybrid (k-NN unless the vote is split).
+4. **Intent:** evaluate the LLM classifier (`INTENT_CLASSIFIER=llm`) against k-NN (now 0.889 macro-F1), mainly for
+   the weakest class (plan_change 0.77) and for novelty detection.
 5. **Throughput:** batched GPU inference for NLI and embeddings, then multiple workers; re-run the load test (target
-   > 5 req/s) and re-run E2 on GPU to decide whether reranking (+0.052 P@5) becomes affordable.
+   > 5 req/s). Reranking is no longer worth it after the switch (+0.010 P@5, E2).
 6. **Complete the novel-class LLM run** with the deployed model (Qwen has 8 of 60; the 100 generation cases are done).
 7. **Real data:** re-run every evaluation on real (anonymised) tickets; the synthetic set fixes relevance labels but
    not linguistic variety.
-8. **Switch to all-mpnet-base-v2** (E4: +0.16 nDCG@10) with a full re-baseline: 768-d columns, re-embed,
-   re-tune E3 thresholds and sufficiency floors on the new cosine scale, re-run all evaluations.
+8. **Precompute source sentence embeddings** at ingestion (today a cross-request cache) so validation never embeds
+   sources at request time; then mpnet could also be used for validation at no latency cost.
    Optional experiments not run: E6 LLM temperature, E7 context length (free-tier LLM quota), E8 caching.
 9. **Out-of-domain stress test** with the Hugging Face tickets (§1): measure how often the system RESOLVEs IT
    tickets it has no knowledge for, and whether the drift monitor alerts.

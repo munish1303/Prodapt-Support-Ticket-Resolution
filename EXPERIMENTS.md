@@ -4,14 +4,19 @@ Every number below is copied from a results file in `experiments/results/`, prod
 the section. Where an experiment was iterated (E1, E3, E4′), the earlier run is kept and the reason for the change
 is documented.
 
+**Embedding switch.** E4 found `all-mpnet-base-v2` significantly better than the original `all-MiniLM-L6-v2`, so the
+system was switched and re-baselined: E1, E2, E3 and E4′ were re-run ("Re-run after the embedding switch"
+subsections). The original MiniLM numbers are kept in each section; their result files are in
+`experiments/results/minilm_baseline/`, and the files in `experiments/results/` are the current (mpnet) runs.
+
 | # | Question | Status | Decision |
 |---|---|---|---|
-| E1 | Does hybrid retrieval beat semantic-only, lexical-only and keyword search? | **Done** | Hybrid RRF 0.8:0.2 (weight chosen on dev) |
-| E2 | Does cross-encoder reranking pay for its latency? | **Done** | +0.052 P@5 but +2.7 s on CPU, so kept **off** |
-| E3 | Does multi-method groundedness beat single signals? | **Done** (v2) | Multi-method v2: sentence premises + quote rule; F1 0.918 |
-| E4′ | Can the system absorb a new ticket class without retraining? | **Done** | Yes (85% after ingestion); added intent-mix drift alert |
-| E4 | Would a different embedding model retrieve better? | **Done** | all-mpnet-base-v2 is significantly better (+0.16 nDCG@10); switch recommended, deferred pending a re-baseline |
-| E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional) | Keep 0.75; 0.90 gives 100% precision at 42% coverage; the real fix is wrong-scenario detection |
+| E1 | Does hybrid retrieval beat semantic-only, lexical-only and keyword search? | **Done**, re-run with mpnet | Hybrid RRF 0.9:0.1 with mpnet (0.8:0.2 with MiniLM), chosen on dev; nDCG@10 0.729 |
+| E2 | Does cross-encoder reranking pay for its latency? | **Done**, re-run with mpnet | Kept **off**: +0.010 P@5 for +2 s with mpnet (+0.052 for +2.7 s with MiniLM) |
+| E3 | Does multi-method groundedness beat single signals? | **Done** (v2), re-run with both embeddings | Multi-method v2; F1 0.918 with MiniLM, 0.927 with mpnet (n.s.); validation keeps MiniLM (6x faster) |
+| E4′ | Can the system absorb a new ticket class without retraining? | **Done**, re-run with mpnet | Yes (88% after ingestion with mpnet, 85% with MiniLM); intent-mix drift alert fires before |
+| E4 | Would a different embedding model retrieve better? | **Done** | all-mpnet-base-v2 significantly better (+0.16 nDCG@10): **switched**, with a full re-baseline |
+| E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional, pre-switch drafts) | Keep 0.75; 0.90 gave 100% precision at 42% coverage; the real fix is wrong-scenario detection |
 
 ---
 
@@ -82,6 +87,28 @@ Against lexical_or and the keyword baseline, every metric improves by +0.20 to +
 
 **Decision.** Hybrid retrieval with RRF, semantic:lexical = 0.8:0.2, OR-term lexical query, plus 2 guaranteed KB slots.
 
+### Re-run after the embedding switch (all-mpnet-base-v2)
+
+Same script, queries and judgments (`experiments/results/e1_retrieval.json`; MiniLM run in
+`minilm_baseline/e1_retrieval.json`). Lexical and keyword rows do not use embeddings and are unchanged.
+
+| Configuration (200 queries) | nDCG@10 | MRR | P@5 | Hit@5 | Recall@10 (capped) |
+|---|---:|---:|---:|---:|---:|
+| keyword baseline | 0.221 | 0.270 | 0.208 | 0.405 | 0.197 |
+| lexical, OR-of-terms FTS | 0.274 | 0.452 | 0.270 | 0.565 | 0.242 |
+| semantic, MiniLM (before) | 0.557 | 0.600 | 0.545 | 0.715 | 0.559 |
+| hybrid 0.8:0.2, MiniLM (before, deployed then) | 0.572 | 0.657 | 0.561 | 0.760 | 0.558 |
+| semantic, mpnet | 0.716 | 0.752 | 0.704 | 0.870 | 0.721 |
+| **hybrid 0.9:0.1, mpnet (deployed)** | **0.729** | **0.793** | **0.722** | **0.890** | **0.726** |
+
+Dev-split weight selection moved from 0.8 to 0.9 semantic (dev nDCG@10 at semantic weight 0.7 / 0.8 / 0.9: 0.712 /
+0.728 / 0.729):
+with stronger semantic retrieval, lexical search adds less but still adds something. Hybrid vs semantic-only with
+mpnet: nDCG@10 +0.014 (p = 0.0005), MRR +0.041 (p = 0.003), P@5 +0.018 (p = 0.0005), Recall@10 +0.006 (p = 0.06,
+n.s.). pgvector ivfflat matches exact in-memory search (semantic nDCG@10 0.716 in both E1 and E4). Latencies in this
+re-run were measured inside a 2-core container, so they are not comparable with the MiniLM run on the host.
+**Decision.** Hybrid RRF 0.9:0.1 with mpnet; everything else unchanged.
+
 **A bug this experiment caught (v1 → v2).** The first run (`e1_retrieval_v1_per_table_rrf.json`) fused
 rankings *per table* and then interleaved tickets and KB articles by RRF score. Because RRF depends only on rank,
 the #1 of 40 KB articles tied the #1 of 2,043 tickets, so roughly half of every top-10 was KB articles, most of
@@ -124,6 +151,10 @@ relevance, not complaint → resolved-ticket similarity, so a gain is not a fore
 real, so this is a deployment question, not a dead end. On a GPU, or with fewer candidates or an ONNX/quantised
 cross-encoder, the latency term could fall under budget; re-run E2 in that environment before enabling. If enabled,
 keep `RETRIEVAL_KB_MIN_SLOTS` so KB articles are not lost.
+
+**Re-run after the embedding switch.** With mpnet first-stage retrieval the reranker adds only +0.010 P@5 and
++0.006 nDCG@10 (0.722 → 0.732, 0.729 → 0.736) for about +2.0 s (`experiments/results/e2_reranking.json`): better
+first-stage ranking leaves little for the cross-encoder to fix. Reranking stays off, with a much clearer margin.
 
 ---
 
@@ -210,6 +241,23 @@ earns half credit in the groundedness score.
 verbatim copies, not free-form LLM text; LLM-draft groundedness is measured in EVALUATION.md §4. The v2 design was
 motivated by a failure seen in the generation eval, and its thresholds were then chosen on E3's dev half only.
 
+### Re-run after the embedding switch
+
+The similarity signal uses an embedding model, so E3 was re-run with both models on a widened threshold grid (the
+first mpnet run put the optimum on the old grid's edges: sim 0.4, contradiction 0.9). Thresholds tuned on dev,
+reported on test, v2 configuration:
+
+| Validation embedding | Tuned thresholds (dev) | Test F1 (not-supported) | Paraphrase false alarms |
+|---|---|---:|---:|
+| all-MiniLM-L6-v2 (`e3_groundedness.json`) | sim 0.60 / 0.45, entail 0.30 / 0.15, lexical 0.50 / 0.30, contradiction 0.50 (unchanged) | **0.918** | 15% |
+| all-mpnet-base-v2 (`e3_groundedness_mpnet.json`) | sim 0.20 / 0.05 (gate effectively off), entail 0.50 / 0.25, lexical 0.50 / 0.30, contradiction 0.90 | 0.927 | 10% |
+
+The difference (one item in 100) is within noise, and with mpnet the dev optimum effectively turns the similarity
+gate off and relies on NLI and lexical overlap. Validation embeds ~80 source sentences per request, where mpnet is
+6x slower than MiniLM (4.8 s vs 0.8 s per request on 2 CPU cores, measured in the API container). **Decision:**
+validation keeps MiniLM (`VALIDATION_EMBEDDING_MODEL`) with its original thresholds; retrieval and understanding use
+mpnet. A cross-request cache of source sentence embeddings was added as well (latency only; results identical).
+
 ---
 
 ## E4′: Evolving ticket classes ✅
@@ -269,6 +317,19 @@ fires: *"intent mix shifted: TVD 0.517 > 0.323 … a new issue type may be landi
 Real traffic has seasonal mix shifts, so the coefficient should be recalibrated from historical windows and
 the alert treated as a review trigger, not an automatic action.
 
+**Re-run after the embedding switch** (`experiments/results/evolving_classes.json`, extractive generator):
+
+| | MiniLM (before) | mpnet |
+|---|---:|---:|
+| Phase A: roaming complaints RESOLVEd while the class does not exist | 29 / 60 | 31 / 60 |
+| Phase A: intent-mix drift alert (TVD vs size-aware threshold 0.32) | fired (0.52) | fired (0.48) |
+| Phase C: recognised as `roaming_issue` after ingestion | 85% | **88%** |
+| Phase C: decisions RESOLVE / REVIEW | 39 / 21 | 41 / 19 |
+| In-distribution intent accuracy after adding the class (offline eval) | 0.682 | **0.888** |
+
+Better embeddings make the new class easier to absorb and cost the old classes much less, but they also make
+unseen complaints look more familiar before ingestion (31 vs 29 RESOLVEs), so the drift alert stays the defence.
+
 ---
 
 ## Optional experiments (plan §35): status
@@ -286,7 +347,8 @@ the alert treated as a review trigger, not an automatic action.
 **Question.** What RESOLVE threshold balances precision (auto-resolved drafts that are safe) against coverage
 (share of drafts auto-resolved)?
 
-**Data.** (confidence, "safe to use as-is") pairs for the 50 drafts of the rating sheet, rated by an AI rater blind
+**Data.** (confidence, "safe to use as-is") pairs for the 50 drafts of the rating sheet (drafts and confidence from
+the run *before* the embedding switch; a re-rating of new drafts is pending the LLM re-run), rated by an AI rater blind
 to system outputs (EVALUATION.md §6.4; `experiments/results/ai_rater_eval.json`, `resolve_threshold_sweep`).
 Coverage counts drafts at or above the threshold; policy rules (critical severity, unknown intent, injection) can
 still send some of them to REVIEW, so coverage is an upper bound on automation.
@@ -336,11 +398,14 @@ Latencies are on the CPU-limited container (2 cores), so compare them relatively
 * Cost of mpnet: 2x dimensions (index and storage), about 2x query-encode and 6-7x corpus-encode time on CPU, and a
   larger model in memory.
 
-**Decision.** By the plan's rule mpnet should replace MiniLM, and it is the recommended next change. It was **not
-switched in this submission**, because the switch is a re-baseline, not a config edit: the vector columns change to
-768 dimensions, the corpus is re-embedded and the ivfflat indexes rebuilt, and several thresholds were tuned on
-MiniLM's cosine scale (groundedness similarity in E3, evidence-sufficiency relevance floors, the confidence
-normaliser), so E3's threshold tuning and every downstream evaluation (understanding k-NN, E1, E2, the 100-case LLM
-run, about one day of free-tier LLM quota) must be re-run to keep the reported numbers consistent with what is
-deployed. Better semantic neighbours may also lift intent F1, which uses the same embeddings for k-NN.
+**Decision.** Switched to mpnet, as the plan's rule requires, with a full re-baseline rather than a config edit:
+1. `scripts/reembed.py` resized the vector columns to 768 dimensions and re-embedded the corpus (it now runs on every
+   start, so a future model change is handled the same way);
+2. thresholds with a tuning procedure were re-tuned on the dev split (E1 weights → 0.9:0.1; E3 grid; unknown-intent
+   sweep, which kept 0.35 / 0.40), and the four scale-only floors were translated by matching score distributions on
+   dev and novel complaints (`experiments/recalibrate_thresholds.py`: top relevance 0.35 → 0.42, top-5 mean
+   0.40 → 0.45, confidence normaliser 0.80 → 0.79, drift low-similarity alert 0.45 → 0.51);
+3. every evaluation was re-run. Headline changes: retrieval nDCG@10 0.572 → 0.729, Recall@10 0.558 → 0.726 (target
+   0.70 now met), intent macro-F1 0.723 → 0.889 (target 0.75 met), extractive reference-step recall 0.743 → 0.829,
+   confidence AUROC 0.75 → 0.89; validation kept MiniLM (E3), so latency stayed at p50 0.9 s without the LLM.
 

@@ -4,7 +4,7 @@
 
 * Python 3.10+ (developed on 3.14, container uses 3.11)
 * Docker Desktop (for PostgreSQL + pgvector; optional for the API itself)
-* About 2 GB RAM for the models (MiniLM, DeBERTa NLI, RoBERTa sentiment) plus about 1 GB for PostgreSQL
+* About 2.5 GB RAM for the models (mpnet and MiniLM embeddings, DeBERTa NLI, RoBERTa sentiment) plus about 1 GB for PostgreSQL
 * Optional: an API key for any OpenAI-compatible LLM (Groq or Gemini free tiers work)
 
 ## 1. Python environment
@@ -52,6 +52,10 @@ the same name. The most useful ones:
 | `DECISION_RESOLVE_THRESHOLD` / `DECISION_REVIEW_THRESHOLD` | `0.75` / `0.55` | provisional decision thresholds |
 | `GROUNDED_*`, `EVIDENCE_*`, `CONF_W_*` | see config | validation, sufficiency and confidence weights (all provisional) |
 | `DRIFT_*` | see config | drift alert thresholds |
+| `EMBEDDING_MODEL` / `EMBEDDING_DIM` | `all-mpnet-base-v2` / `768` | retrieval and understanding embeddings; changing them re-embeds the corpus on the next start (`scripts/reembed.py`) |
+| `VALIDATION_EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | embeddings used to pick NLI premises during validation (as accurate as mpnet there, 6x faster) |
+| `VALIDATION_SOURCE_CACHE_SIZE` | `2500` | cited-source sentence embeddings cached across requests (~30 KB each) |
+| `METRIC_EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | evaluation only: reference-step matching (kept fixed so metrics stay comparable) |
 | `DB_QUERY_TIMEOUT_S` | `10` | k-NN, retrieval and audit-log queries slower than this fail and count as a database failure (model inference is not timed) |
 | `DB_CIRCUIT_FAILURE_THRESHOLD` / `DB_CIRCUIT_RECOVERY_S` | `5` / `30` | consecutive database failures before the circuit opens; seconds before a trial call |
 
