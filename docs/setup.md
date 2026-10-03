@@ -46,6 +46,7 @@ the same name. The most useful ones:
 | `LLM_PROVIDER` | `openai_compatible` | `extractive` forces the no-LLM generator |
 | `LLM_REASONING_EFFORT` | unset | `low` for reasoning models (gpt-oss, Gemini thinking models) |
 | `LLM_FORCE_IPV4` / `LLM_MAX_RETRIES` | `false` / `3` | network resilience (see troubleshooting.md) |
+| `LLM_MAX_RATE_LIMIT_WAIT_S` / `LLM_REQUEST_DEADLINE_S` | `10` / `45` | most a request waits on 429s (daily-quota 429s fail over at once) / overall LLM deadline; past either, the extractive draft is used |
 | `INTENT_CLASSIFIER` | `knn` | `llm` to classify intent with the LLM |
 | `RRF_SEMANTIC_WEIGHT` / `RRF_LEXICAL_WEIGHT` | `0.8` / `0.2` | hybrid fusion weights (chosen in E1) |
 | `USE_RERANKING` | `false` | cross-encoder reranking (E2: better quality, +2.7 s on CPU) |

@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     LLM_MAX_TOKENS: int = 1200
     LLM_TIMEOUT_S: float = 30.0
     LLM_MAX_RETRIES: int = 3
+    # Most seconds one request may spend waiting on 429 rate limits before falling back to the extractive draft;
+    # daily-quota 429s fail over immediately (an agent is waiting at the console).
+    LLM_MAX_RATE_LIMIT_WAIT_S: float = 10.0
+    # Overall deadline for the LLM draft (all attempts); past it the extractive draft is used instead.
+    LLM_REQUEST_DEADLINE_S: float = 45.0
     # Fall back to the extractive generator when the LLM is unavailable.
     LLM_FALLBACK_TO_EXTRACTIVE: bool = True
     # Force IPv4 for LLM calls (workaround for networks with a broken IPv6 route).

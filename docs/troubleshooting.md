@@ -63,6 +63,13 @@ Evaluated working: Groq `qwen/qwen3.8-27b`, `openai/gpt-oss-20b`, `openai/gpt-os
 The service falls back to extractive drafts (flag `llm_unavailable_extractive_fallback`). Evaluations checkpoint
 every case; re-run the same command later to resume (`--fresh` starts over).
 
+**The console sits on the "searching" screen for minutes.**
+The LLM was rate-limited (usually the free-tier daily quota) and an older build waited out the provider's
+"try again in N minutes" on every retry. Requests now fail over to the extractive draft at once on a daily-quota
+429 and after at most `LLM_MAX_RATE_LIMIT_WAIT_S` (10 s) of rate-limit waiting or `LLM_REQUEST_DEADLINE_S` (45 s)
+overall; the result carries the flag `llm_unavailable_extractive_fallback`. The progress steps shown while waiting
+are an estimate; the real per-stage timings appear when the response arrives.
+
 **Reasoning models return empty or invalid JSON.**
 Hidden reasoning tokens consume the output budget. Set `LLM_REASONING_EFFORT=low` (gpt-oss, Gemini thinking models).
 

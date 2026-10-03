@@ -277,7 +277,7 @@ response (`app/services/pipeline.py`, tests in `tests/unit/test_degradation.py`)
 
 | Failure | What the agent gets | Flag |
 |---|---|---|
-| LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual | `llm_unavailable_extractive_fallback` |
+| LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual; a daily-quota 429 fails over at once, other waits are capped (10 s on 429s, 45 s overall) | `llm_unavailable_extractive_fallback` |
 | Database down, a query slower than `DB_QUERY_TIMEOUT_S` (10 s), or circuit open | no LLM call; ESCALATE "Knowledge base unavailable" | `retrieval_unavailable` |
 | Understanding fails | intent treated as unknown, so the decision is at most REVIEW; retrieval and drafting continue | `understanding_unavailable` |
 | Generator crashes | no draft; ESCALATE | `generation_error` |

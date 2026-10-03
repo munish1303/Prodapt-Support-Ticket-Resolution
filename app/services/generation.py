@@ -10,6 +10,7 @@ Two generators share one interface:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from collections import defaultdict
@@ -153,7 +154,13 @@ class GenerationService:
             return GenerationResult([], "No relevant sources were retrieved.", None, generator="none")
         if self.llm_generator is not None and self.llm_generator.llm.available:
             try:
-                return await self.llm_generator.generate(complaint, metadata, documents)
+                try:
+                    return await asyncio.wait_for(
+                        self.llm_generator.generate(complaint, metadata, documents),
+                        timeout=settings.LLM_REQUEST_DEADLINE_S,
+                    )
+                except TimeoutError as exc:
+                    raise LLMUnavailable(f"LLM draft exceeded {settings.LLM_REQUEST_DEADLINE_S:.0f}s") from exc
             except LLMUnavailable as exc:
                 logger.warning("LLM unavailable, falling back: %s", exc)
                 if not self.fallback:
