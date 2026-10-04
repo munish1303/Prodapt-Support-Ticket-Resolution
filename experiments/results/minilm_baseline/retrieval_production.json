@@ -1,0 +1,29 @@
+{
+  "metrics": {
+    "ndcg@10": 0.4753,
+    "mrr": 0.6574,
+    "p@5": 0.561,
+    "p@10": 0.4125,
+    "hit@1": 0.565,
+    "hit@5": 0.76,
+    "recall@10_capped": 0.4125,
+    "recall@20_capped": 0.2062,
+    "kb_recall@5": 0.08,
+    "kb_recall@10": 0.77
+  },
+  "latency_ms": {
+    "p50": 150.9,
+    "p95": 230.5,
+    "mean": 153.0
+  },
+  "config": {
+    "rrf_weights": [
+      0.8,
+      0.2
+    ],
+    "kb_min_slots": 2,
+    "lexical_query_mode": "or",
+    "use_reranking": false,
+    "top_k": 8
+  }
+}

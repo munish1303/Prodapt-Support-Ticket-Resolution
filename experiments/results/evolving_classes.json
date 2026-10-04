@@ -2,23 +2,22 @@
   "n_cases": 60,
   "phase_a_before": {
     "intent_distribution": {
-      "outage_report": 15,
-      "billing_dispute": 17,
-      "connectivity_issue": 25,
-      "unknown_intent": 2,
-      "speed_issue": 1
+      "connectivity_issue": 12,
+      "billing_dispute": 20,
+      "outage_report": 20,
+      "unknown_intent": 1,
+      "service_activation": 7
     },
     "target_intent_accuracy": 0.0,
-    "unknown_intent_rate": 0.0333,
+    "unknown_intent_rate": 0.0167,
     "decisions": {
-      "REVIEW": 30,
-      "ESCALATE": 1,
-      "RESOLVE": 29
+      "RESOLVE": 31,
+      "REVIEW": 29
     },
-    "resolve_rate": 0.4833,
-    "mean_confidence": 0.8352,
-    "mean_nearest_similarity": 0.6315,
-    "mean_max_relevance": 0.5927,
+    "resolve_rate": 0.5167,
+    "mean_confidence": 0.87,
+    "mean_nearest_similarity": 0.6742,
+    "mean_max_relevance": 0.6211,
     "target_kb_retrieved_rate": 0.0,
     "mean_groundedness": 1.0
   },
@@ -26,39 +25,38 @@
     "window_hours": 24,
     "recent": {
       "n": 60,
-      "unknown_intent_rate": 0.0333,
+      "unknown_intent_rate": 0.0167,
       "intent_distribution": {
-        "billing_dispute": 0.2833,
-        "connectivity_issue": 0.4167,
-        "outage_report": 0.25,
-        "speed_issue": 0.0167,
-        "unknown_intent": 0.0333
+        "billing_dispute": 0.3333,
+        "connectivity_issue": 0.2,
+        "outage_report": 0.3333,
+        "service_activation": 0.1167,
+        "unknown_intent": 0.0167
       },
-      "mean_nearest_similarity": 0.6315,
-      "escalation_rate": 0.0167
+      "mean_nearest_similarity": 0.6742,
+      "escalation_rate": 0.0
     },
     "baseline": {
       "n": 60,
-      "unknown_intent_rate": 0.0167,
+      "unknown_intent_rate": 0.0,
       "intent_distribution": {
-        "account_management": 0.0667,
-        "billing_dispute": 0.1667,
-        "connectivity_issue": 0.15,
-        "hardware_problem": 0.1,
-        "outage_report": 0.1333,
-        "plan_change": 0.05,
+        "account_management": 0.0833,
+        "billing_dispute": 0.1333,
+        "connectivity_issue": 0.1833,
+        "hardware_problem": 0.15,
+        "outage_report": 0.1,
+        "plan_change": 0.0833,
         "service_activation": 0.1,
-        "speed_issue": 0.05,
-        "technical_support": 0.1667,
-        "unknown_intent": 0.0167
+        "speed_issue": 0.0667,
+        "technical_support": 0.1
       },
-      "mean_nearest_similarity": 0.6435,
+      "mean_nearest_similarity": 0.684,
       "escalation_rate": 0.0
     },
-    "intent_tvd": 0.5167,
+    "intent_tvd": 0.4834,
     "intent_tvd_alert_threshold": 0.3227,
     "alerts": [
-      "intent mix shifted: TVD 0.5167 > 0.3227 (noise threshold for these window sizes); a new issue type may be landing in existing classes - review recent requests"
+      "intent mix shifted: TVD 0.4834 > 0.3227 (noise threshold for these window sizes); a new issue type may be landing in existing classes - review recent requests"
     ]
   },
   "ingestion": {
@@ -76,21 +74,22 @@
   },
   "phase_c_after": {
     "intent_distribution": {
-      "outage_report": 5,
-      "roaming_issue": 51,
-      "connectivity_issue": 4
+      "roaming_issue": 53,
+      "connectivity_issue": 5,
+      "outage_report": 1,
+      "unknown_intent": 1
     },
-    "target_intent_accuracy": 0.85,
-    "unknown_intent_rate": 0.0,
+    "target_intent_accuracy": 0.8833,
+    "unknown_intent_rate": 0.0167,
     "decisions": {
-      "REVIEW": 21,
-      "RESOLVE": 39
+      "RESOLVE": 41,
+      "REVIEW": 19
     },
-    "resolve_rate": 0.65,
-    "mean_confidence": 0.8864,
-    "mean_nearest_similarity": 0.7103,
-    "mean_max_relevance": 0.6642,
-    "target_kb_retrieved_rate": 0.8667,
+    "resolve_rate": 0.6833,
+    "mean_confidence": 0.9193,
+    "mean_nearest_similarity": 0.7611,
+    "mean_max_relevance": 0.7051,
+    "target_kb_retrieved_rate": 0.85,
     "mean_groundedness": 1.0
   },
   "generator": "extractive",

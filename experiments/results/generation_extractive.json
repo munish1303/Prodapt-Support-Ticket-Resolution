@@ -2,60 +2,62 @@
   "summary": {
     "generator": "extractive",
     "n": 100,
+    "n_planned": 100,
+    "n_novel": 60,
     "match_threshold": 0.6,
     "metrics": {
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.7432,
-      "step_precision": 0.56,
+      "reference_step_recall": 0.8285,
+      "step_precision": 0.624,
       "n_steps": 5.0,
-      "kb_retrieved": 0.78,
-      "intent_correct": 0.69,
-      "confidence": 0.8708
+      "kb_retrieved": 0.86,
+      "intent_correct": 0.88,
+      "confidence": 0.8994
     },
     "generation_errors": 0,
     "drafts_with_contradiction": 0,
     "decisions": {
-      "RESOLVE": 81,
-      "REVIEW": 18,
-      "ESCALATE": 1
+      "RESOLVE": 86,
+      "REVIEW": 14
     },
     "quality_by_decision": {
       "RESOLVE": {
-        "n": 81,
-        "mean_reference_step_recall": 0.7477,
+        "n": 86,
+        "mean_reference_step_recall": 0.8238,
         "mean_groundedness": 1.0
       },
       "REVIEW": {
-        "n": 18,
-        "mean_reference_step_recall": 0.7083,
+        "n": 14,
+        "mean_reference_step_recall": 0.8571,
         "mean_groundedness": 1.0
       },
       "ESCALATE": {
-        "n": 1,
-        "mean_reference_step_recall": 1.0,
-        "mean_groundedness": 1.0
+        "n": 0,
+        "mean_reference_step_recall": null,
+        "mean_groundedness": null
       }
     },
-    "confidence_quality_auc": 0.7511,
+    "confidence_quality_auc": 0.8912,
     "latency_ms": {
-      "p50": 1014,
-      "p95": 1464,
-      "max": 4109
+      "p50": 908,
+      "p95": 1585,
+      "max": 2531
     },
     "stage_latency_ms_mean": {
-      "embed": 47,
-      "understand_retrieve": 272,
+      "embed": 195,
+      "understand_retrieve": 245,
       "generate": 0,
-      "validate": 769,
+      "validate": 515,
       "decide": 0
     },
     "novel_intent_decisions": {
-      "REVIEW": 30,
-      "ESCALATE": 1,
-      "RESOLVE": 29
-    }
+      "RESOLVE": 31,
+      "REVIEW": 29
+    },
+    "novel_intent_empty_drafts": 0,
+    "novel_intent_generation_errors": 0
   },
   "rows": [
     {
@@ -63,23 +65,38 @@
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 0.5,
+      "step_precision": 0.4,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8135,
+      "confidence": 0.896,
       "decision": "RESOLVE",
-      "latency_ms": 4109,
+      "latency_ms": 2531,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 3030,
+        "embed": 185,
+        "understand_retrieve": 520,
         "generate": 0,
-        "validate": 1032,
+        "validate": 1824,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the data usage against the plan's fair-usage allowance in the account [1][2][3][5]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [7][8]",
+        "Install the latest carrier settings and phone software update [7][8]",
+        "Explain that speeds are reduced after the allowance until the bill cycle resets [1][2][3][4]",
+        "Offer a data add-on or a higher-allowance plan [1][4][5][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0002",
@@ -90,42 +107,72 @@
       "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 1.0,
-      "confidence": 0.8603,
+      "intent_correct": 0.0,
+      "confidence": 0.81,
       "decision": "RESOLVE",
-      "latency_ms": 1553,
+      "latency_ms": 1584,
       "stage_ms": {
-        "embed": 55,
-        "understand_retrieve": 286,
-        "generate": 2,
-        "validate": 1209,
+        "embed": 166,
+        "understand_retrieve": 223,
+        "generate": 0,
+        "validate": 1193,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [1][2][3][6]",
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [8]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet [1][2][3][6]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold [2][4][6][7]",
+        "Enable QoS on the router to prioritise video calls during peak hours [2][4][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0003",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.4,
-      "step_precision": 0.4,
+      "reference_step_recall": 0.6,
+      "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 0.0,
-      "confidence": 0.9211,
+      "confidence": 0.931,
       "decision": "RESOLVE",
-      "latency_ms": 1145,
+      "latency_ms": 1159,
       "stage_ms": {
-        "embed": 52,
-        "understand_retrieve": 248,
-        "generate": 0,
-        "validate": 843,
+        "embed": 183,
+        "understand_retrieve": 243,
+        "generate": 1,
+        "validate": 730,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Place the router upright in a ventilated spot, not in a cabinet or on other electronics [1][2][3][5]",
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [8]",
+        "Check the router's event log for thermal or power-related restarts [1][2][3][5]",
+        "Update the router firmware [1][2][5][6]",
+        "If reboots continue, replace the router and power adapter [1][2][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0004",
@@ -135,66 +182,111 @@
       "reference_step_recall": 1.0,
       "step_precision": 0.6,
       "n_steps": 5,
-      "kb_retrieved": 1.0,
+      "kb_retrieved": 0.0,
       "intent_correct": 1.0,
-      "confidence": 0.8631,
-      "decision": "REVIEW",
-      "latency_ms": 924,
+      "confidence": 0.8626,
+      "decision": "RESOLVE",
+      "latency_ms": 990,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 225,
+        "embed": 153,
+        "understand_retrieve": 249,
         "generate": 0,
-        "validate": 655,
+        "validate": 586,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange [1][2][3][4]",
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [7]",
+        "Run the router's channel scan and move the 2.4 GHz radio to the least congested channel (1, 6 or 11) [7]",
+        "Confirm the maintenance window and expected completion date [1][2][3][4]",
+        "Sign the customer up for maintenance notifications [1][2]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0005",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.6666666666666666,
-      "step_precision": 0.4,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8808,
+      "confidence": 0.8986,
       "decision": "REVIEW",
-      "latency_ms": 924,
+      "latency_ms": 1181,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 236,
+        "embed": 197,
+        "understand_retrieve": 182,
         "generate": 0,
-        "validate": 637,
+        "validate": 799,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the network status page for mast outages near the customer's postcode [3][4][5][6]",
+        "Check the coverage map for the customer's address [1]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2]",
+        "Share the incident reference and estimated restoration time [3][4][5][6]",
+        "Enable Wi-Fi Calling as a workaround if the customer has broadband [4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0006",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.6666666666666666,
-      "step_precision": 0.4,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8204,
-      "decision": "REVIEW",
-      "latency_ms": 958,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.9093,
+      "decision": "RESOLVE",
+      "latency_ms": 1142,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 251,
+        "embed": 310,
+        "understand_retrieve": 259,
         "generate": 0,
-        "validate": 657,
+        "validate": 571,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check that the 5G service flag is provisioned on the line [1][2][3][4]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [7]",
+        "Install the latest carrier settings and phone software update [7]",
+        "Re-provision the 5G service if missing [1][2][3][4]",
+        "Ask the customer to restart the handset to refresh network registration [3][4][5][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0007",
@@ -206,18 +298,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9083,
+      "confidence": 0.8868,
       "decision": "RESOLVE",
-      "latency_ms": 1544,
+      "latency_ms": 1052,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 233,
+        "embed": 179,
+        "understand_retrieve": 252,
         "generate": 0,
-        "validate": 1260,
+        "validate": 620,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Enable UPnP in the router settings [1][4][5][6]",
+        "Check the planned maintenance schedule for the customer's exchange [8]",
+        "Give the console a reserved IP address in the router DHCP settings [1][4][5][6]",
+        "Forward the game's required ports to the console's reserved IP [1][5][7]",
+        "Restart the console and re-test the NAT type [5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0008",
@@ -225,22 +332,37 @@
       "citation_coverage": 1.0,
       "groundedness": 1.0,
       "reference_step_recall": 1.0,
-      "step_precision": 0.6,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8252,
+      "confidence": 0.908,
       "decision": "RESOLVE",
-      "latency_ms": 1026,
+      "latency_ms": 1105,
       "stage_ms": {
-        "embed": 42,
-        "understand_retrieve": 214,
-        "generate": 1,
-        "validate": 767,
+        "embed": 129,
+        "understand_retrieve": 172,
+        "generate": 0,
+        "validate": 802,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [1][2][4][5]",
+        "Check the coverage map for the customer's address [8]",
+        "Connect the modem to the master socket using the test socket to bypass internal wiring [1][2][3][4]",
+        "Run a remote line test from the support system to check for noise and line faults [1][3][4][6]",
+        "If the line test fails, book an engineer visit to repair the line [1][3][4][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0009",
@@ -252,18 +374,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9141,
+      "confidence": 0.9359,
       "decision": "RESOLVE",
-      "latency_ms": 1142,
+      "latency_ms": 1218,
       "stage_ms": {
-        "embed": 44,
-        "understand_retrieve": 221,
-        "generate": 1,
-        "validate": 874,
+        "embed": 179,
+        "understand_retrieve": 285,
+        "generate": 0,
+        "validate": 752,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check whether the service is available at the customer's new address [2][3][4][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "If service is unavailable at the new address, waive the early termination fee under the home-move policy [2][3][4][5]",
+        "If service is available, offer to transfer the contract to the new address instead [1][2][4][5]",
+        "Issue a corrected final bill [1][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0010",
@@ -275,18 +412,33 @@
       "n_steps": 5,
       "kb_retrieved": 0.0,
       "intent_correct": 0.0,
-      "confidence": 0.686,
-      "decision": "ESCALATE",
-      "latency_ms": 977,
+      "confidence": 0.7905,
+      "decision": "RESOLVE",
+      "latency_ms": 928,
       "stage_ms": {
-        "embed": 38,
-        "understand_retrieve": 207,
+        "embed": 134,
+        "understand_retrieve": 162,
         "generate": 0,
-        "validate": 730,
+        "validate": 630,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the current account holder or the bereavement documentation [1][2][3][4]",
+        "Check the cancellation request date and the date the service was actually ceased [7]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit [7]",
+        "Collect the new holder's identity and payment details [1][2][3][4]",
+        "Complete the transfer of ownership without interrupting service [1][2][3][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0011",
@@ -297,19 +449,34 @@
       "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.7805,
+      "intent_correct": 1.0,
+      "confidence": 0.8924,
       "decision": "RESOLVE",
-      "latency_ms": 1189,
+      "latency_ms": 1025,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 231,
-        "generate": 1,
-        "validate": 905,
+        "embed": 218,
+        "understand_retrieve": 182,
+        "generate": 0,
+        "validate": 624,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the customer's identity with security questions [1][2][3][4]",
+        "Log in to the router admin page using the default credentials on the label [8]",
+        "Re-enter the broadband PPPoE username and password from the account [8]",
+        "Unlock the account and send a password reset link [1][2][3][4]",
+        "Update the recovery email or mobile number if it is outdated [1][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0012",
@@ -319,43 +486,73 @@
       "reference_step_recall": 0.0,
       "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 0.0,
-      "confidence": 0.8258,
+      "confidence": 0.7991,
       "decision": "RESOLVE",
-      "latency_ms": 933,
+      "latency_ms": 1599,
       "stage_ms": {
-        "embed": 55,
-        "understand_retrieve": 262,
-        "generate": 0,
-        "validate": 615,
+        "embed": 629,
+        "understand_retrieve": 479,
+        "generate": 1,
+        "validate": 489,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange [1][3][4]",
+        "Try a different LAN port and a known-good ethernet cable [7]",
+        "Check the computer's network adapter is enabled and drivers are current [7]",
+        "Confirm the maintenance window and expected completion date [1][3][4]",
+        "If multiple ports fail, replace the router [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0013",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 1.0,
+      "kb_retrieved": 0.0,
       "intent_correct": 0.0,
-      "confidence": 0.8557,
+      "confidence": 0.8262,
       "decision": "RESOLVE",
-      "latency_ms": 1117,
+      "latency_ms": 959,
       "stage_ms": {
-        "embed": 49,
-        "understand_retrieve": 231,
+        "embed": 235,
+        "understand_retrieve": 220,
         "generate": 0,
-        "validate": 835,
+        "validate": 503,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Log in to the router admin page using the default credentials on the label [1][2][3][4]",
+        "Try a different LAN port and a known-good ethernet cable [8]",
+        "Re-enter the broadband PPPoE username and password from the account [1][2][3][4]",
+        "Set the WAN VLAN ID required by the network if using a third-party router [1][2][3][4]",
+        "Reconfigure the Wi-Fi name and password [1][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0014",
@@ -367,18 +564,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8751,
+      "confidence": 0.9007,
       "decision": "RESOLVE",
-      "latency_ms": 887,
+      "latency_ms": 1055,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 216,
+        "embed": 244,
+        "understand_retrieve": 175,
         "generate": 0,
-        "validate": 621,
+        "validate": 635,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the port request status and any rejection reason [1][2][3][4]",
+        "Verify the current account holder or the bereavement documentation [8]",
+        "Verify the PAC or porting code is valid, unexpired and matches the number [1][2][3][4]",
+        "Resubmit the port request with corrected details [1][2][3][4]",
+        "Tell the customer the port completes within one working day of a valid request [1][2][3][4]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0015",
@@ -390,18 +602,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9175,
+      "confidence": 0.9632,
       "decision": "RESOLVE",
-      "latency_ms": 1109,
+      "latency_ms": 1270,
       "stage_ms": {
-        "embed": 54,
-        "understand_retrieve": 240,
-        "generate": 0,
-        "validate": 813,
+        "embed": 306,
+        "understand_retrieve": 349,
+        "generate": 1,
+        "validate": 611,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [1][2][3][5]",
+        "Check the network status page for mast outages near the customer's postcode [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2][3][5]",
+        "Make sure the phone software and carrier settings are up to date [3][5][6][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0016",
@@ -411,43 +638,73 @@
       "reference_step_recall": 0.0,
       "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8617,
+      "confidence": 0.8774,
       "decision": "RESOLVE",
-      "latency_ms": 1587,
+      "latency_ms": 889,
       "stage_ms": {
-        "embed": 49,
-        "understand_retrieve": 265,
+        "embed": 167,
+        "understand_retrieve": 205,
         "generate": 0,
-        "validate": 1271,
+        "validate": 515,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the payment failure reason code [1][2][3][6]",
+        "Check the account for an expired promotional discount [7]",
+        "Update the card or bank details on the account [1][2][3][6]",
+        "Take a one-off payment for the outstanding balance [1][3][6]",
+        "Waive the late fee as a one-time courtesy if it was the first failure [1][3]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0017",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.9057,
-      "decision": "RESOLVE",
-      "latency_ms": 1460,
+      "intent_correct": 1.0,
+      "confidence": 0.8902,
+      "decision": "REVIEW",
+      "latency_ms": 1359,
       "stage_ms": {
-        "embed": 61,
-        "understand_retrieve": 338,
-        "generate": 1,
-        "validate": 1059,
+        "embed": 306,
+        "understand_retrieve": 267,
+        "generate": 0,
+        "validate": 784,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [1][2][4][6]",
+        "Enable UPnP in the router settings [8]",
+        "Flush the DNS cache on the device (ipconfig /flushdns on Windows) [1][2][4][6]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8 [1][6][7]",
+        "Restart the router after changing DNS settings [1][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0018",
@@ -457,20 +714,35 @@
       "reference_step_recall": 0.0,
       "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.7749,
-      "decision": "REVIEW",
-      "latency_ms": 1125,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8186,
+      "decision": "RESOLVE",
+      "latency_ms": 794,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 224,
-        "generate": 1,
-        "validate": 847,
+        "embed": 249,
+        "understand_retrieve": 200,
+        "generate": 0,
+        "validate": 343,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it [2]",
+        "Check the negotiated link speed on the computer's network adapter (100 Mbps vs 1 Gbps) [7]",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end [2]",
+        "Check the outage map for a fibre fault in the area [2]",
+        "If LOS stays red, raise a fibre fault and dispatch a field engineer [2]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0019",
@@ -482,18 +754,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8211,
+      "confidence": 0.9243,
       "decision": "RESOLVE",
-      "latency_ms": 1309,
+      "latency_ms": 1048,
       "stage_ms": {
-        "embed": 44,
-        "understand_retrieve": 229,
+        "embed": 140,
+        "understand_retrieve": 185,
         "generate": 0,
-        "validate": 1034,
+        "validate": 720,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied [1][2][3][4]",
+        "Check the negotiated link speed on the computer's network adapter (100 Mbps vs 1 Gbps) [8]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile [1][2][3][4]",
+        "Run a line check to confirm the synced speed [1][4][6][7]",
+        "If the profile is not applied, escalate to provisioning [1][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0020",
@@ -505,18 +792,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9303,
+      "confidence": 0.9811,
       "decision": "RESOLVE",
-      "latency_ms": 1071,
+      "latency_ms": 1371,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 248,
+        "embed": 279,
+        "understand_retrieve": 261,
         "generate": 0,
-        "validate": 774,
+        "validate": 830,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [8]",
+        "Update the number after identity verification if it is outdated [1][2][3][4]",
+        "Offer email or authenticator-app verification as an alternative [5][7]",
+        "Check for SMS blocking or spam filtering on the handset [5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0021",
@@ -528,18 +830,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9357,
+      "confidence": 0.9795,
       "decision": "RESOLVE",
-      "latency_ms": 926,
+      "latency_ms": 565,
       "stage_ms": {
-        "embed": 82,
-        "understand_retrieve": 219,
-        "generate": 1,
-        "validate": 622,
+        "embed": 150,
+        "understand_retrieve": 187,
+        "generate": 0,
+        "validate": 226,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [8]",
+        "Update the number after identity verification if it is outdated [1][2][3][4]",
+        "Offer email or authenticator-app verification as an alternative [7]",
+        "Check for SMS blocking or spam filtering on the handset [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0022",
@@ -550,65 +867,110 @@
       "step_precision": 0.0,
       "n_steps": 5,
       "kb_retrieved": 0.0,
-      "intent_correct": 1.0,
-      "confidence": 0.8412,
+      "intent_correct": 0.0,
+      "confidence": 0.8895,
       "decision": "RESOLVE",
-      "latency_ms": 977,
+      "latency_ms": 1309,
       "stage_ms": {
-        "embed": 54,
-        "understand_retrieve": 245,
-        "generate": 0,
-        "validate": 676,
+        "embed": 248,
+        "understand_retrieve": 230,
+        "generate": 1,
+        "validate": 828,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied [1][2][3][4]",
+        "Check the data usage against the plan's fair-usage allowance in the account [8]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile [1][2][3][4]",
+        "Run a line check to confirm the synced speed [1][2][5][6]",
+        "If the profile is not applied, escalate to provisioning [1][2][5][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0023",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 1.0,
-      "step_precision": 0.6,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 0.0,
-      "confidence": 0.8146,
+      "confidence": 0.8131,
       "decision": "REVIEW",
-      "latency_ms": 861,
+      "latency_ms": 925,
       "stage_ms": {
-        "embed": 46,
-        "understand_retrieve": 212,
+        "embed": 256,
+        "understand_retrieve": 227,
         "generate": 0,
-        "validate": 601,
+        "validate": 440,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [3][4][8]",
+        "Offer a mobile data boost or hotspot during the outage [2][6]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [3][4][8]",
+        "Make sure the phone software and carrier settings are up to date [3][8]",
+        "Apply automatic outage compensation once service is restored [2][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0024",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8216,
+      "intent_correct": 1.0,
+      "confidence": 0.8722,
       "decision": "REVIEW",
-      "latency_ms": 928,
+      "latency_ms": 729,
       "stage_ms": {
-        "embed": 42,
-        "understand_retrieve": 198,
-        "generate": 1,
-        "validate": 685,
+        "embed": 166,
+        "understand_retrieve": 149,
+        "generate": 0,
+        "validate": 413,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the outage map and incident system for the customer's area [1][3][4]",
+        "Try a different LAN port and a known-good ethernet cable [7]",
+        "Link the customer to the existing incident and share the latest estimated fix time [1][2][3][4]",
+        "Offer a mobile data boost or hotspot during the outage [2][3][6]",
+        "Apply automatic outage compensation once service is restored [2][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0025",
@@ -620,41 +982,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9093,
+      "confidence": 0.9469,
       "decision": "RESOLVE",
-      "latency_ms": 896,
+      "latency_ms": 1044,
       "stage_ms": {
-        "embed": 42,
-        "understand_retrieve": 213,
+        "embed": 148,
+        "understand_retrieve": 170,
         "generate": 0,
-        "validate": 640,
+        "validate": 724,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the account for an expired promotional discount [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [8]",
+        "Explain that the introductory offer has ended and the plan returned to the standard price [1][2][3][4]",
+        "Offer the current retention deals or a cheaper plan that matches usage [1][2][5][6]",
+        "Confirm the customer received the end-of-offer notification and note it on the account [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0026",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 1.0,
-      "confidence": 0.805,
-      "decision": "RESOLVE",
-      "latency_ms": 977,
+      "kb_retrieved": 1.0,
+      "intent_correct": 0.0,
+      "confidence": 0.8444,
+      "decision": "REVIEW",
+      "latency_ms": 883,
       "stage_ms": {
-        "embed": 55,
-        "understand_retrieve": 249,
+        "embed": 207,
+        "understand_retrieve": 198,
         "generate": 0,
-        "validate": 671,
+        "validate": 476,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Try a different LAN port and a known-good ethernet cable [1][2][3]",
+        "Advise the customer to keep clear of the fallen cable and not touch it [4][5]",
+        "Check the computer's network adapter is enabled and drivers are current [1][2][3]",
+        "Raise an urgent line damage fault for field repair [4][5]",
+        "If multiple ports fail, replace the router [1][2][3]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0027",
@@ -666,18 +1058,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8755,
+      "confidence": 0.8991,
       "decision": "RESOLVE",
-      "latency_ms": 968,
+      "latency_ms": 903,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 224,
-        "generate": 1,
-        "validate": 696,
+        "embed": 181,
+        "understand_retrieve": 189,
+        "generate": 0,
+        "validate": 531,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the payment failure reason code [1][2][3][4]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Update the card or bank details on the account [1][2][3][4]",
+        "Take a one-off payment for the outstanding balance [2][3][4][5]",
+        "Waive the late fee as a one-time courtesy if it was the first failure [2][3][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0028",
@@ -689,18 +1096,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9127,
-      "decision": "REVIEW",
-      "latency_ms": 917,
+      "confidence": 0.87,
+      "decision": "RESOLVE",
+      "latency_ms": 992,
       "stage_ms": {
-        "embed": 52,
-        "understand_retrieve": 246,
+        "embed": 190,
+        "understand_retrieve": 193,
         "generate": 0,
-        "validate": 618,
+        "validate": 607,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify both transactions in the payments ledger and confirm they are for the same invoice [1][2][3][5]",
+        "Check the payment failure reason code [8]",
+        "Raise a refund for the duplicate payment to the original payment method [1][2][3][5]",
+        "Tell the customer refunds take 5-7 working days to appear [1][2][7]",
+        "Offer a goodwill credit if the customer incurred bank charges [1][2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0029",
@@ -710,20 +1132,35 @@
       "reference_step_recall": 0.5,
       "step_precision": 0.4,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8278,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8585,
       "decision": "RESOLVE",
-      "latency_ms": 997,
+      "latency_ms": 676,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 303,
-        "generate": 1,
-        "validate": 643,
+        "embed": 186,
+        "understand_retrieve": 231,
+        "generate": 0,
+        "validate": 257,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the data usage against the plan's fair-usage allowance in the account [1][2][4]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [6][8]",
+        "Install the latest carrier settings and phone software update [6][8]",
+        "Explain that speeds are reduced after the allowance until the bill cycle resets [1][2][3][4]",
+        "Offer a data add-on or a higher-allowance plan [3][4]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0030",
@@ -735,18 +1172,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9279,
+      "confidence": 0.8686,
       "decision": "RESOLVE",
-      "latency_ms": 1094,
+      "latency_ms": 1149,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 243,
+        "embed": 158,
+        "understand_retrieve": 218,
         "generate": 0,
-        "validate": 799,
+        "validate": 770,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check whether the service is available at the customer's new address [1][2][3][4]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "If service is unavailable at the new address, waive the early termination fee under the home-move policy [1][2][3][4]",
+        "If service is available, offer to transfer the contract to the new address instead [2][3][5][6]",
+        "Issue a corrected final bill [2][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0031",
@@ -758,18 +1210,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9267,
+      "confidence": 0.9381,
       "decision": "RESOLVE",
-      "latency_ms": 2173,
+      "latency_ms": 661,
       "stage_ms": {
-        "embed": 46,
-        "understand_retrieve": 206,
+        "embed": 197,
+        "understand_retrieve": 231,
         "generate": 0,
-        "validate": 1918,
+        "validate": 231,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [1][2][4][5]",
+        "Check the network status page for mast outages near the customer's postcode [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2][4][5]",
+        "Make sure the phone software and carrier settings are up to date [1][2][4][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible [2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0032",
@@ -781,18 +1248,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9233,
+      "confidence": 0.9334,
       "decision": "RESOLVE",
-      "latency_ms": 1175,
+      "latency_ms": 1268,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 317,
-        "generate": 1,
-        "validate": 808,
+        "embed": 190,
+        "understand_retrieve": 416,
+        "generate": 0,
+        "validate": 661,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Activate voicemail on the line from the account system [1][2][3][4]",
+        "Power off the phone, reseat the SIM in the tray and restart [8]",
+        "Test the SIM in another phone to isolate SIM versus handset [8]",
+        "Set call diversion on no answer to the voicemail number [1][2][3][4]",
+        "Reset the voicemail PIN and send it by SMS [1][2][4][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0033",
@@ -804,18 +1286,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9036,
+      "confidence": 0.9314,
       "decision": "RESOLVE",
-      "latency_ms": 1091,
+      "latency_ms": 393,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 234,
-        "generate": 1,
-        "validate": 809,
+        "embed": 144,
+        "understand_retrieve": 157,
+        "generate": 0,
+        "validate": 91,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the account for an expired promotional discount [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [8]",
+        "Explain that the introductory offer has ended and the plan returned to the standard price [1][2][3][4]",
+        "Offer the current retention deals or a cheaper plan that matches usage [1][2][5][6]",
+        "Confirm the customer received the end-of-offer notification and note it on the account [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0034",
@@ -827,18 +1324,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9032,
+      "confidence": 0.9204,
       "decision": "RESOLVE",
-      "latency_ms": 1244,
+      "latency_ms": 1007,
       "stage_ms": {
-        "embed": 42,
-        "understand_retrieve": 263,
-        "generate": 1,
-        "validate": 937,
+        "embed": 160,
+        "understand_retrieve": 209,
+        "generate": 0,
+        "validate": 636,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Identify the third-party service and its start date from the billing detail [1][2][4][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Cancel the subscription and apply a premium services bar on the line [1][2][3][4]",
+        "Raise a refund request for the disputed third-party charges [1][3][6][7]",
+        "Advise the customer to enable spending controls for children's phones [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0035",
@@ -850,41 +1362,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9245,
+      "confidence": 0.9784,
       "decision": "RESOLVE",
-      "latency_ms": 1150,
+      "latency_ms": 926,
       "stage_ms": {
-        "embed": 57,
-        "understand_retrieve": 310,
+        "embed": 189,
+        "understand_retrieve": 241,
         "generate": 0,
-        "validate": 781,
+        "validate": 494,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the account for an expired promotional discount [1][3][4][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Explain that the introductory offer has ended and the plan returned to the standard price [1][2][3][4]",
+        "Offer the current retention deals or a cheaper plan that matches usage [2][3][4][6]",
+        "Confirm the customer received the end-of-offer notification and note it on the account [3][4][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0036",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8195,
-      "decision": "RESOLVE",
-      "latency_ms": 975,
+      "intent_correct": 1.0,
+      "confidence": 0.8946,
+      "decision": "REVIEW",
+      "latency_ms": 945,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 241,
+        "embed": 184,
+        "understand_retrieve": 202,
         "generate": 0,
-        "validate": 687,
+        "validate": 557,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the wall socket works and the power adapter is firmly connected [1][2][3][5]",
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [8]",
+        "Test with a compatible replacement power adapter if available [1][2][3][5]",
+        "If the modem still has no lights, send a replacement modem by next-day delivery [1][3][5][7]",
+        "Offer a mobile data hotspot while the replacement is in transit [5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0037",
@@ -896,18 +1438,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8404,
+      "confidence": 0.9033,
       "decision": "RESOLVE",
-      "latency_ms": 1173,
+      "latency_ms": 1508,
       "stage_ms": {
-        "embed": 58,
-        "understand_retrieve": 323,
-        "generate": 0,
-        "validate": 791,
+        "embed": 335,
+        "understand_retrieve": 431,
+        "generate": 1,
+        "validate": 739,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Use IMAP server mail.example-telco.com on port 993 with SSL [4][5][8]",
+        "Set call diversion on no answer to the voicemail number [1][2][7]",
+        "Use SMTP server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled [4][5][6][8]",
+        "Reset the voicemail PIN and send it by SMS [1][2][7]",
+        "Reset the email password from the account portal if authentication keeps failing [4][5][6][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0038",
@@ -917,43 +1474,73 @@
       "reference_step_recall": 0.0,
       "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 0.0,
-      "confidence": 0.8044,
+      "confidence": 0.8104,
       "decision": "RESOLVE",
-      "latency_ms": 734,
+      "latency_ms": 569,
       "stage_ms": {
-        "embed": 55,
-        "understand_retrieve": 225,
+        "embed": 163,
+        "understand_retrieve": 227,
         "generate": 0,
-        "validate": 453,
+        "validate": 177,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange [1][3][6]",
+        "Try a different LAN port and a known-good ethernet cable [7]",
+        "Check the computer's network adapter is enabled and drivers are current [7]",
+        "Confirm the maintenance window and expected completion date [1][3][6]",
+        "Sign the customer up for maintenance notifications [3]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0039",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 1.0,
-      "step_precision": 0.6,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
       "n_steps": 5,
-      "kb_retrieved": 1.0,
+      "kb_retrieved": 0.0,
       "intent_correct": 1.0,
-      "confidence": 0.9041,
+      "confidence": 0.892,
       "decision": "RESOLVE",
-      "latency_ms": 965,
+      "latency_ms": 2098,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 233,
-        "generate": 0,
-        "validate": 687,
+        "embed": 273,
+        "understand_retrieve": 760,
+        "generate": 1,
+        "validate": 1062,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [1][3][5][6]",
+        "Run the router's channel scan and move the 2.4 GHz radio to the least congested channel (1, 6 or 11) [1][3][4][5]",
+        "Enable the 5 GHz band and connect nearby devices to it [3][4][5][6]",
+        "Move the router away from the TV, microwave and metal objects [3][4][6][7]",
+        "Update the router firmware to the latest version [3][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0040",
@@ -964,19 +1551,34 @@
       "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8729,
-      "decision": "REVIEW",
-      "latency_ms": 1404,
+      "intent_correct": 1.0,
+      "confidence": 0.9394,
+      "decision": "RESOLVE",
+      "latency_ms": 866,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 264,
-        "generate": 1,
-        "validate": 1087,
+        "embed": 181,
+        "understand_retrieve": 238,
+        "generate": 0,
+        "validate": 445,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [1][2][3][5]",
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2][3][5]",
+        "Make sure the phone software and carrier settings are up to date [1][2][6][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0041",
@@ -988,41 +1590,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9112,
+      "confidence": 0.9767,
       "decision": "RESOLVE",
-      "latency_ms": 1177,
+      "latency_ms": 1260,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 267,
+        "embed": 180,
+        "understand_retrieve": 309,
         "generate": 1,
-        "validate": 862,
+        "validate": 769,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses [2][3][4][5]",
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [8]",
+        "Add the static IP add-on to the account [2][3][4][5]",
+        "Ask the customer to restart the router to receive the static IP [1][3][4][5]",
+        "Suggest dynamic DNS as a free alternative [1][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0042",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8383,
+      "intent_correct": 1.0,
+      "confidence": 0.8631,
       "decision": "RESOLVE",
-      "latency_ms": 1001,
+      "latency_ms": 621,
       "stage_ms": {
-        "embed": 41,
-        "understand_retrieve": 215,
-        "generate": 1,
-        "validate": 742,
+        "embed": 131,
+        "understand_retrieve": 242,
+        "generate": 0,
+        "validate": 247,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [1][2][3][5]",
+        "Enable UPnP in the router settings [8]",
+        "Flush the DNS cache on the device (ipconfig /flushdns on Windows) [1][2][3][5]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8 [1]",
+        "Restart the router after changing DNS settings [1]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0043",
@@ -1034,18 +1666,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9416,
+      "confidence": 0.9649,
       "decision": "RESOLVE",
-      "latency_ms": 1105,
+      "latency_ms": 1001,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 245,
+        "embed": 177,
+        "understand_retrieve": 233,
         "generate": 0,
-        "validate": 808,
+        "validate": 588,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Identify the third-party service and its start date from the billing detail [1][4][5][6]",
+        "Check the cancellation request date and the date the service was actually ceased [7]",
+        "Raise a refund request for the disputed third-party charges [2][3][8]",
+        "Cancel the subscription and apply a premium services bar on the line [1][2][4][5]",
+        "Advise the customer to enable spending controls for children's phones [2][3][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0044",
@@ -1057,18 +1704,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.881,
+      "confidence": 0.9604,
       "decision": "RESOLVE",
-      "latency_ms": 880,
+      "latency_ms": 1062,
       "stage_ms": {
-        "embed": 44,
-        "understand_retrieve": 224,
-        "generate": 1,
-        "validate": 611,
+        "embed": 306,
+        "understand_retrieve": 357,
+        "generate": 0,
+        "validate": 396,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses [1][3][4][6]",
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [8]",
+        "Add the static IP add-on to the account [1][3][4][6]",
+        "Ask the customer to restart the router to receive the static IP [1][3][4][7]",
+        "Suggest dynamic DNS as a free alternative [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0045",
@@ -1080,18 +1742,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9112,
-      "decision": "REVIEW",
-      "latency_ms": 1179,
+      "confidence": 0.9087,
+      "decision": "RESOLVE",
+      "latency_ms": 1058,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 301,
+        "embed": 185,
+        "understand_retrieve": 270,
         "generate": 0,
-        "validate": 827,
+        "validate": 600,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [1][3][4][5]",
+        "Check the data usage against the plan's fair-usage allowance in the account [8]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet [1][3][4][5]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold [2][3][4][5]",
+        "Enable QoS on the router to prioritise video calls during peak hours [2][3][4][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0046",
@@ -1103,18 +1780,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8963,
+      "confidence": 0.9502,
       "decision": "RESOLVE",
-      "latency_ms": 1031,
+      "latency_ms": 747,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 220,
-        "generate": 1,
-        "validate": 760,
+        "embed": 184,
+        "understand_retrieve": 226,
+        "generate": 0,
+        "validate": 336,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses [1][4][5][6]",
+        "Enable UPnP in the router settings [8]",
+        "Add the static IP add-on to the account [1][4][5][6]",
+        "Ask the customer to restart the router to receive the static IP [1][2][3][5]",
+        "Suggest dynamic DNS as a free alternative [1][2][3][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0047",
@@ -1126,18 +1818,33 @@
       "n_steps": 5,
       "kb_retrieved": 0.0,
       "intent_correct": 0.0,
-      "confidence": 0.8329,
+      "confidence": 0.8971,
       "decision": "RESOLVE",
-      "latency_ms": 1166,
+      "latency_ms": 718,
       "stage_ms": {
-        "embed": 49,
-        "understand_retrieve": 202,
-        "generate": 0,
-        "validate": 914,
+        "embed": 205,
+        "understand_retrieve": 259,
+        "generate": 1,
+        "validate": 252,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied [1][2][3][4]",
+        "Check the negotiated link speed on the computer's network adapter (100 Mbps vs 1 Gbps) [8]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile [1][2][3][4]",
+        "Run a line check to confirm the synced speed [3][5][6][7]",
+        "If the profile is not applied, escalate to provisioning [3][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0048",
@@ -1149,18 +1856,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9156,
+      "confidence": 0.9445,
       "decision": "RESOLVE",
-      "latency_ms": 871,
+      "latency_ms": 650,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 235,
+        "embed": 151,
+        "understand_retrieve": 196,
         "generate": 0,
-        "validate": 588,
+        "validate": 301,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the customer's identity with security questions [1][2][3][4]",
+        "Forget the saved network on the device and reconnect with the new password [8]",
+        "Set the router security mode to WPA2/WPA3 mixed so older devices can join [8]",
+        "Unlock the account and send a password reset link [1][2][3][4]",
+        "Update the recovery email or mobile number if it is outdated [1][2][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0049",
@@ -1172,18 +1894,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9147,
+      "confidence": 0.9167,
       "decision": "RESOLVE",
-      "latency_ms": 1030,
+      "latency_ms": 1120,
       "stage_ms": {
-        "embed": 34,
-        "understand_retrieve": 186,
-        "generate": 1,
-        "validate": 808,
+        "embed": 124,
+        "understand_retrieve": 279,
+        "generate": 0,
+        "validate": 715,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray and restart [1][2][3][4]",
+        "Check the SIM order status and whether identity verification is pending [8]",
+        "Test the SIM in another phone to isolate SIM versus handset [1][2][3][4]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number [5][6][7]",
+        "If the SIM works elsewhere, refer the handset for repair [6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0050",
@@ -1193,20 +1930,35 @@
       "reference_step_recall": 0.5,
       "step_precision": 0.4,
       "n_steps": 5,
-      "kb_retrieved": 1.0,
+      "kb_retrieved": 0.0,
       "intent_correct": 1.0,
-      "confidence": 0.8901,
+      "confidence": 0.9086,
       "decision": "RESOLVE",
-      "latency_ms": 1097,
+      "latency_ms": 1171,
       "stage_ms": {
-        "embed": 56,
-        "understand_retrieve": 318,
-        "generate": 1,
-        "validate": 720,
+        "embed": 210,
+        "understand_retrieve": 262,
+        "generate": 0,
+        "validate": 697,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [1][2][4][5]",
+        "Check the negotiated link speed on the computer's network adapter (100 Mbps vs 1 Gbps) [3][6]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet [1][2][4][5]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold [1][2][4][5]",
+        "Enable QoS on the router to prioritise video calls during peak hours [4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0051",
@@ -1217,19 +1969,34 @@
       "step_precision": 0.0,
       "n_steps": 5,
       "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8875,
+      "intent_correct": 1.0,
+      "confidence": 0.869,
       "decision": "RESOLVE",
-      "latency_ms": 1157,
+      "latency_ms": 912,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 226,
+        "embed": 165,
+        "understand_retrieve": 235,
         "generate": 1,
-        "validate": 881,
+        "validate": 510,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Place the router upright in a ventilated spot, not in a cabinet or on other electronics [2][3][4][5]",
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [7]",
+        "Check the router's event log for thermal or power-related restarts [2][3][4][5]",
+        "Update the router firmware [2][3][5]",
+        "If reboots continue, replace the router and power adapter [2][3][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0052",
@@ -1240,19 +2007,34 @@
       "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8549,
-      "decision": "RESOLVE",
-      "latency_ms": 1323,
+      "intent_correct": 1.0,
+      "confidence": 0.8869,
+      "decision": "REVIEW",
+      "latency_ms": 1463,
       "stage_ms": {
-        "embed": 58,
-        "understand_retrieve": 287,
+        "embed": 219,
+        "understand_retrieve": 292,
         "generate": 1,
-        "validate": 975,
+        "validate": 949,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it [2][4][5][6]",
+        "Try a different LAN port and a known-good ethernet cable [8]",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end [2][3][4][5]",
+        "Check the outage map for a fibre fault in the area [2][3][4][5]",
+        "If LOS stays red, raise a fibre fault and dispatch a field engineer [3][5][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0053",
@@ -1264,18 +2046,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9333,
+      "confidence": 0.962,
       "decision": "REVIEW",
-      "latency_ms": 989,
+      "latency_ms": 805,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 294,
-        "generate": 1,
-        "validate": 641,
+        "embed": 206,
+        "understand_retrieve": 236,
+        "generate": 0,
+        "validate": 361,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the account for an expired promotional discount [1][2][3][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Explain that the introductory offer has ended and the plan returned to the standard price [1][2][3][5]",
+        "Offer the current retention deals or a cheaper plan that matches usage [2][3][5][6]",
+        "Confirm the customer received the end-of-offer notification and note it on the account [2][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0054",
@@ -1287,18 +2084,33 @@
       "n_steps": 5,
       "kb_retrieved": 0.0,
       "intent_correct": 1.0,
-      "confidence": 0.8106,
+      "confidence": 0.844,
       "decision": "RESOLVE",
-      "latency_ms": 905,
+      "latency_ms": 626,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 212,
-        "generate": 1,
-        "validate": 644,
+        "embed": 154,
+        "understand_retrieve": 177,
+        "generate": 0,
+        "validate": 292,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the payment failure reason code [1][2][4][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Update the card or bank details on the account [1][2][4][5]",
+        "Take a one-off payment for the outstanding balance [1][2][3][4]",
+        "Waive the late fee as a one-time courtesy if it was the first failure [1][2][3][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0055",
@@ -1310,41 +2122,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.7368,
-      "decision": "REVIEW",
-      "latency_ms": 962,
+      "confidence": 0.8875,
+      "decision": "RESOLVE",
+      "latency_ms": 865,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 193,
-        "generate": 1,
-        "validate": 720,
+        "embed": 148,
+        "understand_retrieve": 196,
+        "generate": 0,
+        "validate": 520,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the account holder's identity [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [7]",
+        "Cancel the subscription and apply a premium services bar on the line [7]",
+        "Check the plan's maximum lines and shared data options [1][2][3][4]",
+        "Add the new line and send a SIM or eSIM [1][2][3][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0056",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
+      "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8444,
+      "confidence": 0.8725,
       "decision": "RESOLVE",
-      "latency_ms": 719,
+      "latency_ms": 839,
       "stage_ms": {
-        "embed": 33,
-        "understand_retrieve": 191,
-        "generate": 1,
-        "validate": 492,
+        "embed": 121,
+        "understand_retrieve": 177,
+        "generate": 0,
+        "validate": 540,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Place the router upright in a ventilated spot, not in a cabinet or on other electronics [1][4][5][6]",
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [8]",
+        "Check the router's event log for thermal or power-related restarts [1][4][5][6]",
+        "Update the router firmware [1][3][4][5]",
+        "If reboots continue, replace the router and power adapter [1][3][4][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0057",
@@ -1356,41 +2198,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9372,
+      "confidence": 0.933,
       "decision": "RESOLVE",
-      "latency_ms": 943,
+      "latency_ms": 808,
       "stage_ms": {
-        "embed": 42,
-        "understand_retrieve": 189,
+        "embed": 140,
+        "understand_retrieve": 191,
         "generate": 0,
-        "validate": 710,
+        "validate": 475,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray and restart [1][2][3][4]",
+        "Check the SIM order status and whether identity verification is pending [8]",
+        "Test the SIM in another phone to isolate SIM versus handset [1][2][3][4]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number [1][2][3][5]",
+        "If the SIM works elsewhere, refer the handset for repair [2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0058",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 1.0,
+      "step_precision": 1.0,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.9121,
+      "intent_correct": 1.0,
+      "confidence": 0.8881,
       "decision": "RESOLVE",
-      "latency_ms": 1076,
+      "latency_ms": 1081,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 268,
-        "generate": 1,
-        "validate": 756,
+        "embed": 145,
+        "understand_retrieve": 299,
+        "generate": 0,
+        "validate": 635,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [1][2][3][4]",
+        "Try a different LAN port and a known-good ethernet cable [8]",
+        "Flush the DNS cache on the device (ipconfig /flushdns on Windows) [1][2][3][4]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8 [1][2][5][6]",
+        "Restart the router after changing DNS settings [1][2]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0059",
@@ -1398,22 +2270,37 @@
       "citation_coverage": 1.0,
       "groundedness": 1.0,
       "reference_step_recall": 0.75,
-      "step_precision": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.7776,
+      "intent_correct": 1.0,
+      "confidence": 0.8705,
       "decision": "RESOLVE",
-      "latency_ms": 1069,
+      "latency_ms": 834,
       "stage_ms": {
-        "embed": 44,
-        "understand_retrieve": 244,
+        "embed": 216,
+        "understand_retrieve": 211,
         "generate": 0,
-        "validate": 778,
+        "validate": 405,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the account holder's identity [1][2][3][4]",
+        "Identify the third-party service and its start date from the billing detail [7]",
+        "Cancel the subscription and apply a premium services bar on the line [7]",
+        "Check the plan's maximum lines and shared data options [1][2][3][4]",
+        "Add the new line and send a SIM or eSIM [2][4][5][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0060",
@@ -1425,18 +2312,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9468,
+      "confidence": 0.9661,
       "decision": "RESOLVE",
-      "latency_ms": 974,
+      "latency_ms": 882,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 198,
+        "embed": 157,
+        "understand_retrieve": 253,
         "generate": 0,
-        "validate": 729,
+        "validate": 470,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the data usage against the plan's fair-usage allowance in the account [1][2][3][5]",
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [8]",
+        "Explain that speeds are reduced after the allowance until the bill cycle resets [1][2][3][4]",
+        "Offer a data add-on or a higher-allowance plan [1][2][3][4]",
+        "Set up usage alerts so the customer is notified at 80% of the allowance [1][2][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0061",
@@ -1448,18 +2350,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9161,
+      "confidence": 0.9449,
       "decision": "REVIEW",
-      "latency_ms": 869,
+      "latency_ms": 706,
       "stage_ms": {
-        "embed": 38,
-        "understand_retrieve": 200,
+        "embed": 146,
+        "understand_retrieve": 185,
         "generate": 0,
-        "validate": 630,
+        "validate": 373,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Advise the customer to keep clear of the fallen cable and not touch it [2][3][4][5]",
+        "Check the network status page for mast outages near the customer's postcode [8]",
+        "Raise an urgent line damage fault for field repair [2][3][4][5]",
+        "Share the incident reference and estimated restoration time [8]",
+        "Offer a mobile hotspot until the line is repaired [2][3][4][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0062",
@@ -1471,18 +2388,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8701,
+      "confidence": 0.9114,
       "decision": "RESOLVE",
-      "latency_ms": 1022,
+      "latency_ms": 978,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 274,
+        "embed": 239,
+        "understand_retrieve": 297,
         "generate": 0,
-        "validate": 700,
+        "validate": 440,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [1][2][3][4]",
+        "Check the coverage map for the customer's address [8]",
+        "Connect the modem to the master socket using the test socket to bypass internal wiring [1][2][3][4]",
+        "Run a remote line test from the support system to check for noise and line faults [1][2][4][7]",
+        "If the line test fails, book an engineer visit to repair the line [1][2][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0063",
@@ -1494,18 +2426,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9111,
+      "confidence": 0.9322,
       "decision": "RESOLVE",
-      "latency_ms": 909,
+      "latency_ms": 463,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 220,
-        "generate": 1,
-        "validate": 638,
+        "embed": 158,
+        "understand_retrieve": 204,
+        "generate": 0,
+        "validate": 99,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray and restart [1][2][3][4]",
+        "Check the SIM order status and whether identity verification is pending [8]",
+        "Test the SIM in another phone to isolate SIM versus handset [1][2][3][4]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number [1][3][6][7]",
+        "If the SIM works elsewhere, refer the handset for repair [6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0064",
@@ -1517,41 +2464,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8995,
+      "confidence": 0.9153,
       "decision": "RESOLVE",
-      "latency_ms": 962,
+      "latency_ms": 866,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 243,
+        "embed": 147,
+        "understand_retrieve": 196,
         "generate": 0,
-        "validate": 666,
+        "validate": 521,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Use IMAP server mail.example-telco.com on port 993 with SSL [1][2][3][4]",
+        "Activate voicemail on the line from the account system [8]",
+        "Set call diversion on no answer to the voicemail number [8]",
+        "Use SMTP server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled [1][2][3][4]",
+        "Reset the email password from the account portal if authentication keeps failing [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0065",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 0.0,
       "intent_correct": 1.0,
-      "confidence": 0.8624,
+      "confidence": 0.8935,
       "decision": "RESOLVE",
-      "latency_ms": 766,
+      "latency_ms": 669,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 201,
-        "generate": 1,
-        "validate": 518,
+        "embed": 188,
+        "understand_retrieve": 212,
+        "generate": 0,
+        "validate": 267,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Use IMAP server mail.example-telco.com on port 993 with SSL [1][2][5][6]",
+        "Activate voicemail on the line from the account system [7]",
+        "Set call diversion on no answer to the voicemail number [7]",
+        "Use SMTP server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled [1][2][4][5]",
+        "Reset the email password from the account portal if authentication keeps failing [4][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0066",
@@ -1563,18 +2540,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8269,
+      "confidence": 0.8066,
       "decision": "RESOLVE",
-      "latency_ms": 1266,
+      "latency_ms": 813,
       "stage_ms": {
-        "embed": 41,
-        "understand_retrieve": 191,
-        "generate": 1,
-        "validate": 1032,
+        "embed": 131,
+        "understand_retrieve": 138,
+        "generate": 0,
+        "validate": 542,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the current account holder or the bereavement documentation [2][3][4][6]",
+        "Check the contract end date and downgrade eligibility [8]",
+        "Explain the downgrade options available now and from the contract end date [8]",
+        "Collect the new holder's identity and payment details [1][2][3][4]",
+        "Complete the transfer of ownership without interrupting service [1][2][4][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0067",
@@ -1586,18 +2578,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.938,
+      "confidence": 0.9705,
       "decision": "RESOLVE",
-      "latency_ms": 1170,
+      "latency_ms": 980,
       "stage_ms": {
-        "embed": 56,
-        "understand_retrieve": 294,
+        "embed": 213,
+        "understand_retrieve": 244,
         "generate": 0,
-        "validate": 818,
+        "validate": 521,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased [1][3][4][5]",
+        "Check the account for an expired promotional discount [8]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit [1][3][4][5]",
+        "Explain any legitimate final pro-rata charges or notice-period fees [1][3][4][5]",
+        "Confirm the account is closed and send written confirmation [1][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0068",
@@ -1609,18 +2616,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8044,
+      "confidence": 0.8776,
       "decision": "RESOLVE",
-      "latency_ms": 980,
+      "latency_ms": 1675,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 227,
+        "embed": 311,
+        "understand_retrieve": 650,
         "generate": 1,
-        "validate": 699,
+        "validate": 711,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Enable UPnP in the router settings [3][4][5][6]",
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [8]",
+        "Give the console a reserved IP address in the router DHCP settings [3][4][5][6]",
+        "Forward the game's required ports to the console's reserved IP [3][5][7]",
+        "Restart the console and re-test the NAT type [3][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0069",
@@ -1632,18 +2654,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9019,
+      "confidence": 0.9057,
       "decision": "RESOLVE",
-      "latency_ms": 964,
+      "latency_ms": 761,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 241,
-        "generate": 1,
-        "validate": 673,
+        "embed": 178,
+        "understand_retrieve": 229,
+        "generate": 0,
+        "validate": 353,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Power off the phone, reseat the SIM in the tray and restart [1][2][3][4]",
+        "Check the SIM order status and whether identity verification is pending [8]",
+        "Test the SIM in another phone to isolate SIM versus handset [1][2][3][4]",
+        "If the SIM fails in other phones, issue a replacement SIM and keep the same number [1][2][4][5]",
+        "If the SIM works elsewhere, refer the handset for repair [4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0070",
@@ -1655,18 +2692,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8921,
+      "confidence": 0.9031,
       "decision": "RESOLVE",
-      "latency_ms": 961,
+      "latency_ms": 1042,
       "stage_ms": {
-        "embed": 41,
-        "understand_retrieve": 211,
+        "embed": 223,
+        "understand_retrieve": 273,
         "generate": 0,
-        "validate": 708,
+        "validate": 544,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [1][2][3][4]",
+        "Check the data usage against the plan's fair-usage allowance in the account [8]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet [1][2][3][4]",
+        "Raise a congestion ticket with the network team if utilisation is above threshold [2][4][6][7]",
+        "Enable QoS on the router to prioritise video calls during peak hours [2][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0071",
@@ -1674,22 +2726,37 @@
       "citation_coverage": 1.0,
       "groundedness": 1.0,
       "reference_step_recall": 1.0,
-      "step_precision": 0.8,
+      "step_precision": 0.4,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8106,
+      "confidence": 0.8753,
       "decision": "RESOLVE",
-      "latency_ms": 948,
+      "latency_ms": 1111,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 234,
+        "embed": 162,
+        "understand_retrieve": 259,
         "generate": 0,
-        "validate": 669,
+        "validate": 688,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the account for an expired promotional discount [3][4][5][6]",
+        "Check the contract end date and downgrade eligibility [2][7]",
+        "Explain that the introductory offer has ended and the plan returned to the standard price [1][3][4][5]",
+        "Offer the current retention deals or a cheaper plan that matches usage [1][3][6]",
+        "Confirm the customer received the end-of-offer notification and note it on the account [1][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0072",
@@ -1701,18 +2768,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8098,
+      "confidence": 0.8616,
       "decision": "RESOLVE",
-      "latency_ms": 1247,
+      "latency_ms": 1005,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 229,
+        "embed": 192,
+        "understand_retrieve": 192,
         "generate": 0,
-        "validate": 970,
+        "validate": 620,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Forget the saved network on the device and reconnect with the new password [2][3][4][5]",
+        "Log in to the router admin page using the default credentials on the label [8]",
+        "Set the router security mode to WPA2/WPA3 mixed so older devices can join [1][2][3][4]",
+        "Check the router's MAC filter or blocked devices list [1][4][5][6]",
+        "Update the device's network drivers or firmware [4][5]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0073",
@@ -1724,64 +2806,109 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9385,
+      "confidence": 0.9624,
       "decision": "RESOLVE",
-      "latency_ms": 894,
+      "latency_ms": 962,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 267,
-        "generate": 1,
-        "validate": 577,
+        "embed": 145,
+        "understand_retrieve": 208,
+        "generate": 0,
+        "validate": 607,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased [1][4][5][6]",
+        "Check the account for an expired promotional discount [8]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit [1][3][4][5]",
+        "Explain any legitimate final pro-rata charges or notice-period fees [1][3][4][5]",
+        "Confirm the account is closed and send written confirmation [3][4][5][6]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0074",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.7724,
-      "decision": "REVIEW",
-      "latency_ms": 1017,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8357,
+      "decision": "RESOLVE",
+      "latency_ms": 638,
       "stage_ms": {
-        "embed": 46,
-        "understand_retrieve": 229,
-        "generate": 1,
-        "validate": 739,
+        "embed": 173,
+        "understand_retrieve": 195,
+        "generate": 0,
+        "validate": 268,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Try a different LAN port and a known-good ethernet cable [1][2][7]",
+        "Confirm the wall socket works and the power adapter is firmly connected [8]",
+        "Test with a compatible replacement power adapter if available [8]",
+        "Check the computer's network adapter is enabled and drivers are current [1][2][7]",
+        "If multiple ports fail, replace the router [1][2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0075",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.6666666666666666,
-      "step_precision": 0.4,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8063,
-      "decision": "REVIEW",
-      "latency_ms": 817,
+      "intent_correct": 1.0,
+      "confidence": 0.8653,
+      "decision": "RESOLVE",
+      "latency_ms": 922,
       "stage_ms": {
-        "embed": 57,
-        "understand_retrieve": 265,
+        "embed": 201,
+        "understand_retrieve": 237,
         "generate": 0,
-        "validate": 493,
+        "validate": 483,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify the customer's identity with security questions [1][2][3][4]",
+        "Log in to the router admin page using the default credentials on the label [8]",
+        "Re-enter the broadband PPPoE username and password from the account [8]",
+        "Unlock the account and send a password reset link [1][2][3][4]",
+        "Update the recovery email or mobile number if it is outdated [3][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0076",
@@ -1793,18 +2920,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9081,
+      "confidence": 0.9,
       "decision": "RESOLVE",
-      "latency_ms": 970,
+      "latency_ms": 590,
       "stage_ms": {
-        "embed": 52,
-        "understand_retrieve": 226,
-        "generate": 1,
-        "validate": 689,
+        "embed": 277,
+        "understand_retrieve": 219,
+        "generate": 0,
+        "validate": 93,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Enable UPnP in the router settings [3][4][5][6]",
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [8]",
+        "Give the console a reserved IP address in the router DHCP settings [3][4][5][6]",
+        "Forward the game's required ports to the console's reserved IP [4][5][7]",
+        "Restart the console and re-test the NAT type [5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0077",
@@ -1815,19 +2957,34 @@
       "step_precision": 0.0,
       "n_steps": 5,
       "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.817,
+      "intent_correct": 1.0,
+      "confidence": 0.7739,
       "decision": "RESOLVE",
-      "latency_ms": 824,
+      "latency_ms": 620,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 223,
+        "embed": 144,
+        "understand_retrieve": 191,
         "generate": 0,
-        "validate": 555,
+        "validate": 284,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Log in to the router admin page using the default credentials on the label [2][4][5][7]",
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it [1][3]",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end [1][3]",
+        "Re-enter the broadband PPPoE username and password from the account [2][4][5][7]",
+        "Set the WAN VLAN ID required by the network if using a third-party router [2][4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0078",
@@ -1839,18 +2996,33 @@
       "n_steps": 5,
       "kb_retrieved": 0.0,
       "intent_correct": 0.0,
-      "confidence": 0.8195,
+      "confidence": 0.7983,
       "decision": "REVIEW",
-      "latency_ms": 755,
+      "latency_ms": 795,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 211,
-        "generate": 1,
-        "validate": 494,
+        "embed": 160,
+        "understand_retrieve": 184,
+        "generate": 0,
+        "validate": 448,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the network status page for mast outages near the customer's postcode [1][2][3][4]",
+        "Check the coverage map for the customer's address [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [8]",
+        "Share the incident reference and estimated restoration time [1][2][3][4]",
+        "Enable Wi-Fi Calling as a workaround if the customer has broadband [3][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0079",
@@ -1862,18 +3034,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8925,
+      "confidence": 0.9109,
       "decision": "REVIEW",
-      "latency_ms": 973,
+      "latency_ms": 873,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 257,
+        "embed": 230,
+        "understand_retrieve": 275,
         "generate": 0,
-        "validate": 667,
+        "validate": 367,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange [1][2][3][4]",
+        "Run a wired speed test at peak and off-peak times to confirm the slowdown is network-side [8]",
+        "Check the network capacity dashboard for congestion on the customer's cabinet [8]",
+        "Confirm the maintenance window and expected completion date [1][2][3][4]",
+        "Sign the customer up for maintenance notifications [3][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0080",
@@ -1885,18 +3072,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9048,
+      "confidence": 0.9026,
       "decision": "RESOLVE",
-      "latency_ms": 964,
+      "latency_ms": 675,
       "stage_ms": {
-        "embed": 41,
-        "understand_retrieve": 176,
-        "generate": 1,
-        "validate": 744,
+        "embed": 115,
+        "understand_retrieve": 179,
+        "generate": 0,
+        "validate": 380,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the planned maintenance schedule for the customer's exchange [1][2][3][5]",
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [8]",
+        "Run the router's channel scan and move the 2.4 GHz radio to the least congested channel (1, 6 or 11) [8]",
+        "Confirm the maintenance window and expected completion date [1][2][3][4]",
+        "Sign the customer up for maintenance notifications [3][4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0081",
@@ -1908,18 +3110,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9069,
+      "confidence": 0.9167,
       "decision": "RESOLVE",
-      "latency_ms": 1063,
+      "latency_ms": 793,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 233,
-        "generate": 1,
-        "validate": 780,
+        "embed": 235,
+        "understand_retrieve": 251,
+        "generate": 0,
+        "validate": 305,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Identify the third-party service and its start date from the billing detail [1][3][4][5]",
+        "Check the cancellation request date and the date the service was actually ceased [8]",
+        "Cancel the subscription and apply a premium services bar on the line [1][2][3][4]",
+        "Raise a refund request for the disputed third-party charges [1][2][5][6]",
+        "Advise the customer to enable spending controls for children's phones [5][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0082",
@@ -1931,41 +3148,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9007,
+      "confidence": 0.9167,
       "decision": "RESOLVE",
-      "latency_ms": 1010,
+      "latency_ms": 779,
       "stage_ms": {
-        "embed": 46,
-        "understand_retrieve": 218,
+        "embed": 180,
+        "understand_retrieve": 230,
         "generate": 0,
-        "validate": 745,
-        "decide": 0
+        "validate": 366,
+        "decide": 1
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Verify both transactions in the payments ledger and confirm they are for the same invoice [1][2][3][5]",
+        "Check the payment failure reason code [8]",
+        "Raise a refund for the duplicate payment to the original payment method [1][2][3][5]",
+        "Tell the customer refunds take 5-7 working days to appear [1][2][5][6]",
+        "Offer a goodwill credit if the customer incurred bank charges [1][2][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0083",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.5,
-      "step_precision": 0.4,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.87,
+      "confidence": 0.9159,
       "decision": "RESOLVE",
-      "latency_ms": 1213,
+      "latency_ms": 859,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 422,
-        "generate": 1,
-        "validate": 746,
+        "embed": 290,
+        "understand_retrieve": 244,
+        "generate": 0,
+        "validate": 324,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication [1][2][3][4]",
+        "Check the SIM order status and whether identity verification is pending [8]",
+        "Update the number after identity verification if it is outdated [1][2][3][4]",
+        "Offer email or authenticator-app verification as an alternative [4][5][7]",
+        "Check for SMS blocking or spam filtering on the handset [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0084",
@@ -1977,41 +3224,71 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8478,
+      "confidence": 0.9307,
       "decision": "RESOLVE",
-      "latency_ms": 1036,
+      "latency_ms": 572,
       "stage_ms": {
-        "embed": 34,
-        "understand_retrieve": 194,
-        "generate": 1,
-        "validate": 806,
+        "embed": 122,
+        "understand_retrieve": 183,
+        "generate": 0,
+        "validate": 265,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the upgrade order is complete and the new speed profile is applied [1][2][3][4]",
+        "Check the negotiated link speed on the computer's network adapter (100 Mbps vs 1 Gbps) [8]",
+        "Ask the customer to restart the router so the line re-syncs at the new profile [1][2][3][4]",
+        "Run a line check to confirm the synced speed [4][5][6][7]",
+        "If the profile is not applied, escalate to provisioning [5][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0085",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.75,
-      "step_precision": 0.6,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9241,
+      "confidence": 0.945,
       "decision": "REVIEW",
-      "latency_ms": 1108,
+      "latency_ms": 1228,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 234,
+        "embed": 179,
+        "understand_retrieve": 204,
         "generate": 0,
-        "validate": 827,
+        "validate": 843,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the port request status and any rejection reason [1][2][4][5]",
+        "Check the coverage map for the customer's address [8]",
+        "Verify the PAC or porting code is valid, unexpired and matches the number [1][2][3][4]",
+        "Resubmit the port request with corrected details [1][3][6][7]",
+        "Tell the customer the port completes within one working day of a valid request [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0086",
@@ -2019,22 +3296,37 @@
       "citation_coverage": 1.0,
       "groundedness": 1.0,
       "reference_step_recall": 1.0,
-      "step_precision": 0.6,
+      "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 0.0,
-      "confidence": 0.8156,
+      "confidence": 0.8416,
       "decision": "RESOLVE",
-      "latency_ms": 969,
+      "latency_ms": 790,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 238,
+        "embed": 148,
+        "understand_retrieve": 220,
         "generate": 0,
-        "validate": 687,
+        "validate": 420,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the contract end date and downgrade eligibility [2][3][4][6]",
+        "Check the account for an expired promotional discount [1][5][8]",
+        "Explain the downgrade options available now and from the contract end date [2][3][4][6]",
+        "Offer usage-matched add-on removal or retention discounts to reduce cost [2][4][6][7]",
+        "Schedule the downgrade for the earliest eligible date if the customer agrees [2][4][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0087",
@@ -2045,42 +3337,72 @@
       "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8121,
+      "intent_correct": 1.0,
+      "confidence": 0.8905,
       "decision": "RESOLVE",
-      "latency_ms": 1349,
+      "latency_ms": 756,
       "stage_ms": {
-        "embed": 43,
-        "understand_retrieve": 269,
-        "generate": 0,
-        "validate": 1035,
+        "embed": 255,
+        "understand_retrieve": 211,
+        "generate": 1,
+        "validate": 289,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [1][2][8]",
+        "Check the data usage against the plan's fair-usage allowance in the account [3][4][5][7]",
+        "Explain that speeds are reduced after the allowance until the bill cycle resets [3][4][5][6]",
+        "Install the latest carrier settings and phone software update [1][2][8]",
+        "Check that the SIM is 5G-enabled and replace older SIMs [1][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0088",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.0,
-      "step_precision": 0.0,
+      "reference_step_recall": 0.5,
+      "step_precision": 0.4,
       "n_steps": 5,
-      "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8307,
+      "kb_retrieved": 1.0,
+      "intent_correct": 1.0,
+      "confidence": 0.8783,
       "decision": "RESOLVE",
-      "latency_ms": 1138,
+      "latency_ms": 528,
       "stage_ms": {
-        "embed": 49,
-        "understand_retrieve": 306,
-        "generate": 1,
-        "validate": 781,
+        "embed": 194,
+        "understand_retrieve": 230,
+        "generate": 0,
+        "validate": 102,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the data usage against the plan's fair-usage allowance in the account [1][2][4][6]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [5][8]",
+        "Install the latest carrier settings and phone software update [5][8]",
+        "Explain that speeds are reduced after the allowance until the bill cycle resets [1][2][3][4]",
+        "Offer a data add-on or a higher-allowance plan [3][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0089",
@@ -2092,18 +3414,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.8909,
+      "confidence": 0.9543,
       "decision": "RESOLVE",
-      "latency_ms": 922,
+      "latency_ms": 894,
       "stage_ms": {
-        "embed": 44,
-        "understand_retrieve": 229,
+        "embed": 239,
+        "understand_retrieve": 354,
         "generate": 0,
-        "validate": 648,
+        "validate": 299,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Explain the difference between dynamic and static IP addresses [1][2][3][4]",
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [8]",
+        "Add the static IP add-on to the account [1][2][3][4]",
+        "Ask the customer to restart the router to receive the static IP [1][2][3][5]",
+        "Suggest dynamic DNS as a free alternative [7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0090",
@@ -2115,18 +3452,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9405,
+      "confidence": 0.9931,
       "decision": "RESOLVE",
-      "latency_ms": 883,
+      "latency_ms": 722,
       "stage_ms": {
-        "embed": 38,
-        "understand_retrieve": 224,
+        "embed": 148,
+        "understand_retrieve": 250,
         "generate": 0,
-        "validate": 620,
+        "validate": 322,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the mobile number registered for two-factor authentication [1][2][3][4]",
+        "Check the port request status and any rejection reason [8]",
+        "Update the number after identity verification if it is outdated [1][2][3][4]",
+        "Offer email or authenticator-app verification as an alternative [2][6][7]",
+        "Check for SMS blocking or spam filtering on the handset [2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0091",
@@ -2138,18 +3490,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9322,
+      "confidence": 0.9534,
       "decision": "RESOLVE",
-      "latency_ms": 884,
+      "latency_ms": 472,
       "stage_ms": {
-        "embed": 34,
-        "understand_retrieve": 181,
+        "embed": 134,
+        "understand_retrieve": 164,
         "generate": 0,
-        "validate": 668,
+        "validate": 172,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the cancellation request date and the date the service was actually ceased [1][2][3][6]",
+        "Check the account for an expired promotional discount [8]",
+        "If billed past the cancellation date, credit the charges and cancel the direct debit [1][2][3][6]",
+        "Explain any legitimate final pro-rata charges or notice-period fees [1][2][3][6]",
+        "Confirm the account is closed and send written confirmation [1][3][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0092",
@@ -2161,18 +3528,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9341,
+      "confidence": 0.9164,
       "decision": "RESOLVE",
-      "latency_ms": 1056,
+      "latency_ms": 977,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 253,
+        "embed": 157,
+        "understand_retrieve": 208,
         "generate": 0,
-        "validate": 753,
+        "validate": 610,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Activate voicemail on the line from the account system [2][3][4][5]",
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [8]",
+        "Connect the modem to the master socket using the test socket to bypass internal wiring [8]",
+        "Set call diversion on no answer to the voicemail number [1][2][3][4]",
+        "Reset the voicemail PIN and send it by SMS [1][4][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0093",
@@ -2184,18 +3566,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9276,
+      "confidence": 0.9275,
       "decision": "RESOLVE",
-      "latency_ms": 1278,
+      "latency_ms": 525,
       "stage_ms": {
-        "embed": 46,
-        "understand_retrieve": 555,
-        "generate": 1,
-        "validate": 675,
+        "embed": 203,
+        "understand_retrieve": 217,
+        "generate": 0,
+        "validate": 104,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Activate voicemail on the line from the account system [1][2][3][4]",
+        "Fit a microfilter on every phone socket that has a phone or device plugged in [8]",
+        "Connect the modem to the master socket using the test socket to bypass internal wiring [8]",
+        "Set call diversion on no answer to the voicemail number [1][2][3][4]",
+        "Reset the voicemail PIN and send it by SMS [1][4][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0094",
@@ -2206,19 +3603,34 @@
       "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8459,
-      "decision": "RESOLVE",
-      "latency_ms": 1118,
+      "intent_correct": 1.0,
+      "confidence": 0.9111,
+      "decision": "REVIEW",
+      "latency_ms": 678,
       "stage_ms": {
-        "embed": 51,
-        "understand_retrieve": 261,
+        "embed": 193,
+        "understand_retrieve": 239,
         "generate": 0,
-        "validate": 804,
+        "validate": 244,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the thin fibre cable into the ONT for sharp bends, kinks or pinching and straighten it [2][3][5][6]",
+        "Try a different LAN port and a known-good ethernet cable [8]",
+        "Make sure the green fibre connector is fully clicked into the ONT port without touching the fibre end [2][3][4][5]",
+        "Check the outage map for a fibre fault in the area [2][3][4][5]",
+        "If LOS stays red, raise a fibre fault and dispatch a field engineer [4][5][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0095",
@@ -2230,18 +3642,33 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9153,
+      "confidence": 0.9459,
       "decision": "RESOLVE",
-      "latency_ms": 925,
+      "latency_ms": 694,
       "stage_ms": {
-        "embed": 37,
-        "understand_retrieve": 191,
+        "embed": 137,
+        "understand_retrieve": 177,
         "generate": 0,
-        "validate": 695,
+        "validate": 379,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [1][2][4][5]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2][4][5]",
+        "Make sure the phone software and carrier settings are up to date [1][4][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible [1][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0096",
@@ -2252,19 +3679,34 @@
       "step_precision": 0.8,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8491,
+      "intent_correct": 1.0,
+      "confidence": 0.9237,
       "decision": "REVIEW",
-      "latency_ms": 1130,
+      "latency_ms": 887,
       "stage_ms": {
-        "embed": 47,
-        "understand_retrieve": 258,
+        "embed": 254,
+        "understand_retrieve": 281,
         "generate": 0,
-        "validate": 823,
+        "validate": 350,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check the coverage map for the customer's address [1][2][5][6]",
+        "Check the network status page for mast outages near the customer's postcode [8]",
+        "Enable Wi-Fi Calling on the handset so calls route over home broadband [1][2][4][5]",
+        "Make sure the phone software and carrier settings are up to date [2][4][5][7]",
+        "Offer an indoor signal booster or femtocell if Wi-Fi Calling is not possible [2][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0097",
@@ -2275,42 +3717,72 @@
       "step_precision": 1.0,
       "n_steps": 5,
       "kb_retrieved": 1.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8349,
+      "intent_correct": 1.0,
+      "confidence": 0.8392,
       "decision": "RESOLVE",
-      "latency_ms": 967,
+      "latency_ms": 1082,
       "stage_ms": {
-        "embed": 48,
-        "understand_retrieve": 261,
+        "embed": 159,
+        "understand_retrieve": 287,
         "generate": 0,
-        "validate": 657,
+        "validate": 634,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the drops only affect Wi-Fi by testing a device on an ethernet cable [1][3][4][5]",
+        "Run the router's channel scan and move the 2.4 GHz radio to the least congested channel (1, 6 or 11) [1][2][3][4]",
+        "Enable the 5 GHz band and connect nearby devices to it [1][2][3][4]",
+        "Move the router away from the TV, microwave and metal objects [1][2][3][4]",
+        "Update the router firmware to the latest version [2][3][4][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0098",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.6666666666666666,
-      "step_precision": 0.4,
+      "reference_step_recall": 1.0,
+      "step_precision": 0.6,
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9045,
+      "confidence": 0.9065,
       "decision": "RESOLVE",
-      "latency_ms": 1102,
+      "latency_ms": 843,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 259,
-        "generate": 1,
-        "validate": 791,
+        "embed": 192,
+        "understand_retrieve": 239,
+        "generate": 0,
+        "validate": 411,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Check that the 5G service flag is provisioned on the line [1][2][3][5]",
+        "Set the phone's preferred network type to 5G/Auto in mobile network settings [7]",
+        "Install the latest carrier settings and phone software update [7]",
+        "Re-provision the 5G service if missing [1][2][3][4]",
+        "Ask the customer to restart the handset to refresh network registration [2][4][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0099",
@@ -2322,41 +3794,733 @@
       "n_steps": 5,
       "kb_retrieved": 1.0,
       "intent_correct": 1.0,
-      "confidence": 0.9127,
+      "confidence": 0.9431,
       "decision": "RESOLVE",
-      "latency_ms": 929,
+      "latency_ms": 588,
       "stage_ms": {
-        "embed": 45,
-        "understand_retrieve": 225,
+        "embed": 136,
+        "understand_retrieve": 208,
         "generate": 0,
-        "validate": 658,
+        "validate": 243,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Use IMAP server mail.example-telco.com on port 993 with SSL [1][2][3][4]",
+        "Activate voicemail on the line from the account system [8]",
+        "Set call diversion on no answer to the voicemail number [8]",
+        "Use SMTP server smtp.example-telco.com on port 587 with STARTTLS and authentication enabled [1][2][3][4]",
+        "Reset the email password from the account portal if authentication keeps failing [2][5][6][7]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
     },
     {
       "id": "GEN-0100",
       "citation_accuracy": 1.0,
       "citation_coverage": 1.0,
       "groundedness": 1.0,
-      "reference_step_recall": 0.25,
-      "step_precision": 0.2,
+      "reference_step_recall": 0.0,
+      "step_precision": 0.0,
       "n_steps": 5,
       "kb_retrieved": 0.0,
-      "intent_correct": 0.0,
-      "confidence": 0.8726,
+      "intent_correct": 1.0,
+      "confidence": 0.786,
       "decision": "RESOLVE",
-      "latency_ms": 1358,
+      "latency_ms": 1699,
       "stage_ms": {
-        "embed": 50,
-        "understand_retrieve": 295,
+        "embed": 195,
+        "understand_retrieve": 230,
         "generate": 0,
-        "validate": 1011,
+        "validate": 1272,
         "decide": 0
       },
       "generation_error": null,
-      "contradictions": 0
+      "contradictions": 0,
+      "steps": [
+        "Confirm the issue is DNS by pinging an IP address such as 8.8.8.8 [1][4][5][6]",
+        "Set the router security mode to WPA2/WPA3 mixed so older devices can join [2][7]",
+        "Flush the DNS cache on the device (ipconfig /flushdns on Windows) [1][4][5][6]",
+        "Set the router's DNS servers to automatic, or to a public resolver such as 1.1.1.1 and 8.8.8.8 [1][6][8]",
+        "Restart the router after changing DNS settings [1][8]"
+      ],
+      "summary": "Steps that recur across 6 similar historical tickets and 2 KB article(s).",
+      "claim_status": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported"
+      ]
+    }
+  ],
+  "novel_rows": [
+    {
+      "id": "NOV-0001",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5812702387474828,
+      "confidence": 0.806,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0002",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5651282512836219,
+      "confidence": 0.8981,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0003",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6702063086813514,
+      "confidence": 0.8351,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0004",
+      "decision": "REVIEW",
+      "decision_reason": "Unrecognised issue category - needs human assessment",
+      "intent": "unknown_intent",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6376804873562621,
+      "confidence": 0.7866,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0005",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5703318461281597,
+      "confidence": 0.8654,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0006",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6995130836093091,
+      "confidence": 0.943,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0007",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5622776784930389,
+      "confidence": 0.8013,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0008",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5306689897379037,
+      "confidence": 0.8734,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0009",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6386963759811805,
+      "confidence": 0.8392,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0010",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5918239975500209,
+      "confidence": 0.8435,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0011",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6677525643417576,
+      "confidence": 0.9304,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0012",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6362886103895821,
+      "confidence": 0.913,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0013",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6621655217705404,
+      "confidence": 0.8453,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0014",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6271133554230146,
+      "confidence": 0.912,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0015",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6628923422886726,
+      "confidence": 0.8626,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0016",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6819498538970996,
+      "confidence": 0.8698,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0017",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5981962095521675,
+      "confidence": 0.9151,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0018",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6362954378128097,
+      "confidence": 0.8279,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0019",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5282820463181143,
+      "confidence": 0.8322,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0020",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6073402753122766,
+      "confidence": 0.914,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0021",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6306836916646625,
+      "confidence": 0.8526,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0022",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6364991854578242,
+      "confidence": 0.856,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0023",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6248647644713718,
+      "confidence": 0.8993,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0024",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6336068233506663,
+      "confidence": 0.9159,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0025",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6008695844983141,
+      "confidence": 0.8086,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0026",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.588679916453449,
+      "confidence": 0.9111,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0027",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.7037162493814093,
+      "confidence": 0.9478,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0028",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6775700661623749,
+      "confidence": 0.8777,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0029",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6032119242294375,
+      "confidence": 0.86,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0030",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6340727050218147,
+      "confidence": 0.8635,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0031",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6092753252430491,
+      "confidence": 0.8496,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0032",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5843052067029025,
+      "confidence": 0.905,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0033",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.614380827137407,
+      "confidence": 0.8297,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0034",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.635920164220382,
+      "confidence": 0.8741,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0035",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5804025493373606,
+      "confidence": 0.9015,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0036",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5993426562531023,
+      "confidence": 0.8226,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0037",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5839171357500842,
+      "confidence": 0.8187,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0038",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6456422247334603,
+      "confidence": 0.8878,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0039",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.7125710338184803,
+      "confidence": 0.9501,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0040",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5793472528457683,
+      "confidence": 0.8264,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0041",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5458086187613265,
+      "confidence": 0.8786,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0042",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.7028467171557824,
+      "confidence": 0.9461,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0043",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5921951555624235,
+      "confidence": 0.8381,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0044",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5798537540784839,
+      "confidence": 0.8037,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0045",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.711491416310963,
+      "confidence": 0.9368,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0046",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5927779497868457,
+      "confidence": 0.8437,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0047",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5779980924132787,
+      "confidence": 0.9049,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0048",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6864019970888213,
+      "confidence": 0.931,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0049",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.637636068913005,
+      "confidence": 0.8581,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0050",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6008967757225208,
+      "confidence": 0.9163,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0051",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6935236540636384,
+      "confidence": 0.8384,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0052",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5873856828025563,
+      "confidence": 0.8044,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0053",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5905954053785492,
+      "confidence": 0.8934,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0054",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.652821063995366,
+      "confidence": 0.8622,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0055",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6477097760631136,
+      "confidence": 0.8581,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0056",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.59665062774024,
+      "confidence": 0.9068,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0057",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "service_activation",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6325413681690553,
+      "confidence": 0.8535,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0058",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6288686308656254,
+      "confidence": 0.8688,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0059",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.5518074241029107,
+      "confidence": 0.881,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0060",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6229207154342217,
+      "confidence": 0.8058,
+      "generation_error": null
     }
   ]
 }

@@ -85,3 +85,38 @@ async def test_non_retryable_status_raises_immediately(monkeypatch):
     with pytest.raises(LLMUnavailable):
         await provider.generate_json([])
     assert completions.calls == 1
+
+
+def _rate_limit(message: str, retry_after: str | None = None):
+    import openai
+
+    httpx = _httpx_module()
+    headers = {"retry-after": retry_after} if retry_after else {}
+    resp = httpx.Response(429, headers=headers, request=httpx.Request("POST", "http://localhost:1"))
+    return openai.RateLimitError(message, response=resp, body=None)
+
+
+@pytest.mark.asyncio
+async def test_daily_quota_fails_over_immediately(monkeypatch):
+    err = _rate_limit("Rate limit reached for model on tokens per day (TPD): Limit 200000, Used 199252", "505")
+    provider, completions = provider_with([err, json.dumps({"ok": True})], monkeypatch)
+    with pytest.raises(LLMUnavailable, match="daily quota"):
+        await provider.generate_json([])
+    assert completions.calls == 1  # no waiting for a quota that cannot recover within the request
+
+
+@pytest.mark.asyncio
+async def test_long_rate_limit_wait_is_not_waited_out(monkeypatch):
+    err = _rate_limit("Rate limit reached on tokens per minute (TPM)", "45")
+    provider, completions = provider_with([err, json.dumps({"ok": True})], monkeypatch)
+    with pytest.raises(LLMUnavailable, match="retry after 45s"):
+        await provider.generate_json([])
+    assert completions.calls == 1
+
+
+@pytest.mark.asyncio
+async def test_short_rate_limit_is_retried(monkeypatch):
+    err = _rate_limit("Rate limit reached on tokens per minute (TPM)", "2")
+    provider, completions = provider_with([err, json.dumps({"ok": True})], monkeypatch)
+    assert await provider.generate_json([]) == {"ok": True}
+    assert completions.calls == 2

@@ -71,21 +71,19 @@ a { color: inherit; }
 .lines path {
   /* No vector-effect here: with non-scaling-stroke, dash units become screen pixels and the
      pathLength-based draw-in renders as a dotted (grey-looking) line. */
-  fill: none; stroke: var(--red); stroke-width: 1.15; opacity: 0.6;
+  fill: none; stroke: var(--red); stroke-width: 1.15; stroke-opacity: 0.6;
   stroke-dasharray: 1; stroke-dashoffset: 1;
   animation: draw 1.6s var(--ease) forwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
 }
-.lines path:nth-child(1) { animation-delay: 0s; }
-.lines path:nth-child(2) { animation-delay: 0.15s; }
-.lines path:nth-child(3) { animation-delay: 0.25s; }
-.lines path:nth-child(4) { animation-delay: 0.35s; }
-.lines path:nth-child(5) { animation-delay: 0.45s; }
-.lines path:nth-child(6) { animation-delay: 0.3s; animation-duration: 2.2s; }
-.lines path:nth-child(7) { animation-delay: 0.55s; animation-duration: 2s; }
-.lines path:nth-child(8) { animation-delay: 0.65s; animation-duration: 2s; }
-.lines path:nth-child(9) { animation-delay: 0.75s; animation-duration: 2s; }
-.lines path:nth-child(10) { animation-delay: 0.85s; animation-duration: 2s; }
-body[data-state="result"] .lines, body[data-view="kb"] .lines { opacity: 0.45; }
+/* Like prodapt.com: triangles with the logo's orientation (right angle top-right) fill red under the pointer.
+   They receive hover through the empty parts of the page (see "pointer pass-through" below). */
+.lines path.tri--logo {
+  fill: var(--red); fill-opacity: 0; pointer-events: all;
+  transition: fill-opacity 0.35s var(--ease);
+}
+.lines path.tri--logo:hover, .lines path.tri--logo.is-demo { fill-opacity: 0.92; }
+body[data-state="result"] .lines path, body[data-view="kb"] .lines path { stroke-opacity: 0.3; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
 /* ---------- nav ---------- */
@@ -104,11 +102,12 @@ body[data-state="result"] .lines, body[data-view="kb"] .lines { opacity: 0.45; }
   color: var(--red); line-height: 1;
 }
 .brand__notch {
-  width: 11px; height: 11px; margin: 0 0 3px 2px; background: var(--red);
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-  transform-origin: bottom left; animation: notch 2.8s var(--ease) 1s infinite;
+  /* Same orientation as the Prodapt mark: right angle at the top-right, tip resting on the baseline. */
+  width: 10px; height: 10px; margin: 0 0 6px 2px; background: var(--red);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  transform-origin: top right; animation: notch 2.8s var(--ease) 1s infinite;
 }
-@keyframes notch { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-18deg); } 90% { transform: rotate(6deg); } }
+@keyframes notch { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(18deg); } 90% { transform: rotate(-6deg); } }
 .nav__links { display: flex; gap: 6px; margin-left: auto; }
 .nav__link {
   position: relative; border: 0; background: none; padding: 10px 14px;
@@ -133,6 +132,10 @@ body[data-state="result"] .lines, body[data-view="kb"] .lines { opacity: 0.45; }
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(23, 128, 61, 0.45); } 70%, 100% { box-shadow: 0 0 0 8px rgba(23, 128, 61, 0); } }
 
 /* ---------- layout ---------- */
+/* Pointer pass-through: page-level containers ignore the pointer so the background triangles can react to hover
+   in empty areas; everything inside them (cards, text, controls) still receives it. */
+.stage * { pointer-events: auto; }
+.stage, .hero, .hero__title, .hero__line, .kb-hero, .kb-hero__title { pointer-events: none; }
 .stage {
   position: relative; z-index: 1;
   max-width: 1200px; margin: 0 auto; padding: 48px clamp(20px, 4vw, 48px) 80px;
@@ -206,7 +209,7 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
 .example {
   border: 1px solid var(--red-100); background: var(--white); color: var(--red-700);
   padding: 7px 14px; border-radius: 999px; font-size: 13.5px;
-  opacity: 0; animation: fadeUp 0.6s var(--ease) both;
+  animation: fadeUp 0.6s var(--ease) both;
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s var(--ease);
 }
 .example:hover { background: var(--red); color: var(--white); border-color: var(--red); transform: translateY(-2px); }
@@ -298,7 +301,7 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border-radius: 10px;
-  background: var(--surface); font-size: 13px; color: var(--ink-2); opacity: 0; animation: popIn 0.5s var(--ease) both;
+  background: var(--surface); font-size: 13px; color: var(--ink-2); animation: popIn 0.5s var(--ease) both;
 }
 .chip b { font-weight: 600; color: var(--ink); }
 .chip small { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
@@ -378,7 +381,7 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
 .sources::-webkit-scrollbar-thumb { background: var(--red-100); border-radius: 6px; }
 .source {
   position: relative; padding: 14px 14px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--white);
-  opacity: 0; animation: fadeUp 0.5s var(--ease) both; transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease);
+  animation: fadeUp 0.5s var(--ease) both; transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease);
 }
 .source:hover { border-color: var(--red-100); box-shadow: var(--shadow); transform: translateY(-2px); }
 .source.is-hot { border-color: var(--red); box-shadow: 0 0 0 4px var(--red-50); animation: hot 0.9s var(--ease); }
@@ -420,7 +423,7 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
 /* ---------- knowledge base ---------- */
 .kb-hero { margin: 3vh 0 34px; }
 .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 18px; }
-.tile { padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: var(--shadow); border-top: 3px solid var(--red); opacity: 0; animation: fadeUp 0.6s var(--ease) both; }
+.tile { padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: var(--shadow); border-top: 3px solid var(--red); animation: fadeUp 0.6s var(--ease) both; }
 .tile__value { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -0.04em; line-height: 1.05; color: var(--ink); }
 .tile__label { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
 .kb-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin-bottom: 18px; align-items: start; }
@@ -453,11 +456,11 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
 .searchbar select { flex: 0 0 220px; }
 .searchbar input:focus, .searchbar select:focus { border-color: var(--red); box-shadow: 0 0 0 4px var(--red-50); }
 .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
-.col { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; opacity: 0; animation: fadeUp 0.5s var(--ease) both; }
+.col { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; animation: fadeUp 0.5s var(--ease) both; }
 .col__head { padding: 14px 14px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
 .col__head h3 { margin: 0; font-family: var(--display); font-size: 18px; letter-spacing: -0.02em; }
 .col__head p { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
-.hit { display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.2s; opacity: 0; animation: fadeUp 0.4s var(--ease) both; }
+.hit { display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.2s; animation: fadeUp 0.4s var(--ease) both; }
 .hit:last-child { border-bottom: 0; }
 .hit:hover, .hit.is-linked { background: var(--red-50); }
 .hit__rank { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--red); line-height: 1.2; }

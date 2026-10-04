@@ -67,3 +67,30 @@ async def test_generation_service_no_fallback_returns_error(sources, metadata):
 async def test_generation_with_no_sources(metadata):
     result = await GenerationService(None).generate("x", metadata, [])
     assert result.resolution_steps == [] and result.generator == "none"
+
+
+@pytest.mark.asyncio
+async def test_llm_deadline_falls_back_to_extractive(monkeypatch, metadata, sources):
+    import asyncio
+
+    from app.config import settings
+    from app.services.generation import ExtractiveGenerator, GenerationService
+
+    class HangingLLM:
+        available = True
+
+        async def generate_json(self, *a, **kw):
+            await asyncio.sleep(5)
+
+    class Gen:
+        llm = HangingLLM()
+        name = "llm:hanging"
+
+        async def generate(self, complaint, metadata, documents):
+            await asyncio.sleep(5)
+
+    monkeypatch.setattr(settings, "LLM_REQUEST_DEADLINE_S", 0.05)
+    service = GenerationService(Gen(), ExtractiveGenerator(), fallback=True)  # type: ignore[arg-type]
+    result = await service.generate("wifi drops every evening", metadata, sources)
+    assert result.generator == "extractive" and result.resolution_steps
+    assert "exceeded" in (result.error or "")

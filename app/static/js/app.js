@@ -48,6 +48,7 @@
   const DECISION_ICON = { RESOLVE: "✓", REVIEW: "◐", ESCALATE: "▲" };
 
   let lastComplaint = "";
+  let demoCite = null;
   let stageTimer = null;
   let progressTimer = null;
 
@@ -260,6 +261,7 @@
       renderResult(text, data);
       await setState("result");
       animateResult(data);
+      if (demoCite) setTimeout(() => highlightSource(demoCite, true), 300);
     } catch (err) {
       clearInterval(stageTimer);
       clearInterval(progressTimer);
@@ -706,6 +708,9 @@
     if (params.get("q")) { ta().value = params.get("q"); autosize(); setTimeout(() => submit(), 900); }
     // Design preview of the searching scene without calling the API (/?preview=searching).
     if (params.get("preview") === "searching") { document.body.dataset.state = "searching"; startSearch(); }
+    // Design previews: ?tri=demo fills the logo-orientation triangles; ?cite=N highlights citation N after a result.
+    if (params.get("tri") === "demo") $$(".tri--logo").forEach((t) => t.classList.add("is-demo"));
+    demoCite = params.get("cite");
   }
 
   document.addEventListener("DOMContentLoaded", init);

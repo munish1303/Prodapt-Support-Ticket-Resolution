@@ -5,34 +5,34 @@
   "ratings": {
     "relevance": {
       "n": 50,
-      "mean": 4.1,
+      "mean": 4.58,
       "ci95": [
-        3.68,
-        4.48
+        4.26,
+        4.84
       ]
     },
     "completeness": {
       "n": 50,
-      "mean": 4.14,
+      "mean": 4.6,
       "ci95": [
-        3.7,
-        4.52
+        4.26,
+        4.86
       ]
     },
     "correctness": {
       "n": 50,
-      "mean": 4.0,
+      "mean": 4.52,
       "ci95": [
-        3.58,
-        4.36
+        4.22,
+        4.78
       ]
     }
   },
-  "share_safe": 0.72,
+  "share_safe": 0.84,
   "decision": {
     "n": 50,
-    "agreement": 0.64,
-    "cohen_kappa": 0.1541,
+    "agreement": 0.7,
+    "cohen_kappa": -0.1261,
     "confusion_rows_rater_cols_system": {
       "labels": [
         "RESOLVE",
@@ -41,360 +41,357 @@
       ],
       "matrix": [
         [
-          29,
-          6,
-          1
+          35,
+          7,
+          0
         ],
         [
-          3,
+          4,
           0,
           0
         ],
         [
-          6,
-          2,
-          3
+          4,
+          0,
+          0
         ]
       ]
     }
   },
-  "precision_of_system_resolve": 0.7632,
+  "precision_of_system_resolve": 0.814,
   "correctness_by_system_decision": {
     "RESOLVE": {
-      "n": 38,
-      "mean": 4.211,
+      "n": 43,
+      "mean": 4.442,
       "ci95": [
-        3.763,
-        4.605
+        4.093,
+        4.767
       ]
     },
     "REVIEW": {
-      "n": 8,
-      "mean": 4.0,
+      "n": 7,
+      "mean": 5.0,
       "ci95": [
-        3.125,
-        4.875
+        5.0,
+        5.0
       ]
     },
     "ESCALATE": {
-      "n": 4,
-      "mean": 2.0,
-      "ci95": [
-        1.0,
-        4.0
-      ]
+      "n": 0,
+      "mean": null,
+      "ci95": null
     }
   },
   "validity": {
     "rater_correctness_vs_llm_judge_correctness": {
       "n": 50,
-      "rho": 0.9178,
+      "rho": 0.8798,
       "p": 0.0
     },
     "rater_correctness_vs_heuristic_confidence": {
       "n": 50,
-      "rho": 0.5388,
-      "p": 0.0001
+      "rho": 0.0974,
+      "p": 0.5011
     },
     "rater_completeness_vs_auto_reference_recall": {
       "n": 50,
-      "rho": 0.8071,
+      "rho": 0.7299,
       "p": 0.0
     }
   },
-  "confidence_auroc_for_safe": 0.8056,
+  "confidence_auroc_for_safe": 0.631,
   "resolve_threshold_sweep": [
     {
       "threshold": 0.55,
-      "coverage": 0.96,
-      "precision_safe": 0.75
+      "coverage": 1.0,
+      "precision_safe": 0.84
     },
     {
       "threshold": 0.6,
-      "coverage": 0.96,
-      "precision_safe": 0.75
+      "coverage": 1.0,
+      "precision_safe": 0.84
     },
     {
       "threshold": 0.65,
-      "coverage": 0.96,
-      "precision_safe": 0.75
+      "coverage": 1.0,
+      "precision_safe": 0.84
     },
     {
       "threshold": 0.7,
-      "coverage": 0.94,
-      "precision_safe": 0.7447
+      "coverage": 1.0,
+      "precision_safe": 0.84
     },
     {
       "threshold": 0.75,
-      "coverage": 0.92,
-      "precision_safe": 0.7609
+      "coverage": 1.0,
+      "precision_safe": 0.84
     },
     {
       "threshold": 0.8,
-      "coverage": 0.88,
-      "precision_safe": 0.7727
+      "coverage": 0.96,
+      "precision_safe": 0.8333
     },
     {
       "threshold": 0.85,
-      "coverage": 0.68,
-      "precision_safe": 0.8235
+      "coverage": 0.86,
+      "precision_safe": 0.8372
     },
     {
       "threshold": 0.9,
-      "coverage": 0.42,
-      "precision_safe": 1.0
+      "coverage": 0.48,
+      "precision_safe": 0.9167
     }
   ],
   "notes": [
     {
       "sample": "H01",
-      "case_id": "GEN-0031",
-      "note": "[AI] All four reference steps plus a sensible escalation step."
+      "case_id": "GEN-0013",
+      "note": "[AI] Wrong scenario: factory-reset router steps (PPPoE credentials, VLAN) for a new install that has not been provisioned; the new-fibre KB was not retrieved."
     },
     {
       "sample": "H02",
-      "case_id": "GEN-0011",
-      "note": "[AI] All reference steps; recovery details should be updated before re-sending the reset link, since the link is not arriving."
+      "case_id": "GEN-0036",
+      "note": "[AI] All four reference steps plus a sensible escalation step."
     },
     {
       "sample": "H03",
-      "case_id": "GEN-0029",
-      "note": "[AI] Wrong scenario: broadband speed-upgrade steps (router restart, line check) for a phone that never reaches 5G; the 5G tickets [1][3][6] were retrieved but not used."
+      "case_id": "GEN-0012",
+      "note": "[AI] Matches the reference; uses the one relevant source [8] among overnight-outage tickets."
     },
     {
       "sample": "H04",
-      "case_id": "GEN-0045",
-      "note": "[AI] Matches the reference exactly."
-    },
-    {
-      "sample": "H05",
-      "case_id": "GEN-0009",
-      "note": "[AI] Matches the reference; the conditional fee waiver is stated correctly."
-    },
-    {
-      "sample": "H06",
-      "case_id": "GEN-0020",
-      "note": "[AI] All four reference steps."
-    },
-    {
-      "sample": "H07",
-      "case_id": "GEN-0012",
-      "note": "[AI] Declined correctly: no retrieved source covers activating a new fibre connection."
-    },
-    {
-      "sample": "H08",
-      "case_id": "GEN-0051",
-      "note": "[AI] Wrong scenario: DNS fix for a router that was factory reset (needs PPPoE credentials re-entered); the factory-reset KB was not retrieved."
-    },
-    {
-      "sample": "H09",
-      "case_id": "GEN-0008",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H10",
-      "case_id": "GEN-0040",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H11",
-      "case_id": "GEN-0030",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H12",
-      "case_id": "GEN-0047",
-      "note": "[AI] Wrong scenario: broadband upgrade and congestion steps for a phone that never reaches 5G; no 5G source was retrieved."
-    },
-    {
-      "sample": "H13",
-      "case_id": "GEN-0018",
-      "note": "[AI] Wrong scenario: red-LOS fibre-fault steps for a new connection that is not yet provisioned; could dispatch an engineer needlessly."
-    },
-    {
-      "sample": "H14",
-      "case_id": "GEN-0036",
-      "note": "[AI] Matches the reference (only the modem KB was relevant, and it was the one used)."
-    },
-    {
-      "sample": "H15",
-      "case_id": "GEN-0038",
-      "note": "[AI] Declined correctly: sources cover outages and router faults, not a new connection awaiting activation."
-    },
-    {
-      "sample": "H16",
-      "case_id": "GEN-0016",
-      "note": "[AI] Wrong scenario and harmful: treats a duplicate charge as a failed payment and takes another payment from an overdrawn customer; the duplicate-charge ticket [6] was retrieved but not used."
-    },
-    {
-      "sample": "H17",
-      "case_id": "GEN-0039",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H18",
-      "case_id": "GEN-0015",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H19",
-      "case_id": "GEN-0025",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H20",
-      "case_id": "GEN-0003",
-      "note": "[AI] All five reference steps."
-    },
-    {
-      "sample": "H21",
-      "case_id": "GEN-0006",
-      "note": "[AI] Core fix (check and re-provision the 5G flag) is present; the outage check and handset steps are extra and the handset restart is missing."
-    },
-    {
-      "sample": "H22",
-      "case_id": "GEN-0024",
-      "note": "[AI] Wrong scenario: indoor mobile-coverage steps (Wi-Fi Calling over broadband) for an area-wide broadband outage; the outage KB was not retrieved."
-    },
-    {
-      "sample": "H23",
-      "case_id": "GEN-0028",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H24",
-      "case_id": "GEN-0022",
-      "note": "[AI] Broadband speed-upgrade steps (router restart, line check) for a mobile 5G tier; escalating to provisioning is the right idea but the steps don't apply to a phone."
-    },
-    {
-      "sample": "H25",
-      "case_id": "GEN-0046",
-      "note": "[AI] All reference steps; step 4 suggests dynamic DNS, which the customer says they already use."
-    },
-    {
-      "sample": "H26",
       "case_id": "GEN-0002",
       "note": "[AI] Matches the reference."
     },
     {
-      "sample": "H27",
-      "case_id": "GEN-0019",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H28",
-      "case_id": "GEN-0044",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H29",
-      "case_id": "GEN-0035",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H30",
-      "case_id": "GEN-0005",
-      "note": "[AI] Treats a village-wide mast outage as weak indoor coverage; only the Wi-Fi Calling workaround matches; the mast-outage KB was not retrieved."
-    },
-    {
-      "sample": "H31",
-      "case_id": "GEN-0007",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H32",
-      "case_id": "GEN-0013",
-      "note": "[AI] Right fix present (order/ONT check, provisioning, reboot) but only after four factory-reset steps that don't apply; escalation to the provisioning team is missing."
-    },
-    {
-      "sample": "H33",
-      "case_id": "GEN-0023",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H34",
-      "case_id": "GEN-0052",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H35",
-      "case_id": "GEN-0017",
-      "note": "[AI] Matches the reference (step 1 is already confirmed by the customer)."
-    },
-    {
-      "sample": "H36",
-      "case_id": "GEN-0042",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H37",
+      "sample": "H05",
       "case_id": "GEN-0014",
-      "note": "[AI] All four reference steps present, but steps 3-4 start an account-ownership transfer that a porting name mismatch doesn't need."
+      "note": "[AI] All four reference steps present, but steps 3-4 start an account-ownership transfer (bereavement documents, new holder's payment details) that a porting name mismatch doesn't need."
     },
     {
-      "sample": "H38",
-      "case_id": "GEN-0050",
-      "note": "[AI] Wrong scenario: evening-congestion steps although the customer says speed is low day and night; the 100 Mbps-bottleneck KB [8] was retrieved but not used."
+      "sample": "H06",
+      "case_id": "GEN-0047",
+      "note": "[AI] Wrong scenario: broadband speed-upgrade steps (router restart, line check) for a phone that never reaches 5G; no 5G source was retrieved."
     },
     {
-      "sample": "H39",
-      "case_id": "GEN-0034",
-      "note": "[AI] Matches the reference."
+      "sample": "H07",
+      "case_id": "GEN-0049",
+      "note": "[AI] All four reference steps plus escalation."
     },
     {
-      "sample": "H40",
-      "case_id": "GEN-0032",
-      "note": "[AI] Matches the reference."
+      "sample": "H08",
+      "case_id": "GEN-0041",
+      "note": "[AI] Matches the reference; step 4 acknowledges that the customer already uses dynamic DNS."
     },
     {
-      "sample": "H41",
+      "sample": "H09",
+      "case_id": "GEN-0024",
+      "note": "[AI] All four reference steps, taken from the outage tickets (the outage KB was not retrieved); the follow-up call is a harmless extra."
+    },
+    {
+      "sample": "H10",
       "case_id": "GEN-0010",
       "note": "[AI] Matches the reference."
     },
     {
-      "sample": "H42",
-      "case_id": "GEN-0033",
-      "note": "[AI] Matches the reference."
+      "sample": "H11",
+      "case_id": "GEN-0052",
+      "note": "[AI] All four reference steps plus escalation."
     },
     {
-      "sample": "H43",
-      "case_id": "GEN-0027",
-      "note": "[AI] Matches the reference."
-    },
-    {
-      "sample": "H44",
+      "sample": "H12",
       "case_id": "GEN-0021",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H13",
+      "case_id": "GEN-0032",
+      "note": "[AI] All three reference steps plus escalation."
+    },
+    {
+      "sample": "H14",
+      "case_id": "GEN-0007",
       "note": "[AI] Matches the reference."
     },
     {
-      "sample": "H45",
-      "case_id": "GEN-0004",
-      "note": "[AI] All reference steps; the fallback congestion checks fit slowdowns rather than drop-outs."
+      "sample": "H15",
+      "case_id": "GEN-0045",
+      "note": "[AI] Matches the reference."
     },
     {
-      "sample": "H46",
+      "sample": "H16",
+      "case_id": "GEN-0008",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H17",
+      "case_id": "GEN-0005",
+      "note": "[AI] All three reference steps from the mast-outage KB; the software-update step is a harmless extra."
+    },
+    {
+      "sample": "H18",
+      "case_id": "GEN-0051",
+      "note": "[AI] Wrong scenario: steps for a router that reboots itself (ventilation, firmware, replacement) after a factory reset that needs the PPPoE credentials re-entered; the factory-reset KB was not retrieved."
+    },
+    {
+      "sample": "H19",
+      "case_id": "GEN-0015",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H20",
+      "case_id": "GEN-0020",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H21",
+      "case_id": "GEN-0044",
+      "note": "[AI] Matches the reference; dynamic DNS is offered only as a cheaper alternative."
+    },
+    {
+      "sample": "H22",
+      "case_id": "GEN-0009",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H23",
+      "case_id": "GEN-0029",
+      "note": "[AI] All four reference steps, including the handset-support check that matters for a phone bought abroad; the fair-usage check is a harmless extra."
+    },
+    {
+      "sample": "H24",
+      "case_id": "GEN-0006",
+      "note": "[AI] All three reference steps plus escalation."
+    },
+    {
+      "sample": "H25",
+      "case_id": "GEN-0011",
+      "note": "[AI] All reference steps; recovery details should be updated before re-sending the reset link, since the link is not arriving."
+    },
+    {
+      "sample": "H26",
+      "case_id": "GEN-0048",
+      "note": "[AI] All reference steps plus escalation."
+    },
+    {
+      "sample": "H27",
+      "case_id": "GEN-0017",
+      "note": "[AI] Matches the reference (step 1 is already confirmed by the customer)."
+    },
+    {
+      "sample": "H28",
+      "case_id": "GEN-0027",
+      "note": "[AI] All four reference steps; follow-up call and escalation are harmless extras."
+    },
+    {
+      "sample": "H29",
+      "case_id": "GEN-0038",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H30",
+      "case_id": "GEN-0016",
+      "note": "[AI] Matches the reference; uses the duplicate-payment KB [8] rather than the failed-payment tickets ranked above it."
+    },
+    {
+      "sample": "H31",
+      "case_id": "GEN-0026",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H32",
+      "case_id": "GEN-0023",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H33",
+      "case_id": "GEN-0033",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H34",
+      "case_id": "GEN-0028",
+      "note": "[AI] Matches the reference."
+    },
+    {
+      "sample": "H35",
       "case_id": "GEN-0043",
       "note": "[AI] Matches the reference."
     },
     {
-      "sample": "H47",
-      "case_id": "GEN-0048",
+      "sample": "H36",
+      "case_id": "GEN-0019",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H37",
+      "case_id": "GEN-0034",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H38",
+      "case_id": "GEN-0031",
       "note": "[AI] Matches the reference."
     },
     {
+      "sample": "H39",
+      "case_id": "GEN-0037",
+      "note": "[AI] All three reference steps plus escalation."
+    },
+    {
+      "sample": "H40",
+      "case_id": "GEN-0050",
+      "note": "[AI] Steps 5-6 match half the reference (link speed, cable), but steps 1-4 are evening-congestion steps although the customer says speed is low day and night; the gigabit-router check is missing."
+    },
+    {
+      "sample": "H41",
+      "case_id": "GEN-0030",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H42",
+      "case_id": "GEN-0022",
+      "note": "[AI] Broadband speed-upgrade steps (router restart, line check) for a mobile 5G tier; escalating to provisioning is the right idea but the steps don't apply to a phone."
+    },
+    {
+      "sample": "H43",
+      "case_id": "GEN-0003",
+      "note": "[AI] All five reference steps; mixes in router-reboot advice and suggests replacing the router as a fallback, which is premature for Wi-Fi interference."
+    },
+    {
+      "sample": "H44",
+      "case_id": "GEN-0039",
+      "note": "[AI] Steps 1-5 treat it as Wi-Fi interference; only step 6 (maintenance schedule and window) matches the reference, and the notification sign-up is missing."
+    },
+    {
+      "sample": "H45",
+      "case_id": "GEN-0042",
+      "note": "[AI] All four reference steps plus escalation."
+    },
+    {
+      "sample": "H46",
+      "case_id": "GEN-0046",
+      "note": "[AI] All reference steps; step 4 suggests dynamic DNS, which the customer says they already use."
+    },
+    {
+      "sample": "H47",
+      "case_id": "GEN-0004",
+      "note": "[AI] All three reference steps; the follow-up call is a harmless extra."
+    },
+    {
       "sample": "H48",
-      "case_id": "GEN-0041",
-      "note": "[AI] As H25: suggests dynamic DNS, which the customer already uses."
+      "case_id": "GEN-0001",
+      "note": "[AI] Steps 3-5 match three reference steps, but it leads with fair-usage throttling steps and ends with a data add-on the customer may not need; misses the handset-support check, which matters for a phone bought abroad."
     },
     {
       "sample": "H49",
-      "case_id": "GEN-0049",
+      "case_id": "GEN-0025",
       "note": "[AI] Matches the reference."
     },
     {
       "sample": "H50",
-      "case_id": "GEN-0001",
-      "note": "[AI] Steps 1-3 match the reference; steps 4-6 are broadband-congestion steps that don't apply to a phone; misses the handset-support check, which matters for a phone bought abroad."
+      "case_id": "GEN-0035",
+      "note": "[AI] Matches the reference."
     }
   ]
 }

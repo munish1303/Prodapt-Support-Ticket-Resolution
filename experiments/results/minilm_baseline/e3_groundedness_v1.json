@@ -1,0 +1,227 @@
+{
+  "n_items": 160,
+  "labels": {
+    "supported": 80,
+    "unsupported": 40,
+    "contradicted": 40
+  },
+  "dev_scenarios": 20,
+  "test_scenarios": 20,
+  "models": {
+    "cross-encoder/nli-deberta-v3-small": {
+      "score_ms_per_claim": 580.7,
+      "methods": {
+        "similarity": {
+          "tuned_thresholds": {
+            "sim": 0.7,
+            "sim_weak": 0.5499999999999999,
+            "entail": 0.5,
+            "entail_weak": 0.25,
+            "lexical": 0.5,
+            "lexical_weak": 0.3,
+            "contradiction": 0.7
+          },
+          "test_tuned": {
+            "precision": 0.5128,
+            "recall": 1.0,
+            "f1": 0.678,
+            "accuracy": 0.525,
+            "tp": 40,
+            "fp": 38,
+            "fn": 0,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          },
+          "test_tuned_weak_as_supported": null,
+          "test_default_config": {
+            "precision": 0.5,
+            "recall": 0.65,
+            "f1": 0.5652,
+            "accuracy": 0.5,
+            "tp": 26,
+            "fp": 26,
+            "fn": 14,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          },
+          "all_default_config": {
+            "precision": 0.5,
+            "recall": 0.675,
+            "f1": 0.5745,
+            "accuracy": 0.5,
+            "tp": 54,
+            "fp": 54,
+            "fn": 26,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          }
+        },
+        "lexical": {
+          "tuned_thresholds": {
+            "sim": 0.6,
+            "sim_weak": 0.44999999999999996,
+            "entail": 0.5,
+            "entail_weak": 0.25,
+            "lexical": 0.5,
+            "lexical_weak": 0.3,
+            "contradiction": 0.7
+          },
+          "test_tuned": {
+            "precision": 0.6538,
+            "recall": 0.85,
+            "f1": 0.7391,
+            "accuracy": 0.7,
+            "tp": 34,
+            "fp": 18,
+            "fn": 6,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          },
+          "test_tuned_weak_as_supported": null,
+          "test_default_config": {
+            "precision": 0.6538,
+            "recall": 0.85,
+            "f1": 0.7391,
+            "accuracy": 0.7,
+            "tp": 34,
+            "fp": 18,
+            "fn": 6,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          },
+          "all_default_config": {
+            "precision": 0.6804,
+            "recall": 0.825,
+            "f1": 0.7458,
+            "accuracy": 0.7188,
+            "tp": 66,
+            "fp": 31,
+            "fn": 14,
+            "contradiction_recall": 0.0,
+            "supported_flagged_contradicted": 0
+          }
+        },
+        "nli": {
+          "tuned_thresholds": {
+            "sim": 0.6,
+            "sim_weak": 0.44999999999999996,
+            "entail": 0.3,
+            "entail_weak": 0.15,
+            "lexical": 0.5,
+            "lexical_weak": 0.3,
+            "contradiction": 0.5
+          },
+          "test_tuned": {
+            "precision": 0.597,
+            "recall": 1.0,
+            "f1": 0.7477,
+            "accuracy": 0.6625,
+            "tp": 40,
+            "fp": 27,
+            "fn": 0,
+            "contradiction_recall": 0.8,
+            "supported_flagged_contradicted": 4
+          },
+          "test_tuned_weak_as_supported": null,
+          "test_default_config": {
+            "precision": 0.597,
+            "recall": 1.0,
+            "f1": 0.7477,
+            "accuracy": 0.6625,
+            "tp": 40,
+            "fp": 27,
+            "fn": 0,
+            "contradiction_recall": 0.8,
+            "supported_flagged_contradicted": 4
+          },
+          "all_default_config": {
+            "precision": 0.5797,
+            "recall": 1.0,
+            "f1": 0.7339,
+            "accuracy": 0.6375,
+            "tp": 80,
+            "fp": 58,
+            "fn": 0,
+            "contradiction_recall": 0.625,
+            "supported_flagged_contradicted": 6
+          }
+        },
+        "multi": {
+          "tuned_thresholds": {
+            "sim": 0.4,
+            "sim_weak": 0.25,
+            "entail": 0.3,
+            "entail_weak": 0.15,
+            "lexical": 0.4,
+            "lexical_weak": 0.2,
+            "contradiction": 0.9
+          },
+          "test_tuned": {
+            "precision": 0.7115,
+            "recall": 0.925,
+            "f1": 0.8043,
+            "accuracy": 0.775,
+            "tp": 37,
+            "fp": 15,
+            "fn": 3,
+            "contradiction_recall": 0.75,
+            "supported_flagged_contradicted": 3
+          },
+          "test_tuned_weak_as_supported": {
+            "precision": 0.8889,
+            "recall": 0.8,
+            "f1": 0.8421,
+            "accuracy": 0.85,
+            "tp": 32,
+            "fp": 4,
+            "fn": 8,
+            "contradiction_recall": 0.75,
+            "supported_flagged_contradicted": 3
+          },
+          "test_default_config": {
+            "precision": 0.6,
+            "recall": 0.975,
+            "f1": 0.7429,
+            "accuracy": 0.6625,
+            "tp": 39,
+            "fp": 26,
+            "fn": 1,
+            "contradiction_recall": 0.8,
+            "supported_flagged_contradicted": 4
+          },
+          "all_default_config": {
+            "precision": 0.5909,
+            "recall": 0.975,
+            "f1": 0.7358,
+            "accuracy": 0.65,
+            "tp": 78,
+            "fp": 54,
+            "fn": 2,
+            "contradiction_recall": 0.625,
+            "supported_flagged_contradicted": 6
+          }
+        }
+      },
+      "mean_signals_by_label": {
+        "supported": {
+          "semantic": 0.4746,
+          "entailment": 0.2749,
+          "contradiction": 0.1092,
+          "lexical": 0.4851
+        },
+        "unsupported": {
+          "semantic": 0.243,
+          "entailment": 0.0035,
+          "contradiction": 0.1157,
+          "lexical": 0.1427
+        },
+        "contradicted": {
+          "semantic": 0.5618,
+          "entailment": 0.0021,
+          "contradiction": 0.6548,
+          "lexical": 0.4147
+        }
+      }
+    }
+  }
+}

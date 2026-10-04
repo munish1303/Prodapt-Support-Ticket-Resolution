@@ -93,6 +93,7 @@ class OpenAICompatibleProvider(LLMProvider):
         import openai
 
         last_error: Exception | None = None
+        waited = 0.0  # seconds spent waiting on rate limits in this call
         for attempt in range(self.max_retries):
             try:
                 started = time.perf_counter()
@@ -125,7 +126,15 @@ class OpenAICompatibleProvider(LLMProvider):
             except openai.RateLimitError as exc:
                 last_error = exc
                 retry_after = _retry_after_seconds(exc)
-                await asyncio.sleep(retry_after if retry_after is not None else min(2 ** (attempt + 1), 30))
+                wait = retry_after if retry_after is not None else min(2 ** (attempt + 1), 30)
+                # Someone is waiting on this request: a daily quota cannot recover within it, and a long per-minute
+                # wait is worse than the extractive fallback. Give up at once in those cases.
+                if _is_daily_quota(exc):
+                    raise LLMUnavailable(f"LLM daily quota exhausted: {exc}") from exc
+                if waited + wait > settings.LLM_MAX_RATE_LIMIT_WAIT_S:
+                    raise LLMUnavailable(f"LLM rate-limited (retry after {wait:.0f}s): {exc}") from exc
+                waited += wait
+                await asyncio.sleep(wait)
                 continue
             except (openai.APIConnectionError, openai.APITimeoutError, openai.InternalServerError) as exc:
                 last_error = exc
@@ -133,6 +142,12 @@ class OpenAICompatibleProvider(LLMProvider):
                 raise LLMUnavailable(f"LLM request rejected: {exc.status_code} {exc.message}") from exc
             await asyncio.sleep(min(2**attempt, 30))
         raise LLMUnavailable(f"LLM failed after {self.max_retries} attempts: {last_error}")
+
+
+def _is_daily_quota(exc: Exception) -> bool:
+    """Groq/OpenAI-style 429 for a per-day limit (tokens or requests per day)."""
+    text = str(exc).lower()
+    return "per day" in text or "(tpd)" in text or "(rpd)" in text or "perday" in text
 
 
 def _retry_after_seconds(exc: Exception) -> float | None:

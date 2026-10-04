@@ -28,9 +28,11 @@ locally, and in the platform's secret store in production, never in the image or
 
 ## Sizing (measured, see EVALUATION.md §6.1)
 
-* One worker sustains about 1 request/s on a 4-core laptop CPU without the LLM (p50 1.0 s at concurrency 1).
-  Throughput does not rise with concurrency inside one worker: inference is CPU-bound and serialised.
-* Each worker holds about 1.7 GB of models; PostgreSQL needs well under 1 GB at this corpus size.
+* One worker serves about 1 request/s at concurrency 1 without the LLM (p50 1.0 s) and 1.3 requests/s at
+  concurrency 8 (p50 5.2 s), with 0% errors. Inference is CPU-bound; the gain under concurrency comes from the
+  validation cache (cited sources repeat), not from parallel inference.
+* A process with all models loaded (mpnet and MiniLM embeddings, NLI, sentiment) measured about 1.2 GB resident
+  (`docker stats`); allow ~2 GB per worker for request-time growth. PostgreSQL needs well under 1 GB here.
 * With an LLM, add the provider's latency (measured p50 0.97 s for generation) and stay within its rate limits.
 
 ## Scaling path
@@ -48,3 +50,31 @@ locally, and in the platform's secret store in production, never in the image or
 * Metrics export to Prometheus/Grafana (the `/metrics` JSON already has the numbers) and alerts on the drift report.
 * Backups / point-in-time recovery for PostgreSQL.
 * A paid LLM tier (free tiers cap at about 100 drafts/day on Groq and 20 requests/day per model on Gemini).
+
+## Changing the embedding model
+
+Set `EMBEDDING_MODEL` and `EMBEDDING_DIM`, rebuild the image so the model is baked in (add it to the Dockerfile's
+model layer), and restart. On startup `scripts/reembed.py` compares the model recorded in `system_meta` with the
+configured one; if they differ it resizes the vector columns, re-embeds all tickets and KB articles in committed
+batches and rebuilds the ivfflat indexes before the API starts. It can also be run by hand, in time slots:
+
+```bash
+docker compose run --rm --no-deps --entrypoint python api scripts/reembed.py --dry-run          # show the plan
+docker compose run --rm --no-deps --entrypoint python api scripts/reembed.py --max-minutes 8    # resumable chunk
+```
+
+After a model change, re-tune the scale-dependent thresholds on the dev split (EXPERIMENTS.md, E4 re-baseline) and
+re-run the evaluations; `experiments/recalibrate_thresholds.py` translates the thresholds that have no tuning
+procedure of their own. The drift baseline restarts automatically, because similarities from different models are not
+comparable.
+
+## Docker disk usage on a laptop
+
+Docker Desktop keeps images in one virtual disk (`docker_data.vhdx`) that grows but never shrinks on its own. Every
+image rebuild that changes a large layer adds a copy of it; old builds stay until pruned. Keep an eye on it with
+`docker system df`, prune unused images and build cache with `docker image prune -f` and
+`docker builder prune -f --keep-storage 8GB` (keeps the recent cache so model layers are not downloaded again), and
+compact the virtual disk to return the freed space to the host drive (Docker Desktop stopped, `wsl --shutdown`, then
+`diskpart`: `select vdisk file="...\docker_data.vhdx"`, `attach vdisk readonly`, `compact vdisk`, `detach vdisk`;
+needs an administrator prompt).
+

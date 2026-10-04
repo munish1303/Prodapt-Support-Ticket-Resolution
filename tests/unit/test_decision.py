@@ -1,5 +1,6 @@
 import pytest
 
+from app.config import settings
 from app.models.schemas import ClaimCheck, Document, QueryMetadata, RetrievalResult, RetrievedDocument, ValidationResult
 from app.services.decision import (
     ESCALATE,
@@ -32,7 +33,8 @@ def test_single_authoritative_source_can_be_sufficient():
     "scores,validation,expected_reason",
     [
         ([0.2, 0.1], vr(["supported"]), "relevant"),
-        ([0.36, 0.2, 0.2, 0.2, 0.2], vr(["supported"]), "relevance"),
+        # top source just above the relevance floor, but a weak top-5 mean (values follow the configured floors)
+        ([settings.EVIDENCE_MIN_TOP_RELEVANCE + 0.01, 0.2, 0.2, 0.2, 0.2], vr(["supported"]), "relevance"),
         ([0.8], vr([]), "No resolution steps"),
         ([0.8], vr(["supported", "contradicted"]), "contradicted"),
         ([0.8], vr(["unsupported", "unsupported", "supported"]), "groundedness"),

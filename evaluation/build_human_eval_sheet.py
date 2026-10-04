@@ -74,9 +74,21 @@ def style_header(ws, headers: list[str], widths: list[int]) -> None:
 
 
 def main() -> None:
+    import argparse
     import json
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--case-limit",
+        type=int,
+        default=52,
+        help="sample from the first N generation cases (GEN-0001..N), as the original sheet did",
+    )
+    args = parser.parse_args()
     rows = json.loads((RESULTS_DIR / "generation_llm.json").read_text(encoding="utf-8"))["rows"]
+    rows = [r for r in rows if r["id"].startswith("GEN-") and int(r["id"][4:]) <= args.case_limit]
+    if len(rows) < args.case_limit:
+        raise SystemExit(f"only {len(rows)} of the first {args.case_limit} cases are in generation_llm.json")
     cases = {c["id"]: c for c in load_eval("generation_eval")}
     rng = random.Random(SEED)
     empty = [r for r in rows if r["n_steps"] == 0]

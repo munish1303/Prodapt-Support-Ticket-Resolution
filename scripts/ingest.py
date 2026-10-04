@@ -23,6 +23,7 @@ from app.models.embeddings import get_embedding_service  # noqa: E402
 from app.services.ingestion import IngestionReport, IngestionService, KBArticleIn, TicketIn  # noqa: E402
 from app.services.understanding import load_taxonomy_files  # noqa: E402
 from scripts.init_db import build_indexes  # noqa: E402
+from scripts.reembed import ensure_vector_schema  # noqa: E402
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -42,6 +43,7 @@ async def main() -> None:
     started = time.perf_counter()
     service = IngestionService(get_session_factory(), get_embedding_service(), args.batch_size)
     try:
+        await ensure_vector_schema()  # vector columns sized for the configured embedding model
         if not args.no_taxonomy:
             intents, products = load_taxonomy_files()
             await service.upsert_intents(intents)

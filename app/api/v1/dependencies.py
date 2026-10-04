@@ -67,7 +67,7 @@ async def build_container() -> Container:
         understanding,
         RetrievalService(retriever, reranker),
         GenerationService(llm_generator, ExtractiveGenerator()),
-        ValidationService(GroundednessChecker(embedder, NLIModel())),
+        ValidationService(GroundednessChecker(get_embedding_service(settings.VALIDATION_EMBEDDING_MODEL), NLIModel())),
         DecisionService(),
         session_factory,
     )

@@ -19,6 +19,15 @@ Move Docker's data with Docker Desktop → Settings → Resources → Advanced �
 (`Wsl/Service/CreateInstance/MountDisk/0x800701c0 … untrusted mount point`). If that happens, delete the junction
 (`rmdir`, not recursive delete) and restore the original folder.
 
+**Docker engine returns `500 Internal Server Error`; a build fails with `Read-only file system`.**
+The host drive holding Docker's virtual disk is full, so the disk inside the VM went read-only (seen when D: hit
+100%). Cause here: the Dockerfile used to `chown -R` the model directory after copying the code, which wrote a full
+copy of ~2.5 GB of models into a new layer on every rebuild; it no longer does (the app user only needs to read
+`/models`). Recovery: free some space on the host drive, `docker desktop restart` (PostgreSQL runs its normal crash
+recovery; check `docker logs support-assistant-db-1` for `database system is ready`), then
+`docker image prune -f` and `docker builder prune -f --keep-storage 8GB`, and compact the virtual disk
+(docs/deployment.md, "Docker disk usage").
+
 **Machine runs out of memory / background jobs get killed.**
 Docker's WSL VM can grow to half of RAM and keep it. Cap it with `%USERPROFILE%\.wslconfig`:
 ```
@@ -54,6 +63,13 @@ Evaluated working: Groq `qwen/qwen3.8-27b`, `openai/gpt-oss-20b`, `openai/gpt-os
 The service falls back to extractive drafts (flag `llm_unavailable_extractive_fallback`). Evaluations checkpoint
 every case; re-run the same command later to resume (`--fresh` starts over).
 
+**The console sits on the "searching" screen for minutes.**
+The LLM was rate-limited (usually the free-tier daily quota) and an older build waited out the provider's
+"try again in N minutes" on every retry. Requests now fail over to the extractive draft at once on a daily-quota
+429 and after at most `LLM_MAX_RATE_LIMIT_WAIT_S` (10 s) of rate-limit waiting or `LLM_REQUEST_DEADLINE_S` (45 s)
+overall; the result carries the flag `llm_unavailable_extractive_fallback`. The progress steps shown while waiting
+are an estimate; the real per-stage timings appear when the response arrives.
+
 **Reasoning models return empty or invalid JSON.**
 Hidden reasoning tokens consume the output budget. Set `LLM_REASONING_EFFORT=low` (gpt-oss, Gemini thinking models).
 
@@ -83,6 +99,10 @@ new issue type.
 The database is unreachable or too slow, or the circuit breaker opened after repeated failures. Check
 `/api/v1/health` (`database`, `database_circuit`) and `docker compose ps`; once the database is back, the next
 request after `DB_CIRCUIT_RECOVERY_S` (30 s) closes the circuit automatically.
+
+**The API takes minutes to become healthy after changing `EMBEDDING_MODEL`.**
+Expected: `scripts/reembed.py` re-embeds the corpus before the API starts (about 25 minutes for mpnet on 2 CPU
+cores; progress is logged as `tickets re-embedded: N`). It resumes if interrupted.
 
 **Everything is escalated with "contradicted" steps.**
 Seen once during development when NLI used multi-sentence premises; fixed (EXPERIMENTS.md, E3 v2). If it reappears

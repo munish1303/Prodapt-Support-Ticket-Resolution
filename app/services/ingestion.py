@@ -82,8 +82,18 @@ class IngestionReport:
     errors: list[str] = field(default_factory=list)
 
 
+def ticket_text(complaint: str, resolution: str | None) -> str:
+    """Text behind tickets.embedding (complaint + resolution). Shared with scripts/reembed.py."""
+    return f"{complaint} {resolution or ''}".strip()
+
+
+def kb_text(title: str, content: str) -> str:
+    """Text behind kb_articles.embedding. Shared with scripts/reembed.py."""
+    return f"{title}\n{content}"
+
+
 def ticket_embedding_text(t: TicketIn) -> str:
-    return f"{t.complaint} {t.resolution or ''}".strip()
+    return ticket_text(t.complaint, t.resolution)
 
 
 class IngestionService:
@@ -179,7 +189,7 @@ class IngestionService:
         report.kb_unchanged += len(articles) - len(changed)
         if not changed:
             return report
-        vecs = await asyncio.to_thread(self.embedder.encode, [f"{a.title}\n{a.content}" for a in changed])
+        vecs = await asyncio.to_thread(self.embedder.encode, [kb_text(a.title, a.content) for a in changed])
         report.embeddings_generated += len(changed)
         async with self.session_factory() as session:
             for a, v in zip(changed, vecs):

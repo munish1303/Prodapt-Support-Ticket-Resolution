@@ -26,7 +26,7 @@ flowchart LR
 
     subgraph API[FastAPI service: modular monolith]
         direction TB
-        E[Embed complaint<br/>MiniLM-L6 384-d] --> U & R
+        E[Embed complaint<br/>all-mpnet-base-v2 768-d] --> U & R
         U[Understanding<br/>k-NN intent + severity<br/>products: aliases + neighbours<br/>sentiment: RoBERTa]
         R[Retrieval<br/>pgvector cosine + Postgres FTS<br/>RRF fusion, KB slots]
         U --> G
@@ -67,8 +67,9 @@ Single PostgreSQL 16 database (`migrations/001_initial_schema.sql`); vectors liv
 
 | Table | Purpose | Key columns | Indexes |
 |---|---|---|---|
-| `tickets` | historical tickets (retrieval corpus, k-NN labels) | `ticket_id` PK, `complaint`, `resolution`, `category`, `product`, `severity`, `sentiment`, `created_at`, provenance (`source`, `label_source`, `verified`, `split`), `metadata` JSONB, `embedding vector(384)` (complaint + resolution), `complaint_embedding vector(384)`, `text_search tsvector` (generated) | ivfflat on both vectors (`lists = √rows`, built after ingestion), GIN on `text_search`, b-tree on category / product / severity / source / created_at |
+| `tickets` | historical tickets (retrieval corpus, k-NN labels) | `ticket_id` PK, `complaint`, `resolution`, `category`, `product`, `severity`, `sentiment`, `created_at`, provenance (`source`, `label_source`, `verified`, `split`), `metadata` JSONB, `embedding vector(768)` (complaint + resolution), `complaint_embedding vector(768)`, `text_search tsvector` (generated) | ivfflat on both vectors (`lists = √rows`, built after ingestion), GIN on `text_search`, b-tree on category / product / severity / source / created_at |
 | `kb_articles` | KB procedures | `article_id` PK, `title`, `content`, `category`, `product`, `tags[]`, `version`, `metadata`, `embedding`, `text_search` | ivfflat, GIN, b-tree on category / product / updated_at |
+| `system_meta` | facts about how the data was built | `key` PK, `value`: `embedding_model`, `embedding_dim`, `reembed_complete` | PK |
 | `kb_article_versions` | superseded KB versions | (`article_id`, `version`) PK, `title`, `content`, `archived_at` | PK |
 | `intent_taxonomy` | ticket classes, extensible at runtime | `intent_name` unique, `description`, `examples` JSONB, `parent_intent_id`, `active` | name, active |
 | `product_taxonomy` | products and aliases | `product_name` unique, `category`, `aliases[]`, `active` | name, category, active |
@@ -122,10 +123,11 @@ scores. The lexical side is **PostgreSQL full-text search (`ts_rank`), not BM25*
 for all 200 eval complaints, so lexical search uses an OR-of-content-terms `tsquery` ranked by `ts_rank`. Fusion
 happens over **one** semantic and **one** lexical ranking spanning tickets and KB articles. Fusing per table and
 interleaving lets the #1 of 40 KB articles tie the #1 of 2,000 tickets (the first E1 run caught this). Weights
-0.8 semantic / 0.2 lexical were chosen on the dev split. Measured gain over semantic-only: MRR +0.057 (p = 0.0005),
-Hit@5 +0.045 (p = 0.01), for about +120 ms median latency. KB articles are guaranteed 2 of the top-k slots rather than
+0.9 semantic / 0.1 lexical were chosen on the dev split (0.8 / 0.2 with the earlier MiniLM embeddings: stronger
+semantic retrieval leaves less for lexical search to add). Measured gain over semantic-only: nDCG@10 +0.014
+(p = 0.0005), MRR +0.041 (p = 0.003), P@5 +0.018 (p = 0.0005), for about +80 ms median latency. KB articles are guaranteed 2 of the top-k slots rather than
 competing on score, because agents want the canonical procedure even when near-duplicate tickets outrank it. Measured:
-the scenario's KB article reaches the generator's 8-source context for 77% of complaints with the slots vs 19% without.
+the scenario's KB article reaches the generator's 8-source context for 87% of complaints with the slots vs 14% without.
 
 ### 4.4 Relevance used for evidence is cosine similarity, not the RRF score
 RRF scores (~1/(60+rank)) only order results; they say nothing about *how* relevant the best hit is. Evidence
@@ -158,7 +160,8 @@ combined rule is in `decide_support()`.
 Two measured reasons for this design (EXPERIMENTS.md E3): similarity alone cannot see polarity ("disable 5 GHz" is
 as similar to the source as a correct paraphrase), and NLI misreads *imperative* fix steps when the premise is a
 multi-sentence chunk: it called verbatim-supported steps neutral and merely different steps contradictions,
-which flagged 88% of real drafts in the first version. Held-out F1 for detecting not-supported claims: 0.918.
+which flagged 88% of real drafts in the first version. Held-out F1 for detecting not-supported claims: 0.918
+(re-confirmed after the embedding switch; validation keeps MiniLM, §4.11).
 NLI model choice: `cross-encoder/nli-deberta-v3-small` instead of the plan's `roberta-large-mnli` (about 1.4 GB, several times
 slower on CPU); configurable via `NLI_MODEL`.
 
@@ -178,6 +181,23 @@ average relevance, no steps, any contradicted step, groundedness below threshold
 insufficient evidence → ESCALATE; unknown intent → REVIEW; suspected injection → REVIEW; critical severity → REVIEW;
 confidence ≥ 0.75 → RESOLVE; ≥ 0.55 → REVIEW; else ESCALATE. All thresholds are in `app/config.py`.
 
+### 4.11 Embedding models: mpnet where it wins, MiniLM where it is enough
+*Retrieval and understanding: `all-mpnet-base-v2` (768-d).* Experiment 4 compared three models on the E1 queries:
+mpnet beat the original `all-MiniLM-L6-v2` by +0.16 nDCG@10 (p < 0.001); `bge-small-en-v1.5` was worse. After
+the switch and a full re-baseline, deployed hybrid retrieval went from nDCG@10 0.572 to 0.729 and Recall@10 from
+0.558 to 0.726, and intent macro-F1 from 0.723 to 0.889, because the k-NN classifier uses the same embeddings.
+*Groundedness validation: `all-MiniLM-L6-v2` (`VALIDATION_EMBEDDING_MODEL`).* Validation embeds every sentence of the
+cited sources (~80 per request) to choose the premises NLI checks. E3 found validation quality equal with either
+model (F1 0.918 MiniLM vs 0.927 mpnet on the same grid, one item in 100), while mpnet was 6x slower on that
+workload (4.8 s vs 0.8 s per request on 2 CPU cores). Keeping MiniLM there kept end-to-end latency at p50 0.9 s.
+*Evaluation metric: MiniLM, fixed (`METRIC_EMBEDDING_MODEL`).* Reference-step matching keeps the model its 0.6
+threshold was defined with, so before/after numbers measure the system, not a moved yardstick.
+*Re-tuning.* Thresholds with a tuning procedure were re-tuned on the dev split (E1 fusion weights, E3 grid, unknown-
+intent sweep); the four scale-only floors were translated by matching score distributions on dev complaints
+(`experiments/recalibrate_thresholds.py`). *Cost:* 2x vector storage, ~2x query-embedding time, larger image.
+*Side effect:* unseen issue types also look more familiar (extractive RESOLVEs on novel complaints 48% to 52%),
+which keeps the intent-mix drift alert essential.
+
 ## 5. Deviations from IMPLEMENTATION_PLAN.md (with justification)
 
 | Plan | Implemented | Why |
@@ -194,6 +214,7 @@ confidence ≥ 0.75 → RESOLVE; ≥ 0.55 → REVIEW; else ESCALATE. All thresho
 | Very negative sentiment bumps medium → high severity | Disabled by default (configurable) | Measured on the dev split: severity accuracy 0.749 without the bump vs 0.558 with it. Severity reflects impact, not tone |
 | Argmax sentiment label | Polarity thresholds calibrated on dev | Complaints describe problems, so argmax labels nearly everything negative (EVALUATION.md §2) |
 | Dictionary product extraction | + products implied by same-class neighbours | Complaints often imply a product without naming it ("the web keeps cutting out"); dev product F1 0.385 → 0.767 |
+| `all-MiniLM-L6-v2` for all embeddings | `all-mpnet-base-v2` for retrieval/understanding; MiniLM kept for validation and the evaluation metric | Plan's own E4 rule (switch on a significant improvement: +0.16 nDCG@10); validation quality is equal with MiniLM at 1/6 of the cost (§4.11) |
 | Single `embedding` column | + `complaint_embedding` | k-NN intent must compare complaint to complaint, not to complaint+resolution |
 | "Real-time agent UI" out of scope (API only) | Web console at `/` plus read-only knowledge-base endpoints (`/corpus/*`, `/requests`) | Added at the project owner's request so a reviewer can see what RAG retrieves from; plain HTML/CSS/JS served by the API, no extra service. The corpus endpoints are unauthenticated like the rest of this demo API and belong behind auth in production |
 | `POST /ingestion/tickets` | `POST /ingestion` | One idempotent endpoint accepts tickets and KB articles together |
@@ -203,7 +224,9 @@ confidence ≥ 0.75 → RESOLVE; ≥ 0.55 → REVIEW; else ESCALATE. All thresho
 
 ## 6. Production considerations
 
-**Latency.** Stage timings are logged per request. On CPU, the dominant costs are the LLM call (network-bound) and
+**Latency.** Stage timings are logged per request. Validation caches the sentence embeddings of cited sources
+across requests (keyed by a hash of the source text, bounded LRU), since the same KB articles and tickets are cited
+again and again. On CPU, the dominant costs are the LLM call (network-bound) and
 NLI validation (about 0.5 s per claim measured in E3, so a 5-step draft costs roughly 2-3 s). Levers, in order: batch all claim/chunk
 NLI pairs in one forward pass, run NLI on GPU or a smaller model, cache embeddings of KB chunks (static), and stream
 the draft to the agent while validation completes.
@@ -222,6 +245,15 @@ tickets matter less for resolution.
 new version and archive the old one, and new intents can be registered via API. k-NN classification and retrieval
 pick up new rows immediately. The drift endpoint watches for the signature of a new ticket class (rising
 unknown-intent rate, falling nearest-neighbour similarity, intent-mix shift).
+
+**Changing the embedding model.** Stored vectors only mean something for the model that produced it, so a model
+change is handled by the data layer, not by hand: `system_meta` records the model, and `scripts/reembed.py` runs
+on every container start. If the configured model differs, it resizes the vector columns (if the dimension
+changed), re-embeds every row in small committed batches (resumable; `--max-minutes` fits it into job slots),
+rebuilds the ivfflat indexes and records the new model; otherwise it is a no-op that loads no model. The drift
+report only compares requests embedded by the current model, because similarities from different models are not
+comparable. The MiniLM to mpnet switch re-embedded 2,083 documents (4,126 vectors) in about 25 minutes on 2 CPU
+cores; results before the switch are kept in `experiments/results/minilm_baseline/`.
 
 **Reliability.** Connection-level retries in the HTTP transport (connect errors and resets only, never a request that reached the server) plus request-level retries with exponential backoff and `Retry-After` handling on LLM calls; optional IPv4 pinning (`LLM_FORCE_IPV4`) for networks that advertise IPv6 but drop it (seen on the dev machine as `WinError 64` resets); non-retryable 4xx fail fast; extractive fallback;
 monitoring writes never break the request path; savepoints so one bad ingestion row doesn't abort a batch;
@@ -245,7 +277,7 @@ response (`app/services/pipeline.py`, tests in `tests/unit/test_degradation.py`)
 
 | Failure | What the agent gets | Flag |
 |---|---|---|
-| LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual | `llm_unavailable_extractive_fallback` |
+| LLM down, rate-limited or invalid output | extractive draft from the same sources, validated as usual; a daily-quota 429 fails over at once, other waits are capped (10 s on 429s, 45 s overall) | `llm_unavailable_extractive_fallback` |
 | Database down, a query slower than `DB_QUERY_TIMEOUT_S` (10 s), or circuit open | no LLM call; ESCALATE "Knowledge base unavailable" | `retrieval_unavailable` |
 | Understanding fails | intent treated as unknown, so the decision is at most REVIEW; retrieval and drafting continue | `understanding_unavailable` |
 | Generator crashes | no draft; ESCALATE | `generation_error` |
@@ -280,6 +312,7 @@ start: sentiment model plus first connection); that case was discarded and re-ru
   construction but the language is less varied than real tickets. Absolute metric values will not transfer to
   production data; the *comparisons* (hybrid vs semantic, multi-method vs similarity) are the transferable part.
   The suggested public datasets were measured and not used (EVALUATION.md §1).
-* Novel-intent detection from k-NN vote share is weak (EVALUATION.md §2.3).
+* Novel-intent detection from k-NN vote share is weak (EVALUATION.md §2.3), and better embeddings made unseen
+  complaints look more familiar, not less (§4.11); the intent-mix drift alert is the reliable signal.
 * Heuristic confidence is uncalibrated until agent feedback is collected.
 * Single-language (English) FTS configuration.

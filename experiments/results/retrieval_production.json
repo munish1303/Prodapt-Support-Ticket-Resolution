@@ -1,25 +1,25 @@
 {
   "metrics": {
-    "ndcg@10": 0.4753,
-    "mrr": 0.6574,
-    "p@5": 0.561,
-    "p@10": 0.4125,
-    "hit@1": 0.565,
-    "hit@5": 0.76,
-    "recall@10_capped": 0.4125,
-    "recall@20_capped": 0.2062,
-    "kb_recall@5": 0.08,
-    "kb_recall@10": 0.77
+    "ndcg@10": 0.5925,
+    "mrr": 0.7937,
+    "p@5": 0.722,
+    "p@10": 0.5175,
+    "hit@1": 0.715,
+    "hit@5": 0.89,
+    "recall@10_capped": 0.5175,
+    "recall@20_capped": 0.2588,
+    "kb_recall@5": 0.055,
+    "kb_recall@10": 0.87
   },
   "latency_ms": {
-    "p50": 150.9,
-    "p95": 230.5,
-    "mean": 153.0
+    "p50": 281.9,
+    "p95": 448.6,
+    "mean": 298.4
   },
   "config": {
     "rrf_weights": [
-      0.8,
-      0.2
+      0.9,
+      0.1
     ],
     "kb_min_slots": 2,
     "lexical_query_mode": "or",

@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     LLM_MAX_TOKENS: int = 1200
     LLM_TIMEOUT_S: float = 30.0
     LLM_MAX_RETRIES: int = 3
+    # Most seconds one request may spend waiting on 429 rate limits before falling back to the extractive draft;
+    # daily-quota 429s fail over immediately (an agent is waiting at the console).
+    LLM_MAX_RATE_LIMIT_WAIT_S: float = 10.0
+    # Overall deadline for the LLM draft (all attempts); past it the extractive draft is used instead.
+    LLM_REQUEST_DEADLINE_S: float = 45.0
     # Fall back to the extractive generator when the LLM is unavailable.
     LLM_FALLBACK_TO_EXTRACTIVE: bool = True
     # Force IPv4 for LLM calls (workaround for networks with a broken IPv6 route).
@@ -53,8 +58,18 @@ class Settings(BaseSettings):
     LLM_REASONING_EFFORT: str | None = None
 
     # --- Models ----------------------------------------------------------
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
-    EMBEDDING_DIM: int = 384
+    # all-mpnet-base-v2 replaced all-MiniLM-L6-v2 after Experiment 4 (+0.16 nDCG@10). Changing the model is safe:
+    # on startup scripts/reembed.py notices the change (system_meta table), resizes the vector columns and
+    # re-embeds the corpus. Scale-dependent thresholds below were re-tuned for this model (EXPERIMENTS.md).
+    EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
+    EMBEDDING_DIM: int = 768
+    # Evaluation-only: reference-step matching in evaluation/generation_eval.py keeps using MiniLM (cosine >= 0.6)
+    # so the metric means the same thing before and after the embedding switch.
+    METRIC_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    # Groundedness validation embeds every sentence of the cited sources to pick the premises NLI checks. E3 shows
+    # validation quality is the same with either model (F1 0.918 MiniLM vs 0.927 mpnet, n.s.), while mpnet is 6x
+    # slower on this workload (4.8 s vs 0.8 s per request on a 2-core CPU), so validation keeps MiniLM.
+    VALIDATION_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     SENTIMENT_MODEL: str = "cardiffnlp/twitter-roberta-base-sentiment-latest"
     # Lighter than roberta-large-mnli (see ARCHITECTURE.md, "NLI model choice").
     NLI_MODEL: str = "cross-encoder/nli-deberta-v3-small"
@@ -84,9 +99,10 @@ class Settings(BaseSettings):
     RETRIEVAL_TOP_K: int = 8
     RETRIEVAL_KB_MIN_SLOTS: int = 2
     RRF_K: int = 60
-    # Selected on the dev split in Experiment 1 (grid 0.3-0.9; plateau 0.6-0.9, best 0.8).
-    RRF_SEMANTIC_WEIGHT: float = 0.8
-    RRF_LEXICAL_WEIGHT: float = 0.2
+    # Selected on the dev split in Experiment 1 (grid 0.3-0.9). With all-mpnet-base-v2 the best is 0.9 (MiniLM: 0.8):
+    # stronger semantic retrieval leaves less for lexical search to add.
+    RRF_SEMANTIC_WEIGHT: float = 0.9
+    RRF_LEXICAL_WEIGHT: float = 0.1
     # "or" builds an OR-of-terms tsquery; "and" uses plainto_tsquery (all terms).
     LEXICAL_QUERY_MODE: str = "or"
     IVFFLAT_PROBES: int = 10
@@ -97,8 +113,14 @@ class Settings(BaseSettings):
     MAX_CONTEXT_CHARS: int = 8000
 
     # --- Validation ------------------------------------------------------
+    # Sentence embeddings of cited sources are cached across requests (keyed by a hash of the source text, so an
+    # edited KB article is re-embedded). Sources repeat across requests, and encoding ~80 source sentences per
+    # request with all-mpnet-base-v2 costs ~4.8 s on a 2-core CPU. ~30 KB per document.
+    VALIDATION_SOURCE_CACHE_SIZE: int = 2500
     # Tuned on the dev half of the groundedness set in Experiment 3 (v2: sentence premises,
-    # top-similarity contradiction, quote rule; experiments/results/e3_groundedness.json).
+    # top-similarity contradiction, quote rule; experiments/results/e3_groundedness.json), re-tuned for
+    # VALIDATION_EMBEDDING_MODEL (MiniLM); re-confirmed on the widened grid used for the embedding comparison
+    # (experiments/results/e3_groundedness_mpnet.json has the mpnet alternative).
     GROUNDED_SIM_THRESHOLD: float = 0.60
     GROUNDED_SIM_WEAK_THRESHOLD: float = 0.45
     GROUNDED_ENTAIL_THRESHOLD: float = 0.30
@@ -115,14 +137,14 @@ class Settings(BaseSettings):
     GROUNDED_USE_QUOTE_MATCH: bool = True
 
     # --- Evidence sufficiency / decision --------------------------------
-    EVIDENCE_MIN_TOP_RELEVANCE: float = 0.35
-    EVIDENCE_MIN_AVG_RELEVANCE: float = 0.40
+    EVIDENCE_MIN_TOP_RELEVANCE: float = 0.42
+    EVIDENCE_MIN_AVG_RELEVANCE: float = 0.45
     EVIDENCE_MIN_GROUNDEDNESS: float = 0.60
     CONF_W_RETRIEVAL: float = 0.30
     CONF_W_EVIDENCE: float = 0.40
     CONF_W_UNDERSTANDING: float = 0.20
     CONF_W_SUFFICIENCY: float = 0.10
-    CONF_RETRIEVAL_NORMALISER: float = 0.80
+    CONF_RETRIEVAL_NORMALISER: float = 0.79
     CONF_INSUFFICIENT_CREDIT: float = 0.3
     DECISION_RESOLVE_THRESHOLD: float = 0.75
     DECISION_REVIEW_THRESHOLD: float = 0.55
@@ -131,7 +153,7 @@ class Settings(BaseSettings):
     # --- Monitoring ------------------------------------------------------
     DRIFT_WINDOW_HOURS: int = 24
     DRIFT_UNKNOWN_RATE_ALERT: float = 0.15
-    DRIFT_LOW_SIMILARITY_ALERT: float = 0.45
+    DRIFT_LOW_SIMILARITY_ALERT: float = 0.51
     # Intent-mix shift alert: TVD > coef / sqrt(min window size) ~ 99th percentile of sampling noise
     # (measured: p99 = 0.467 / 0.317 / 0.217 / 0.138 at n = 30 / 60 / 120 / 240). Recalibrate on real traffic.
     DRIFT_TVD_ALERT_COEF: float = 2.5

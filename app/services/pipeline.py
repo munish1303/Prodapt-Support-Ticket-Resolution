@@ -285,6 +285,8 @@ class ResolutionPipeline:
                                 "severity": r.metadata.severity,
                                 "sentiment": r.metadata.sentiment,
                                 "nearest_similarity": r.metadata.nearest_similarity,
+                                # similarities are only comparable within one embedding model (drift baseline)
+                                "embedding_model": settings.EMBEDDING_MODEL,
                             }
                         ),
                         "src": json.dumps(
