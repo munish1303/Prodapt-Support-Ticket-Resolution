@@ -41,10 +41,10 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 | Groundedness check, F1 at catching unsupported/contradicted steps | **0.918** multi-method vs 0.694 similarity-only (E3); validation keeps MiniLM: same quality as mpnet (0.927, n.s.) at 1/6 of the cost |
 | Understanding (500 complaints) | intent macro-F1 **0.889** · products F1 0.814 · severity acc 0.884 · sentiment acc 0.790 |
 | New ticket class, no retraining | 0% → **88%** recognised after ingestion; caught beforehand by the intent-mix drift alert (E4′) |
-| LLM drafts (Groq `qwen3.8-27b`, all 100 cases; **measured before the embedding switch**, re-run in progress) | groundedness 0.94 · step precision +0.066 vs extractive (p = 0.002) · RESOLVE drafts recover 83% of reference steps, ESCALATE 19% · confidence AUROC 0.84 |
-| Draft quality, 50 pre-switch drafts rated by an AI rater (Claude, blind to system outputs; **not human**) | 72% safe to use as-is; 76% of system RESOLVEs safe; confidence AUROC 0.81 for "safe"; the unsafe RESOLVEs are wrong-scenario drafts (EVALUATION.md §6.4) |
-| Unseen issue type (60 complaints) | confident wrong answers with extractive drafts: 52% (48% before the switch: better similarity makes unseen complaints look *more* familiar); **22% with an LLM** that declines when sources don't fit (pre-switch) |
-| Latency / load (1 worker, laptop CPU) | p50 0.9 s / p95 1.6 s without LLM · 1.34 req/s at concurrency 8 (0.84 before the switch, thanks to the validation cache), 0% errors · with the free-tier LLM: pre-switch p50 6.4 s / p95 16.7 s (rate-limit waits) |
+| LLM drafts (Groq `qwen3.8-27b`, all 100 cases) | reference-step recall 0.765 → **0.865** and step precision 0.626 → **0.736** after the embedding switch (both p ≤ 0.003) · groundedness 0.988 · citation accuracy 0.99 · step precision +0.112 vs extractive (p < 0.001) · confidence AUROC 0.85 |
+| Draft quality, 50 drafts rated by an AI rater (Claude, blind to system outputs; **not human**) | **84%** safe to use as-is (72% before the switch); 81% of system RESOLVEs safe (76%); every unsafe draft left is a confusable-scenario draft auto-resolved at confidence 0.83-0.91, which confidence cannot catch (AUROC 0.63, EVALUATION.md §6.4) |
+| Unseen issue type (60 complaints) | confident wrong answers with extractive drafts: 52% (48% before the switch: better similarity makes unseen complaints look *more* familiar); with the LLM, which declines when sources don't fit, **30%** vs 51% extractive on the 47 complaints the quota covered |
+| Latency / load (1 worker, laptop CPU) | p50 0.9 s / p95 1.6 s without LLM · 1.34 req/s at concurrency 8 (0.84 before the switch, thanks to the validation cache), 0% errors · with the free-tier LLM: p50 8.1 s / p95 **14.7 s** (16.7 s before; target 15 s) |
 | Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
 | Deployment | `docker compose up --build` verified end to end on the dev machine (offline model loading; changing the embedding model re-embeds the corpus automatically on startup) |
 
@@ -182,13 +182,13 @@ uvicorn app.main:app --reload
 ## Tests and quality
 
 ```bash
-pytest --cov=app                 # 91 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
+pytest --cov=app                 # 102 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
 pytest -m db                     # DB integration tests only (needs the database running)
 black --check . && flake8 && mypy app scripts evaluation experiments tests
 locust -f tests/load/locustfile.py --host http://localhost:8000   # optional interactive load test
 ```
 
-Current status: 91 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
+Current status: 102 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
 
 ## Evaluations and experiments
 

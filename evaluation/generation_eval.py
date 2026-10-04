@@ -227,7 +227,9 @@ async def main() -> None:
         if args.delay:
             await asyncio.sleep(args.delay)
     novel_rows = [done[c["id"]] for c in novel if c["id"] in done]
-    novel_decisions = Counter(r["decision"] for r in novel_rows)
+    # A case whose LLM call failed (quota) has no draft to judge; count decisions over scored cases only.
+    novel_scored = [r for r in novel_rows if not r["generation_error"]]
+    novel_decisions = Counter(r["decision"] for r in novel_scored)
 
     lat = [r["latency_ms"] for r in rows]
     stage_keys = rows[0]["stage_ms"].keys() if rows else []
@@ -262,8 +264,9 @@ async def main() -> None:
             "max": max(lat) if lat else None,
         },
         "stage_latency_ms_mean": {k: round(mean([r["stage_ms"][k] for r in rows])) for k in stage_keys},
+        "novel_intent_scored": len(novel_scored),
         "novel_intent_decisions": dict(novel_decisions),
-        "novel_intent_empty_drafts": sum(1 for r in novel_rows if r["n_steps"] == 0),
+        "novel_intent_empty_drafts": sum(1 for r in novel_scored if r["n_steps"] == 0),
         "novel_intent_generation_errors": sum(1 for r in novel_rows if r["generation_error"]),
     }
     judged = [r["judge"] for r in rows if r.get("judge")]

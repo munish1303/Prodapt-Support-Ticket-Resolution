@@ -16,7 +16,7 @@ subsections). The original MiniLM numbers are kept in each section; their result
 | E3 | Does multi-method groundedness beat single signals? | **Done** (v2), re-run with both embeddings | Multi-method v2; F1 0.918 with MiniLM, 0.927 with mpnet (n.s.); validation keeps MiniLM (6x faster) |
 | E4′ | Can the system absorb a new ticket class without retraining? | **Done**, re-run with mpnet | Yes (88% after ingestion with mpnet, 85% with MiniLM); intent-mix drift alert fires before |
 | E4 | Would a different embedding model retrieve better? | **Done** | all-mpnet-base-v2 significantly better (+0.16 nDCG@10): **switched**, with a full re-baseline |
-| E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional, pre-switch drafts) | Keep 0.75; 0.90 gave 100% precision at 42% coverage; the real fix is wrong-scenario detection |
+| E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional), re-run on mpnet drafts | Keep 0.75; precision is 84% at any threshold up to 0.85, 100% only above 0.91 (36% coverage); the real fix is wrong-scenario detection |
 
 ---
 
@@ -307,7 +307,8 @@ fires: *"intent mix shifted: TVD 0.517 > 0.323 … a new issue type may be landi
   with its KB article retrieved 87% of the time.
 * **Before ingestion the system is overconfident:** 48% of novel complaints are RESOLVEd with drafts grounded in the
   wrong tickets (extractive generator; EVALUATION.md §4.1, "grounded but wrong"). An LLM generator that may decline
-  when sources don't fit lowers this to 22% (EVALUATION.md §4.2). Per-request signals can't see this; the
+  when sources don't fit lowers this: 22% with gpt-oss-20b before the switch; after it, 51% → 30% with the deployed
+  Qwen on the 47 complaints its quota covered (EVALUATION.md §4.2). Per-request signals can't see this; the
   traffic-level intent-mix alert can, after about 60 requests. That is the operational backstop: the alert triggers a
   review, the reviewer registers the class, and ingestion fixes it.
 * Cost of the new class: in-distribution intent accuracy drops 0.724 → 0.682 (offline eval), because roaming tickets
@@ -347,30 +348,31 @@ unseen complaints look more familiar before ingestion (31 vs 29 RESOLVEs), so th
 **Question.** What RESOLVE threshold balances precision (auto-resolved drafts that are safe) against coverage
 (share of drafts auto-resolved)?
 
-**Data.** (confidence, "safe to use as-is") pairs for the 50 drafts of the rating sheet (drafts and confidence from
-the run *before* the embedding switch; a re-rating of new drafts is pending the LLM re-run), rated by an AI rater blind
-to system outputs (EVALUATION.md §6.4; `experiments/results/ai_rater_eval.json`, `resolve_threshold_sweep`).
+**Data.** (confidence, "safe to use as-is") pairs for the 50 drafts of the rating sheet, drafts and confidence from
+the mpnet LLM run, rated by an AI rater blind to system outputs (EVALUATION.md §6.4;
+`experiments/results/ai_rater_eval.json`, `resolve_threshold_sweep`; the 0.91 row is computed from the same sheet).
 Coverage counts drafts at or above the threshold; policy rules (critical severity, unknown intent, injection) can
-still send some of them to REVIEW, so coverage is an upper bound on automation.
+still send some of them to REVIEW, so coverage is an upper bound on automation. The pre-switch sweep is kept in
+`experiments/results/minilm_baseline/ai_rater_eval.json`.
 
-| RESOLVE threshold | Coverage | Precision (safe) |
-|---:|---:|---:|
-| 0.55 - 0.65 | 96% | 75% |
-| 0.70 | 94% | 74% |
-| **0.75 (deployed)** | 92% | 76% |
-| 0.80 | 88% | 77% |
-| 0.85 | 68% | 82% |
-| 0.90 | 42% | 100% |
+| RESOLVE threshold | Coverage | Precision (safe) | before (MiniLM): coverage, precision |
+|---:|---:|---:|---|
+| 0.55 - 0.70 | 100% | 84% | 94-96%, 74-75% |
+| **0.75 (deployed)** | 100% | 84% | 92%, 76% |
+| 0.80 | 96% | 83% | 88%, 77% |
+| 0.85 | 86% | 84% | 68%, 82% |
+| 0.90 | 48% | 92% | 42%, 100% |
+| 0.91 | 36% | 100% | |
 
-Confidence AUROC for "safe" is 0.81, so the score does rank drafts, but precision only rises steeply above 0.85.
+Every draft in the sample has confidence ≥ 0.79, and the 8 unsafe ones sit between 0.83 and 0.91, inside the range
+of the safe ones. Confidence AUROC for "safe" fell to 0.63 [95% CI 0.48-0.79] from 0.81 before the switch.
 
-**Decision.** Keep 0.75 as the deployed default for now. If precision matters more than automation, 0.90 is the
-setting this data supports (no unsafe draft auto-resolved, but fewer than half auto-resolved) and is a one-line
-config change (`DECISION_RESOLVE_THRESHOLD`). Not adopted yet because (1) the ratings are AI-generated and n = 50,
-so the precision estimates are wide; (2) the threshold treats the symptom: the unsafe auto-resolves are wrong-scenario
-drafts with confidence 0.81-0.89, well grounded in the wrong sources, which a threshold cannot separate from good
-drafts without discarding most of them. The structural fix is per-request wrong-scenario detection (EVALUATION.md
-§9, item 1). Re-run this sweep on human ratings before changing the production threshold.
+**Decision.** Keep 0.75. Precision is the same (84%) at every threshold up to 0.85, so raising it buys nothing until
+0.91, where it would auto-resolve only about a third of drafts. Precision at the deployed threshold rose from 76% to
+84% because the drafts got better, not because the threshold works better. The unsafe auto-resolves are
+confusable-scenario drafts, well grounded in sources for a neighbouring problem, which no threshold on this score can
+separate from good drafts. The structural fix is per-request wrong-scenario detection (EVALUATION.md §9, item 1).
+Re-run this sweep on human ratings before changing the production threshold.
 
 ## E4: Embedding model comparison (plan §35.1)
 
