@@ -17,6 +17,7 @@ subsections). The original MiniLM numbers are kept in each section; their result
 | E4′ | Can the system absorb a new ticket class without retraining? | **Done**, re-run with mpnet | Yes (88% after ingestion with mpnet, 85% with MiniLM); intent-mix drift alert fires before |
 | E4 | Would a different embedding model retrieve better? | **Done** | all-mpnet-base-v2 significantly better (+0.16 nDCG@10): **switched**, with a full re-baseline |
 | E5 | Where should the RESOLVE threshold be? | **Done on AI ratings** (provisional), re-run on mpnet drafts | Keep 0.75; precision is 84% at any threshold up to 0.85, 100% only above 0.91 (36% coverage); the real fix is wrong-scenario detection |
+| E9 | Can runtime signals catch a context from the wrong scenario? | **Done** (added experiment) | Not adopted: ranks bad drafts well (AUROC 0.89) but catching 4 of 7 bad LLM auto-resolves costs 16 points of RESOLVE rate |
 
 ---
 
@@ -373,6 +374,63 @@ of the safe ones. Confidence AUROC for "safe" fell to 0.63 [95% CI 0.48-0.79] fr
 confusable-scenario drafts, well grounded in sources for a neighbouring problem, which no threshold on this score can
 separate from good drafts. The structural fix is per-request wrong-scenario detection (EVALUATION.md §9, item 1).
 Re-run this sweep on human ratings before changing the production threshold.
+
+## E9: Per-request wrong-scenario detection (added experiment; not adopted)
+
+**Question.** The remaining unsafe auto-resolves are "grounded but wrong" drafts: faithful to sources about a
+confusable problem (EVALUATION.md §4.1, §6.3, §6.4). Can runtime signals spot a context from the wrong scenario, so
+those drafts go to REVIEW instead?
+
+**Procedure.** `python experiments/e9_wrong_scenario.py collect` (in the API container, about an hour on CPU) runs
+understanding and production hybrid retrieval for 861 complaints and records, per source, semantic and lexical
+ranks, cosine relevance, category, product and a cross-encoder score (complaint ↔ source,
+`ms-marco-MiniLM-L-6-v2`) → `experiments/results/e9_features.jsonl`. `... analyze` → `e9_wrong_scenario.json`.
+Scenario ids are used only as labels, never as signals.
+* **Tuning set:** the 500 understanding-eval complaints. Label "wrong context": fewer than half of the 8 sources come
+  from the complaint's true scenario (102 of 500).
+* **14 candidate signals:** retrieval strength, intent-vote confidence, semantic-vs-lexical ranker disagreement,
+  cross-encoder scores (top source, mean, best KB article, whether it prefers a different KB article), category
+  split among sources, share of sources whose category differs from the predicted intent, product mismatch.
+* **Rules fixed before any test result was seen:** logistic regression with greedy forward selection by 5-fold CV
+  AUROC on the tuning set; cross-encoder signals only if they add ≥ 0.03 AUROC (they cost latency); operating point
+  = flag at most 10% of correct-context tuning cases; a flagged RESOLVE becomes REVIEW. Adopt only if it catches
+  wrong drafts without a real loss of RESOLVE rate in-distribution (EVALUATION.md §9).
+* **Tests (untouched):** the 200 retrieval-eval complaints (same label), the 100 generation cases with LLM and
+  extractive drafts (bad = reference-step recall < 0.5), the 50 AI-rated drafts (bad = not safe), the 60
+  unseen-issue complaints (every RESOLVE is wrong), and the §6.3 example.
+
+**Selected detector.** Low intent-vote confidence + share of sources whose category differs from the predicted intent
++ product mismatch. CV AUROC 0.855 on the tuning set; the cross-encoder added only +0.003, so it was left out.
+Ranker disagreement, proposed in §6.3, is weak on its own (AUROC 0.63).
+
+**Results.**
+
+| Test set | Detector AUROC (bad vs good RESOLVEs) | Bad RESOLVEs caught | Good RESOLVEs sent to REVIEW | RESOLVE rate | RESOLVE precision |
+|---|---:|---:|---:|---|---|
+| Retrieval-level check (200) | 0.821 (wrong vs correct context) | 54% of wrong contexts flagged | 14% of correct flagged | | |
+| Generation, LLM drafts (100) | 0.888 | 4 of 7 | 12 of 78 | 85% → 69% | 0.918 → 0.957 |
+| Generation, extractive drafts (100) | 0.928 | 9 of 12 | 8 of 74 | 86% → 69% | 0.861 → 0.957 |
+| AI-rated LLM drafts (50) | 0.743 | 2 of 8 | 7 of 35 | 86% → 68% | 0.814 → 0.824 |
+| Unseen issue type, LLM RESOLVEs | n/a | 2 of 17 | n/a | 28% → 25% | |
+| Unseen issue type, extractive RESOLVEs | n/a | 5 of 31 | n/a | 52% → 43% | |
+| §6.3 example | n/a | flagged | | | |
+
+**Decision: not adopted.** The detector *ranks* bad drafts well (AUROC 0.89 on LLM drafts), but bad auto-resolves are
+rare (7 of 85), so any useful threshold costs many good ones: about 16 points of RESOLVE rate to catch 4 of 7 bad LLM
+drafts, and almost no precision gain on the AI-rated set. On unseen issue types it catches 2 of 17 confident wrong
+answers. That fails the pre-set criterion, so production is unchanged.
+
+**Why it misses.** The drafts it misses are wrong *consistently*: the k-NN intent vote is confident (0.65-0.85 for the 6
+unsafe rated drafts it misses; mean 0.85 for unseen-issue RESOLVEs) and the sources agree with each other, because all the
+nearest tickets come from the same confusable scenario (a 5G phone complaint whose neighbours are almost all broadband
+speed-upgrade tickets). Category-level agreement signals cannot see that, and an off-the-shelf passage-relevance
+cross-encoder doesn't separate the scenarios either. What remains needs a fine-grained check that reads the complaint
+against the source ("does this source describe the customer's device and symptom?"), e.g. an NLI or LLM verifier
+over the 3-5 cited sources, or confusable-pair training data for a cross-encoder.
+
+**What is still useful.** The score is a good ranking signal (0.82-0.93 AUROC on three test sets) and costs nothing at
+request time. It is a natural input to a *calibrated* confidence model once human labels exist (EVALUATION.md §9,
+item 3), rather than a hard rule.
 
 ## E4: Embedding model comparison (plan §35.1)
 

@@ -24,7 +24,7 @@ reported as missed; the sections below explain each number.
 | P95 latency < 15 s (MVP) | 1.6 s without LLM (concurrency 1); with the free-tier LLM **14.7 s** on the 67 cases run under the current rate-limit settings (16.7 s before the switch) | ✓ (just, free tier) | §4.2, §6.1 |
 | Throughput > 5 req/s | 1.0 req/s at concurrency 1, 1.34 req/s at concurrency 8 per worker on the laptop CPU, 0% errors | ✗ | §6.1 |
 | Test coverage > 70% | 88% of `app/` | ✓ | §7 |
-| Experiments 1-3 run, with decisions | E1, E2, E3 done; optional E4 (embeddings) and E5 (thresholds, on AI ratings) done; E4′ evolving classes | ✓ | EXPERIMENTS.md |
+| Experiments 1-3 run, with decisions | E1, E2, E3 done; optional E4 (embeddings) and E5 (thresholds, on AI ratings) done; E4′ evolving classes; E9 wrong-scenario detection (not adopted) | ✓ | EXPERIMENTS.md |
 
 The embedding switch (EXPERIMENTS.md E4) moved intent F1 and Recall@10 above their targets. The remaining miss,
 throughput, comes from CPU inference in one worker; LLM latency meets the target only just, on the free tier. The
@@ -436,7 +436,8 @@ Root cause, from per-ranker inspection:
 
 Not tuned away (fitting the system to its demo example would be overfitting). What the evidence suggests instead:
 (1) **ranker disagreement as an uncertainty signal**: here the semantic and lexical top-10s barely overlap, a cheap
-runtime clue that should lower confidence; (2) sentence-level / late-interaction retrieval so boilerplate cannot
+runtime clue that should lower confidence (tested in E9: weak on its own, AUROC 0.63; the E9 detector does flag this
+example); (2) sentence-level / late-interaction retrieval so boilerplate cannot
 outvote the symptom sentence; (3) the LLM generator, which sees the evening-Wi-Fi KB article in its context and can
 decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on the cited sources.
 
@@ -532,7 +533,7 @@ trades that wait for more false alarms under load.
 |---|---|
 | Unit + API + DB integration tests (`pytest`) | 102 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 88% |
-| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 79 files) | clean |
+| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 81 files) | clean |
 | Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |
 | `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
 | Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |
@@ -544,7 +545,8 @@ trades that wait for more false alarms under load.
 * Labels by construction: no inter-annotator agreement and no human verification.
 * **"Grounded but wrong"** (§4.1, §6.3): validation checks draft ↔ sources, not sources ↔ complaint. When retrieval
   picks a semantically close but wrong scenario, the system can RESOLVE confidently. Mitigated at traffic level by the
-  intent-mix drift alert (E4′); per-request mitigations (ranker disagreement, relevance verifier) are next steps.
+  intent-mix drift alert (E4′). A per-request detector from cheap signals (EXPERIMENTS.md E9) ranks bad drafts well
+  (AUROC 0.89) but was not adopted: catching 4 of 7 bad LLM auto-resolves would cost 16 points of RESOLVE rate.
 * Intent macro-F1 is 0.889 after the embedding switch (0.723 before); the LLM classifier (`INTENT_CLASSIFIER=llm`)
   has not been evaluated.
 * Better embeddings made unseen issue types look more familiar (novel-class RESOLVEs 29 → 31 of 60, extractive), so
@@ -561,15 +563,17 @@ trades that wait for more false alarms under load.
 
 ## 9. Future work (prioritised by expected impact on the measured weaknesses)
 
-1. **Per-request "wrong scenario" detection** (the "grounded but wrong" mode, §4.1 and §6.3). Add (a) semantic vs
-   lexical *ranker disagreement* as an uncertainty signal in the confidence score, and (b) a complaint ↔ cited-source
-   relevance check with the cross-encoder applied to the 3–5 cited sources only. Evaluate on the 60 novel-class
-   complaints, the §6.3 example and the 8 unsafe auto-resolves of §6.4 (all confusable scenarios, confidence
-   0.83-0.91); success = fewer confident wrong RESOLVEs with no loss of RESOLVE rate in-distribution.
+1. **Per-request "wrong scenario" detection, fine-grained** (the "grounded but wrong" mode, §4.1, §6.3, §6.4).
+   E9 tried cheap category-level signals (intent-vote confidence, source/intent category agreement, product
+   mismatch, ranker disagreement, an off-the-shelf cross-encoder): good ranking (AUROC 0.89 on LLM drafts) but too
+   costly as a rule, because the remaining errors are *consistently* wrong (confident vote, sources agreeing). Next:
+   a verifier that reads the complaint against each of the 3-5 cited sources ("same device and symptom?"), as NLI or
+   an LLM call, or a cross-encoder trained on confusable scenario pairs. Evaluate with the E9 harness; success =
+   fewer confident wrong RESOLVEs with no real loss of RESOLVE rate in-distribution.
 2. **Sentence-level / late-interaction retrieval** so boilerplate sentences ("I work from home…") cannot outvote the
    symptom sentence; re-run E1.
 3. **Calibrate the confidence score** from the human ratings (§6.4) and the feedback endpoint (isotonic or Platt on
-   "safe to use"); then run Experiment 5 to set RESOLVE/REVIEW thresholds for a target precision.
+   "safe to use", with the E9 wrong-scenario score as an extra input); then run Experiment 5 to set RESOLVE/REVIEW thresholds for a target precision.
 4. **Intent:** evaluate the LLM classifier (`INTENT_CLASSIFIER=llm`) against k-NN (now 0.889 macro-F1), mainly for
    the weakest class (plan_change 0.77) and for novelty detection.
 5. **Throughput:** batched GPU inference for NLI and embeddings, then multiple workers; re-run the load test (target

@@ -45,7 +45,7 @@ caveats in [EVALUATION.md](EVALUATION.md) and [EXPERIMENTS.md](EXPERIMENTS.md).
 | Draft quality, 50 drafts rated by an AI rater (Claude, blind to system outputs; **not human**) | **84%** safe to use as-is (72% before the switch); 81% of system RESOLVEs safe (76%); every unsafe draft left is a confusable-scenario draft auto-resolved at confidence 0.83-0.91, which confidence cannot catch (AUROC 0.63, EVALUATION.md §6.4) |
 | Unseen issue type (60 complaints) | confident wrong answers with extractive drafts: 52% (48% before the switch: better similarity makes unseen complaints look *more* familiar); with the LLM, which declines when sources don't fit, **28%** |
 | Latency / load (1 worker, laptop CPU) | p50 0.9 s / p95 1.6 s without LLM · 1.34 req/s at concurrency 8 (0.84 before the switch, thanks to the validation cache), 0% errors · with the free-tier LLM: p50 8.1 s / p95 **14.7 s** (16.7 s before; target 15 s) |
-| Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3) |
+| Known failure mode | "grounded but wrong": a fluent, well-cited draft from the wrong scenario, documented with root cause (EVALUATION.md §6.3); a runtime detector was built and tested, and not adopted because it cost 16 points of RESOLVE rate (EXPERIMENTS.md E9) |
 | Deployment | `docker compose up --build` verified end to end on the dev machine (offline model loading; changing the embedding model re-embeds the corpus automatically on startup) |
 
 ## Features
