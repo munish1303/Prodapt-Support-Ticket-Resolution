@@ -307,8 +307,8 @@ fires: *"intent mix shifted: TVD 0.517 > 0.323 … a new issue type may be landi
   with its KB article retrieved 87% of the time.
 * **Before ingestion the system is overconfident:** 48% of novel complaints are RESOLVEd with drafts grounded in the
   wrong tickets (extractive generator; EVALUATION.md §4.1, "grounded but wrong"). An LLM generator that may decline
-  when sources don't fit lowers this: 22% with gpt-oss-20b before the switch; after it, 51% → 30% with the deployed
-  Qwen on the 47 complaints its quota covered (EVALUATION.md §4.2). Per-request signals can't see this; the
+  when sources don't fit lowers this: 22% with gpt-oss-20b before the switch; after it, 52% → 28% with the deployed
+  Qwen (EVALUATION.md §4.2). Per-request signals can't see this; the
   traffic-level intent-mix alert can, after about 60 requests. That is the operational backstop: the alert triggers a
   review, the reviewer registers the class, and ingestion fixes it.
 * Cost of the new class: in-distribution intent accuracy drops 0.724 → 0.682 (offline eval), because roaming tickets

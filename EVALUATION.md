@@ -273,8 +273,8 @@ familiar, not less). The drafts are faithfully grounded, just in the wrong ticke
 similar enough to mobile-connectivity tickets (cosine ≈ 0.7) to pass the relevance gate, and the extractive
 generator has no notion of "these sources don't answer this question". Groundedness verifies *draft ↔ sources*,
 not *sources ↔ complaint*. Mitigations: the LLM generator is instructed to return no steps when sources don't
-address the complaint (measured in §4.2: on 47 unseen complaints, wrong RESOLVEs fall from 51% with extractive
-drafts to 30% with Qwen); a complaint↔source relevance verifier (e.g. the cross-encoder from E2
+address the complaint (measured in §4.2: wrong RESOLVEs fall from 52% with extractive drafts to 28% with Qwen);
+a complaint↔source relevance verifier (e.g. the cross-encoder from E2
 applied to the 3–5 cited sources only) is the natural next safeguard; drift monitoring watches the
 nearest-neighbour similarity of incoming traffic.
 
@@ -359,28 +359,22 @@ Two LLMs from different families agree closely, which supports the conclusions a
 not a precise estimate.
 
 **Novel-class complaints with an LLM generator: the "grounded but wrong" test.** The same 60 roaming complaints as
-§4.1 (a class absent from the corpus). With the deployed Qwen model on the mpnet system, **47 of 60** were scored
-before the daily quota ran out; the other 13 hit the quota and are not counted (`generation_llm.json`,
-`novel_rows`). An earlier run with Groq `openai/gpt-oss-20b` (low reasoning effort, MiniLM system, before the switch)
-covered all 60 (`experiments/results/generation_llm_gptoss20b_novel.json`). On the 47 complaints all three share:
+§4.1 (a class absent from the corpus), with the deployed Qwen model on the mpnet system (`generation_llm.json`,
+`novel_rows`; the last 13 ran a day later, after the daily quota reset). An earlier run with Groq
+`openai/gpt-oss-20b` (low reasoning effort, MiniLM system, before the switch) is kept for comparison
+(`experiments/results/generation_llm_gptoss20b_novel.json`).
 
-| Unseen-issue complaints (n = 47, paired) | RESOLVE (confident wrong answer) | REVIEW | ESCALATE | Drafts declined (no steps) |
+| Unseen-issue complaints (n = 60, paired) | RESOLVE (confident wrong answer) | REVIEW | ESCALATE | Drafts declined (no steps) |
 |---|---:|---:|---:|---:|
-| Extractive generator, mpnet (§4.1) | **24 (51%)** | 23 | 0 | n/a |
-| LLM Qwen 3.8 27B, mpnet (deployed) | **14 (30%)** | 19 | 14 | 13 (28%) |
-| LLM gpt-oss-20b, MiniLM (before the switch) | 12 (26%) | 12 | 23 | 19 (40%) |
-
-On all 60 complaints: extractive mpnet 31 RESOLVEs (52%), gpt-oss-20b 13 (22%).
+| Extractive generator, mpnet (§4.1) | **31 (52%)** | 29 | 0 | n/a |
+| LLM Qwen 3.8 27B, mpnet (deployed) | **17 (28%)** | 25 | 18 | 17 (28%) |
+| LLM gpt-oss-20b, MiniLM (before the switch) | 13 (22%) | 17 | 30 | 26 (43%) |
 
 The prompt rule *"if the sources do not address the complaint, return an empty list"* does real work: Qwen declined
-13 of 47, which the pipeline turns into ESCALATE ("insufficient evidence"), and confident wrong answers on an unseen
-issue type fall from 51% to 30%. It does not eliminate them, so the traffic-level intent-mix drift alert (E4′)
+17 of 60, which the pipeline turns into ESCALATE ("insufficient evidence"), and confident wrong answers on an unseen
+issue type fall from 52% to 28%. It does not eliminate them, so the traffic-level intent-mix drift alert (E4′)
 remains the second line of defence. Qwen vs gpt-oss-20b is not a clean model comparison (different retrieval
 systems); both show the same effect.
-
-**Remaining gap:** 13 of the 60 unseen-issue cases with Qwen (daily quota). Resume with
-`python evaluation/generation_eval.py --generator llm --judge --judge-model openai/gpt-oss-120b --delay 2`
-(only missing cases run).
 
 ## 5. Groundedness validation (L1)
 
@@ -556,8 +550,8 @@ trades that wait for more false alarms under load.
 * Better embeddings made unseen issue types look more familiar (novel-class RESOLVEs 29 → 31 of 60, extractive), so
   the per-request novelty signal got weaker; the traffic-level intent-mix alert still fires (E4′).
 * LLM generation evaluated on all 100 cases with Qwen (before and after the switch), 19 with Gemini and the 60
-  novel-class cases with gpt-oss-20b (before the switch); Qwen covers 47 of the 60 novel-class cases. Free-tier
-  daily caps (200k tokens/day on Groq, 20 requests/day on Gemini) prevented one model from covering everything.
+  novel-class cases with Qwen (after the switch) and gpt-oss-20b (before it). Free-tier daily caps (200k
+  tokens/day on Groq, 20 requests/day on Gemini) kept Gemini to 19 cases and stretched the Qwen run over three days.
 * E3 test half is small (100 items); the TVD drift coefficient was calibrated on this dataset's class mix.
 * One worker sustains about 1-1.3 requests/s on a laptop CPU (§6.1); horizontal scaling or GPU inference is needed for volume.
 * Heuristic confidence is uncalibrated. It separates good from bad drafts on the automatic labels (AUROC 0.89
@@ -580,12 +574,11 @@ trades that wait for more false alarms under load.
    the weakest class (plan_change 0.77) and for novelty detection.
 5. **Throughput:** batched GPU inference for NLI and embeddings, then multiple workers; re-run the load test (target
    > 5 req/s). Reranking is no longer worth it after the switch (+0.010 P@5, E2).
-6. **Complete the novel-class LLM run** with the deployed model (Qwen has 47 of 60; the 100 generation cases are done).
-7. **Real data:** re-run every evaluation on real (anonymised) tickets; the synthetic set fixes relevance labels but
+6. **Real data:** re-run every evaluation on real (anonymised) tickets; the synthetic set fixes relevance labels but
    not linguistic variety.
-8. **Precompute source sentence embeddings** at ingestion (today a cross-request cache) so validation never embeds
+7. **Precompute source sentence embeddings** at ingestion (today a cross-request cache) so validation never embeds
    sources at request time; then mpnet could also be used for validation at no latency cost.
    Optional experiments not run: E6 LLM temperature, E7 context length (free-tier LLM quota), E8 caching.
-9. **Out-of-domain stress test** with the Hugging Face tickets (§1): measure how often the system RESOLVEs IT
+8. **Out-of-domain stress test** with the Hugging Face tickets (§1): measure how often the system RESOLVEs IT
    tickets it has no knowledge for, and whether the drift monitor alerts.
 

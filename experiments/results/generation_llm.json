@@ -3,7 +3,7 @@
     "generator": "qwen/qwen3.8-27b",
     "n": 100,
     "n_planned": 100,
-    "n_novel": 47,
+    "n_novel": 60,
     "match_threshold": 0.6,
     "metrics": {
       "citation_accuracy": 0.99,
@@ -53,13 +53,13 @@
       "validate": 3397,
       "decide": 0
     },
-    "novel_intent_scored": 47,
+    "novel_intent_scored": 60,
     "novel_intent_decisions": {
-      "ESCALATE": 14,
-      "RESOLVE": 14,
-      "REVIEW": 19
+      "ESCALATE": 18,
+      "RESOLVE": 17,
+      "REVIEW": 25
     },
-    "novel_intent_empty_drafts": 13,
+    "novel_intent_empty_drafts": 17,
     "novel_intent_generation_errors": 0,
     "llm_judge_mean": {
       "relevance": 4.6,
@@ -4990,6 +4990,149 @@
       "groundedness": 0.0,
       "max_relevance": 0.5779980924132787,
       "confidence": 0.4349,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0048",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 5,
+      "groundedness": 1.0,
+      "max_relevance": 0.6864019970888213,
+      "confidence": 0.931,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0049",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.637636068913005,
+      "confidence": 0.8581,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0050",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "billing_dispute",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.6008967757225208,
+      "confidence": 0.4463,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0051",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.6935236540636384,
+      "confidence": 0.8384,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0052",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "connectivity_issue",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.5873856828025563,
+      "confidence": 0.8044,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0053",
+      "decision": "RESOLVE",
+      "decision_reason": "High-confidence, well-grounded resolution",
+      "intent": "billing_dispute",
+      "n_steps": 3,
+      "groundedness": 1.0,
+      "max_relevance": 0.5905954053785492,
+      "confidence": 0.8934,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0054",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "service_activation",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.652821063995366,
+      "confidence": 0.862,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0055",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.6477097760631136,
+      "confidence": 0.8581,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0056",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "billing_dispute",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.59665062774024,
+      "confidence": 0.4368,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0057",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "service_activation",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.6325413681690553,
+      "confidence": 0.3835,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0058",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "outage_report",
+      "n_steps": 6,
+      "groundedness": 0.8333,
+      "max_relevance": 0.6288686308656254,
+      "confidence": 0.8355,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0059",
+      "decision": "ESCALATE",
+      "decision_reason": "Insufficient evidence: No resolution steps could be drawn from the sources",
+      "intent": "billing_dispute",
+      "n_steps": 0,
+      "groundedness": 0.0,
+      "max_relevance": 0.5518074241029107,
+      "confidence": 0.411,
+      "generation_error": null
+    },
+    {
+      "id": "NOV-0060",
+      "decision": "REVIEW",
+      "decision_reason": "Critical severity - human verification required",
+      "intent": "connectivity_issue",
+      "n_steps": 6,
+      "groundedness": 1.0,
+      "max_relevance": 0.6229207154342217,
+      "confidence": 0.8058,
       "generation_error": null
     }
   ]
