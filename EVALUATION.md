@@ -534,9 +534,9 @@ trades that wait for more false alarms under load.
 
 | Check | Result |
 |---|---|
-| Unit + API + DB integration tests (`pytest`) | 102 passed (DB tests run against the live pgvector container; they skip if no DB) |
+| Unit + API + DB integration tests (`pytest`) | 107 passed (DB tests run against the live pgvector container; they skip if no DB) |
 | Line coverage of `app/` | 88% |
-| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 81 files) | clean |
+| `black --check`, `flake8`, `mypy` (app, scripts, evaluation, experiments, tests: 83 files) | clean |
 | Locust load test (`tests/load/locustfile.py`, 2 users, 40 s, containerized API) | 27 requests, 0 failures; resolve p50 1.3 s, p95 2.7 s |
 | `docker compose up --build` (full stack) | verified: API image builds (3.71 GB: CPU torch + 4 baked models), container applies the schema, detects the existing corpus, loads models in 40.7 s, passes its health check, and served a cited LLM draft end to end (7.1 s) |
 | Container offline start | `HF_HUB_OFFLINE=1`: zero Hugging Face Hub calls at startup (models baked into the image) |

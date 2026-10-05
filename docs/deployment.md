@@ -15,11 +15,37 @@ What happens on start (`scripts/docker_entrypoint.sh`):
    and ivfflat indexes are built from the real row count.
 3. uvicorn starts one worker on port 8000. The container health check polls `/api/v1/health`.
 
-The image (about 3.7 GB) contains CPU-only PyTorch and all four models; with `HF_HUB_OFFLINE=1` (set in compose) the
+The image (about 4.1 GB of layers) contains CPU-only PyTorch and all five models; with `HF_HUB_OFFLINE=1` (set in compose) the
 container never contacts the Hugging Face Hub. The image runs as a non-root user.
 
 Verified on the dev machine: image build, schema application, existing-corpus detection, model loading (40.7 s),
 health check, and an end-to-end `/tickets/resolve` call with the LLM.
+
+## Vercel (container image + Neon Postgres)
+
+Vercel runs the same image as a container-image Function (beta, all plans): `Dockerfile.vercel` is a byte-for-byte
+copy of `Dockerfile` (a unit test enforces it). The database is Neon Postgres (pgvector) from Vercel's Storage tab.
+`vercel.json` deploys pushes to `main` only, since every build downloads ~2 GB of models.
+
+One-time setup:
+1. Vercel dashboard → Add New → Project → import the GitHub repository (root directory: repository root).
+2. Storage → Create → Neon → connect it to the project. This sets `DATABASE_URL`; the app accepts Neon's
+   `postgresql://…?sslmode=require` form and its pooled endpoint (`app/core/database.py`, `normalize_database_url`).
+3. Project environment variables: `LLM_API_KEY` (secret), `LLM_BASE_URL`, `LLM_MODEL`, `HF_HUB_OFFLINE=1`,
+   `STARTUP_DB_TASKS=false` and `PORT=8000`.
+4. Load the database once from the local stack (schema, corpus, embeddings and the embedding-model record):
+   `docker compose exec db pg_dump -U support -d support -Fc --no-owner --no-privileges > support.dump`, then
+   `pg_restore --no-owner --no-privileges -d "<Neon URL>" support.dump`.
+5. Redeploy. After that, every push to `main` builds and deploys automatically.
+
+Why `STARTUP_DB_TASKS=false`: a serverless container starts on every cold start, and the entrypoint's migrations,
+re-embedding check and corpus count would add seconds each time. With it set, the entrypoint starts uvicorn
+directly; the database is prepared once (step 4). After an embedding-model change, re-run step 4 (or
+`scripts/reembed.py` against the Neon URL).
+
+What to expect on the Hobby plan (1 vCPU, 2 GB): the API uses ~0.8-1.2 GB with all models loaded. Instances scale
+to zero after 5 minutes without traffic, and the next request waits for model loading (52 s measured locally with
+`STARTUP_DB_TASKS=false` on 2 cores, likely longer on 1 vCPU). Open the site once before a demo.
 
 ## Environment
 

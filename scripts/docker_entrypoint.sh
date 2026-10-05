@@ -2,6 +2,13 @@
 # Container entrypoint: apply schema (idempotent), ingest the corpus on first boot, then start the API.
 set -e
 
+# Serverless hosts (Vercel) start a container on every cold start: there the database is prepared once by hand
+# (docs/deployment.md) and STARTUP_DB_TASKS=false skips these steps, so the API starts loading models immediately.
+if [ "${STARTUP_DB_TASKS:-true}" != "true" ]; then
+    echo "STARTUP_DB_TASKS=false: skipping migrations, re-embedding check and ingestion"
+    exec "$@"
+fi
+
 echo "applying migrations..."
 python scripts/init_db.py
 

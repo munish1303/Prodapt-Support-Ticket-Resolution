@@ -1,0 +1,11 @@
+.venv
+.cache
+.git
+.env
+__pycache__
+*.pyc
+.pytest_cache
+htmlcov
+experiments/results/*.log
+data/external
+experiments/results/minilm_baseline

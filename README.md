@@ -183,13 +183,13 @@ uvicorn app.main:app --reload
 ## Tests and quality
 
 ```bash
-pytest --cov=app                 # 102 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
+pytest --cov=app                 # 107 tests; unit + API run offline (fake embedder/NLI), DB tests skip without a DB
 pytest -m db                     # DB integration tests only (needs the database running)
 black --check . && flake8 && mypy app scripts evaluation experiments tests
 locust -f tests/load/locustfile.py --host http://localhost:8000   # optional interactive load test
 ```
 
-Current status: 102 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
+Current status: 107 passed, 88% line coverage of `app/`, black / flake8 / mypy clean.
 
 ## Evaluations and experiments
 

@@ -21,7 +21,10 @@ def _db_available() -> bool:
     async def probe():
         from sqlalchemy.ext.asyncio import create_async_engine
 
-        engine = create_async_engine(settings.DATABASE_URL)
+        from app.core.database import normalize_database_url
+
+        url, connect_args = normalize_database_url(settings.DATABASE_URL)
+        engine = create_async_engine(url, connect_args=connect_args)
         try:
             async with engine.connect() as conn:
                 await conn.execute(text("SELECT 1 FROM tickets LIMIT 1"))
