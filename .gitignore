@@ -12,3 +12,5 @@ htmlcov/
 *.checkpoint.jsonl
 data/external/
 ~$*
+.vercel
+.env*
