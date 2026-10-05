@@ -35,8 +35,6 @@
   --shadow-lg: 0 2px 6px rgba(28, 28, 28, 0.06), 0 30px 60px -20px rgba(234, 38, 42, 0.22);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
-  --px: 0px;
-  --py: 0px;
 }
 
 * { box-sizing: border-box; }
@@ -62,27 +60,24 @@ a { color: inherit; }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 6px; }
 
 /* ---------- red line-work ---------- */
+/* Like prodapt.com's hero: the grid starts under the nav and scales with the viewport width (cropped at the bottom). */
 .lines {
-  position: fixed; inset: 0; width: 100%; height: 100%;
+  position: fixed; top: 83px; left: 0; width: 100%; height: calc(100% - 83px);
   z-index: 0; pointer-events: none;
-  transform: translate3d(var(--px), var(--py), 0);
-  transition: transform 1.2s var(--ease);
 }
 .lines path {
   /* No vector-effect here: with non-scaling-stroke, dash units become screen pixels and the
      pathLength-based draw-in renders as a dotted (grey-looking) line. */
-  fill: none; stroke: var(--red); stroke-width: 1.15; stroke-opacity: 0.6;
+  fill: none; stroke: var(--red); stroke-width: 1.2;
   stroke-dasharray: 1; stroke-dashoffset: 1;
   animation: draw 1.6s var(--ease) forwards;
-  animation-delay: calc(var(--i, 0) * 45ms);
+  animation-delay: calc(var(--i, 0) * 90ms);
 }
-/* Like prodapt.com: triangles with the logo's orientation (right angle top-right) fill red under the pointer.
-   They receive hover through the empty parts of the page (see "pointer pass-through" below). */
-.lines path.tri--logo {
-  fill: var(--red); fill-opacity: 0; pointer-events: all;
-  transition: fill-opacity 0.35s var(--ease);
-}
-.lines path.tri--logo:hover, .lines path.tri--logo.is-demo { fill-opacity: 0.92; }
+/* Every triangle fills red under the pointer on the landing screen; the hero text it covers turns white (app.js).
+   The triangles receive hover through the empty parts of the page (see "pointer pass-through" below). */
+.lines path.tri { fill: var(--red); fill-opacity: 0; transition: fill-opacity 0.3s var(--ease); }
+body[data-view="console"][data-state="idle"] .lines path.tri { pointer-events: all; }
+.lines path.tri.is-on { fill-opacity: 1; }
 body[data-state="result"] .lines path, body[data-view="kb"] .lines path { stroke-opacity: 0.3; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
@@ -135,7 +130,8 @@ body[data-state="result"] .lines path, body[data-view="kb"] .lines path { stroke
 /* Pointer pass-through: page-level containers ignore the pointer so the background triangles can react to hover
    in empty areas; everything inside them (cards, text, controls) still receives it. */
 .stage * { pointer-events: auto; }
-.stage, .hero, .hero__title, .hero__line, .kb-hero, .kb-hero__title { pointer-events: none; }
+/* The hero text (letters, subtitle and its white copy) is display-only, so hovering it reaches the triangle below. */
+.stage, .hero, .hero *, .kb-hero, .kb-hero__title, .kb-hero__title * { pointer-events: none; }
 .stage {
   position: relative; z-index: 1;
   max-width: 1200px; margin: 0 auto; padding: 48px clamp(20px, 4vw, 48px) 80px;
@@ -146,7 +142,14 @@ body[data-view="console"] .view--console, body[data-view="kb"] .view--kb { displ
 @keyframes viewIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
 /* ---------- hero ---------- */
-.hero { margin: 4vh 0 36px; }
+.hero { position: relative; margin: 4vh 0 36px; }
+/* White copy of the hero text, clipped to the red triangle under the pointer (app.js sets clip-path). */
+.hero__invert {
+  position: absolute; inset: 0; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s var(--ease);
+}
+.hero__invert.is-on { opacity: 1; }
+.hero__invert .hero__title, .hero__invert .hero__sub { color: var(--white); }
 .hero__title, .kb-hero__title {
   margin: 0; font-family: var(--display); font-weight: 700; color: var(--red);
   font-size: clamp(56px, 9.6vw, 148px); line-height: 0.9; letter-spacing: -0.055em;

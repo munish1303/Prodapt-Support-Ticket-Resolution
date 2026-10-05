@@ -160,7 +160,8 @@ and the first values of its 768-dimensional embedding:
 
 Deep links for demos: `/?q=<complaint>` runs a complaint, `/?view=kb&play=<text>` runs the playground,
 `/?record=ticket:TKT-000090` opens a row, `/?insights=1` opens metrics and drift, `&cite=N` highlights citation N on a
-result, `/?tri=demo` shows which background triangles react to hover. Add `&static=1` to skip animations.
+result, `/?tri=demo` (or `/?tri=0`-`4`) lights a background triangle as if hovered, with the hero text over it
+turned white. Add `&static=1` to skip animations.
 The console also respects the OS "reduce motion" setting.
 
 ## Local development (without Docker for the API)

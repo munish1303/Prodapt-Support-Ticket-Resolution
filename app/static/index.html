@@ -12,30 +12,16 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23ea262a'/%3E%3Cpath d='M9 22V10h7a4 4 0 0 1 0 8h-7m7 0 6 4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 </head>
 <body data-state="idle" data-view="console">
-  <!-- Thin red geometric line-work (draws itself in) -->
-  <svg class="lines" id="lines" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <!-- Thin red line-work, laid out like prodapt.com's hero: a grid of 240-unit cells, one right triangle per cell, all
+       with the logo's orientation (right angle at the top-right). Each triangle fills red under the pointer, and the
+       hero text it covers turns white (app.js, "background triangles"). -->
+  <svg class="lines" id="lines" viewBox="0 0 1920 1200" preserveAspectRatio="xMinYMin slice" aria-hidden="true">
     <g class="lines__group">
-      <path pathLength="1" style="--i:0" d="M0 120 H1600" />
-      <path pathLength="1" style="--i:1" d="M1010 120 V1000" />
-      <path pathLength="1" style="--i:2" d="M1215 120 V1000" />
-      <path pathLength="1" style="--i:3" d="M1420 120 V1000" />
-      <path class="tri tri--logo" pathLength="1" style="--i:4" d="M1010 120 H1215 V325 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:5" d="M1215 120 H1420 V325 Z" />
-      <path class="tri" pathLength="1" style="--i:6" d="M1215 120 V325 H1420 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:7" d="M1420 120 H1625 V325 Z" />
-      <path class="tri" pathLength="1" style="--i:8" d="M1010 325 V530 H1215 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:9" d="M1215 325 H1420 V530 Z" />
-      <path class="tri" pathLength="1" style="--i:10" d="M1420 325 V530 H1625 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:11" d="M1420 325 H1625 V530 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:12" d="M1010 530 H1215 V735 Z" />
-      <path class="tri" pathLength="1" style="--i:13" d="M1010 530 V735 H1215 Z" />
-      <path class="tri" pathLength="1" style="--i:14" d="M1215 530 V735 H1420 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:15" d="M1420 530 H1625 V735 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:16" d="M1215 735 H1420 V940 Z" />
-      <path class="tri" pathLength="1" style="--i:17" d="M1420 735 V940 H1625 Z" />
-      <path class="tri" pathLength="1" style="--i:18" d="M0 120 V760 H640 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:19" d="M120 760 H325 V965 Z" />
-      <path class="tri tri--logo" pathLength="1" style="--i:20" d="M0 120 H205 V325 Z" />
+      <path class="tri" pathLength="1" style="--i:0" d="M0 0 H1200 V1200 Z" />
+      <path class="tri" pathLength="1" style="--i:1" d="M1200 0 H1440 V240 Z" />
+      <path class="tri" pathLength="1" style="--i:2" d="M1440 0 H1920 V480 Z" />
+      <path class="tri" pathLength="1" style="--i:3" d="M1200 240 H1440 V480 Z" />
+      <path class="tri" pathLength="1" style="--i:4" d="M1200 480 H1920 V1200 Z" />
     </g>
   </svg>
 

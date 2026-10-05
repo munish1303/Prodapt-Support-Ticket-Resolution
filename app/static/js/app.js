@@ -101,14 +101,52 @@
     $$(".char", root).forEach((c) => { c.style.animation = "none"; void c.offsetWidth; c.style.animation = ""; });
   }
 
-  /* ---------------- parallax on the line-work ---------------- */
-  window.addEventListener("mousemove", (e) => {
-    if (reduced) return;
-    const x = (e.clientX / window.innerWidth - 0.5) * -14;
-    const y = (e.clientY / window.innerHeight - 0.5) * -10;
-    document.documentElement.style.setProperty("--px", `${x.toFixed(1)}px`);
-    document.documentElement.style.setProperty("--py", `${y.toFixed(1)}px`);
-  }, { passive: true });
+  /* ---------------- background triangles (like prodapt.com) ---------------- */
+  // Every triangle has the logo's orientation (right angle at the top-right). Under the pointer it fills red and the
+  // hero text it covers turns white: a white copy of the hero text sits on top, clipped to the triangle's outline.
+  let activeTri = null;
+  function triCorners(path) {
+    // d = "M x y H x2 V y2 Z": corners (x, y), (x2, y), (x2, y2), mapped from SVG units to the screen
+    const [x, y, x2, y2] = path.getAttribute("d").match(/-?[\d.]+/g).map(Number);
+    const m = path.getScreenCTM();
+    return [[x, y], [x2, y], [x2, y2]].map(([px, py]) => new DOMPoint(px, py).matrixTransform(m));
+  }
+  function paintInvert() {
+    const copy = $("#hero .hero__invert");
+    if (!copy) return;
+    if (activeTri) {
+      const r = copy.getBoundingClientRect();
+      const pts = triCorners(activeTri).map((p) => `${(p.x - r.left).toFixed(1)}px ${(p.y - r.top).toFixed(1)}px`);
+      copy.style.clipPath = `polygon(${pts.join(", ")})`;
+    }
+    // On leave the last outline is kept, so the white text fades out together with the red fill.
+    copy.classList.toggle("is-on", Boolean(activeTri));
+  }
+  function setActiveTri(tri) {
+    if (activeTri) activeTri.classList.remove("is-on");
+    activeTri = tri;
+    if (tri) tri.classList.add("is-on");
+    paintInvert();
+  }
+  function initTriangles() {
+    const hero = $("#hero");
+    const copy = document.createElement("div");
+    copy.className = "hero__invert";
+    copy.setAttribute("aria-hidden", "true");
+    // Clone after splitHeadlines(): the copy's letters carry the same animation delays, so both layers rise together.
+    [$(".hero__title", hero), $(".hero__sub", hero)].forEach((el) => {
+      const c = el.cloneNode(true);
+      c.removeAttribute("id");
+      copy.appendChild(c);
+    });
+    hero.appendChild(copy);
+    $$(".lines .tri").forEach((tri) => {
+      tri.addEventListener("pointerenter", () => setActiveTri(tri));
+      tri.addEventListener("pointerleave", () => { if (activeTri === tri) setActiveTri(null); });
+    });
+    window.addEventListener("scroll", paintInvert, { passive: true });
+    window.addEventListener("resize", paintInvert);
+  }
 
   /* ---------------- health ---------------- */
   async function loadHealth() {
@@ -130,6 +168,7 @@
   /* ---------------- views & states ---------------- */
   async function setView(view) {
     if (document.body.dataset.view === view) return;
+    setActiveTri(null); // triangles only react on the landing screen
     document.body.dataset.view = view;
     $$("[data-view-link]").forEach((b) => b.classList.toggle("is-active", b.dataset.viewLink === view));
     const el = view === "kb" ? $("#viewKb") : $("#viewConsole");
@@ -142,6 +181,7 @@
     const body = document.body;
     const current = body.dataset.state;
     if (current === next) return;
+    if (next !== "idle") setActiveTri(null); // triangles only react on the landing screen
     const outgoing = { idle: [$("#hero"), $("#inputCard")], searching: [$("#searchCard")], result: [$("#resultCard")] }[current] || [];
     if (!reduced) {
       outgoing.forEach((el) => el && el.classList.add("is-leaving"));
@@ -675,6 +715,7 @@
   /* ---------------- wiring ---------------- */
   function init() {
     splitHeadlines();
+    initTriangles();
     renderExamples();
     loadHealth();
     ta().addEventListener("input", autosize);
@@ -708,8 +749,13 @@
     if (params.get("q")) { ta().value = params.get("q"); autosize(); setTimeout(() => submit(), 900); }
     // Design preview of the searching scene without calling the API (/?preview=searching).
     if (params.get("preview") === "searching") { document.body.dataset.state = "searching"; startSearch(); }
-    // Design previews: ?tri=demo fills the logo-orientation triangles; ?cite=N highlights citation N after a result.
-    if (params.get("tri") === "demo") $$(".tri--logo").forEach((t) => t.classList.add("is-demo"));
+    // Design previews: ?tri=N fills background triangle N (?tri=demo: the big one); ?cite=N highlights citation N
+    // after a result.
+    if (params.get("tri")) {
+      const n = params.get("tri") === "demo" ? 0 : Number(params.get("tri"));
+      const tri = $$(".lines .tri")[n];
+      if (tri) setTimeout(() => setActiveTri(tri), 1200);
+    }
     demoCite = params.get("cite");
   }
 
