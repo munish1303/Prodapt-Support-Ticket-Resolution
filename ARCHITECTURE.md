@@ -304,7 +304,7 @@ start: sentiment model plus first connection); that case was discarded and re-ru
 | Prometheus + Grafana | `/metrics`, `/monitoring/drift`, structured logs and the console's Insights panel cover a single deployment | there are several replicas to aggregate, or on-call alerting is needed (export the same numbers via a Prometheus endpoint) |
 | Fine-tuned classifiers | trained on templated synthetic data they would learn the templates; k-NN takes new classes without retraining (E4′) | there is enough real, labelled ticket history and intent F1 is the bottleneck |
 | Service extraction | a modular monolith is simpler to run and debug at this size (§4.1) | one stage needs different hardware or scaling, first candidate: NLI validation on a GPU worker |
-| Advanced confidence calibration | needs human labels first | the human ratings (EVALUATION.md §6.4) and agent feedback exist; then fit isotonic/Platt and run Experiment 5 |
+| Advanced confidence calibration | needs more labels first | more labelled drafts than the 50 reviewed ratings (EVALUATION.md §6.4), e.g. from agent feedback; then fit isotonic/Platt and run Experiment 5 |
 
 ## 7. Known limitations
 

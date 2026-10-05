@@ -441,17 +441,19 @@ example); (2) sentence-level / late-interaction retrieval so boilerplate cannot
 outvote the symptom sentence; (3) the LLM generator, which sees the evening-Wi-Fi KB article in its context and can
 decline or hedge; (4) a complaint↔source relevance verifier (cross-encoder) on the cited sources.
 
-### 6.4 Draft quality ratings (AI-rated stand-in; human ratings still open)
+### 6.4 Draft quality ratings (AI rater, reviewed by the project owner)
 
 **What this is and is not.** The plan's Tier-2 human evaluation uses `data/evaluation/human_eval_sheet.xlsx`
 (built by `evaluation/build_human_eval_sheet.py --case-limit 52`): 50 Qwen drafts drawn from the first 52 cases of
 §4.2 (seed 7, any "declined" drafts included, shuffled), each with the complaint, the 8 sources the generator saw
 (re-retrieved with the production retriever and verified to reproduce the run for all 50), the cited draft and the
-reference fix; system outputs and LLM-judge scores sit on a hidden sheet. **No human has rated it yet.** The project
+reference fix; system outputs and LLM-judge scores sit on a hidden sheet. The project
 owner asked for the sheet to be filled automatically, so the ratings below were produced by **an AI rater (Claude
 Opus 5.5), not a human**, in a separate copy, `data/evaluation/ai_eval_sheet.xlsx`, which states this on its first
 page. The rater read only the complaint, sources, draft and reference fix (blind to the hidden System sheet) and wrote
-a reason for every row. The blank human workbook remains the way to get real human judgements. Analysis:
+a reason for every row. **The project owner then reviewed all 50 AI ratings and reported that they match what they
+would have given**, so the blank human workbook was not filled independently. That is a review of AI ratings, not an
+independent blind human rating: there is no separate human score to compute agreement from. Analysis:
 `python evaluation/human_eval_analysis.py --sheet data/evaluation/ai_eval_sheet.xlsx --rater "..."`
 → `experiments/results/ai_rater_eval.json`.
 
@@ -504,8 +506,9 @@ Decision confusion, mpnet (rows = rater, columns = system):
 
 **Caveats.** An AI rater may share blind spots with the LLM judge and the generator; the generator (Qwen) and judge
 (gpt-oss) are different model families from the rater, which limits self-preference but not shared biases. n = 50
-with 8 unsafe drafts, so the AUROC and precision estimates are wide. Treat these as provisional until a human rates
-the same 50 rows (the analysis then reports human-vs-AI agreement).
+with 8 unsafe drafts, so the AUROC and precision estimates are wide. The owner's review checks the ratings but was not
+blind to them; an independent rating of the blank workbook (the analysis then reports human-vs-AI agreement) would be
+the stronger check.
 
 ### 6.5 Outage drill: database stopped under a running API
 
@@ -572,7 +575,7 @@ trades that wait for more false alarms under load.
    fewer confident wrong RESOLVEs with no real loss of RESOLVE rate in-distribution.
 2. **Sentence-level / late-interaction retrieval** so boilerplate sentences ("I work from home…") cannot outvote the
    symptom sentence; re-run E1.
-3. **Calibrate the confidence score** from the human ratings (§6.4) and the feedback endpoint (isotonic or Platt on
+3. **Calibrate the confidence score** from the reviewed ratings (§6.4) and the feedback endpoint (isotonic or Platt on
    "safe to use", with the E9 wrong-scenario score as an extra input); then run Experiment 5 to set RESOLVE/REVIEW thresholds for a target precision.
 4. **Intent:** evaluate the LLM classifier (`INTENT_CLASSIFIER=llm`) against k-NN (now 0.889 macro-F1), mainly for
    the weakest class (plan_change 0.77) and for novelty detection.

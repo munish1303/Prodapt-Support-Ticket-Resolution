@@ -373,7 +373,7 @@ of the safe ones. Confidence AUROC for "safe" fell to 0.63 [95% CI 0.48-0.79] fr
 84% because the drafts got better, not because the threshold works better. The unsafe auto-resolves are
 confusable-scenario drafts, well grounded in sources for a neighbouring problem, which no threshold on this score can
 separate from good drafts. The structural fix is per-request wrong-scenario detection (EVALUATION.md §9, item 1).
-Re-run this sweep on human ratings before changing the production threshold.
+Re-run this sweep on more (ideally independent human) ratings before changing the production threshold.
 
 ## E9: Per-request wrong-scenario detection (added experiment; not adopted)
 
