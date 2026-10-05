@@ -43,9 +43,15 @@ re-embedding check and corpus count would add seconds each time. With it set, th
 directly; the database is prepared once (step 4). After an embedding-model change, re-run step 4 (or
 `scripts/reembed.py` against the Neon URL).
 
-What to expect on the Hobby plan (1 vCPU, 2 GB): the API uses ~0.8-1.2 GB with all models loaded. Instances scale
-to zero after 5 minutes without traffic, and the next request waits for model loading (52 s measured locally with
-`STARTUP_DB_TASKS=false` on 2 cores, likely longer on 1 vCPU). Open the site once before a demo.
+Live: https://resolve-support-assistant.vercel.app (project `resolve-support-assistant`, region `iad1`, Neon in
+`us-east-1`). Measured on 2026-10-06: build 5 min 26 s (2.4 GB image); a cold start answered in ~15 s; warm
+requests: health 0.6-0.7 s, page 0.6 s, `/tickets/resolve` with the LLM 2.6 s and 5.8 s (two complaints). Instances
+scale to zero after 5 minutes without traffic, and Vercel sometimes starts an extra instance, so an occasional
+request pays the ~15 s start. Open the site once before a demo. The API uses ~0.8-1.2 GB with all models loaded
+(Hobby allows 2 GB).
+
+The site is public: every visitor shares the Groq free-tier quota. When it runs out, drafts fall back to the
+extractive generator (flag `llm_unavailable_extractive_fallback`), so the site keeps working.
 
 ## Environment
 

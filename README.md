@@ -2,6 +2,9 @@
 
 Prodapt AI Engineering evaluation, **Use Case 2: Intelligent Support Ticket Resolution Assistant**.
 
+**Live demo: https://resolve-support-assistant.vercel.app** (Vercel container + Neon Postgres, deployed
+automatically from `main`; the first visit after 5 idle minutes waits ~15 s while the models load).
+
 An agent pastes a raw customer complaint and gets structured understanding, the most similar resolved tickets and
 KB articles, a cited step-by-step resolution, validation of every step, and a decision. Real output from the
 containerized service (Groq LLM generator):
