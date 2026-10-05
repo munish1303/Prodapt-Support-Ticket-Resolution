@@ -552,6 +552,14 @@ body:not([data-state="idle"]) .hero, body:not([data-state="idle"]) .card--input 
   .bar { grid-template-columns: 110px 1fr 40px; }
   .breakdown { grid-template-columns: 1fr; }
   .card--search { padding: 28px 20px; }
+  /* Category-bar tooltips stay inside their card instead of sticking out past the screen edge (which let the page
+     scroll sideways on phones). */
+  .bar .tip { left: auto; right: 0; max-width: 100%; white-space: normal; }
+}
+@media (max-width: 420px) {
+  /* All four nav links fit on a phone-width screen. */
+  .nav__link { padding: 8px 7px; font-size: 13.5px; }
+  .nav__link::after { left: 7px; right: 7px; }
 }
 
 /* ---------- reduced motion (OS setting) and ?static=1 (final state, e.g. for screenshots/print) ---------- */
