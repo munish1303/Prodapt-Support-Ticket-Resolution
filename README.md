@@ -7,11 +7,12 @@ automatically from `main`; the first visit after 5 idle minutes waits ~15 s whil
 
 **Promo video**
 
-[![Resolve promo: a "charged twice" complaint gets cited steps, every step is validated, and it resolves at 96 confidence](docs/media/resolve-promo-preview.gif)](docs/media/resolve-promo.mp4?raw=true)
+[![Resolve promo video, all 56 seconds; click to play it with sound](docs/media/resolve-promo.gif)](https://cdn.jsdelivr.net/gh/munish1303/Prodapt-Support-Ticket-Resolution@03d838a/docs/media/resolve-promo.mp4)
 
-▶ **[Watch the full 56-second promo](docs/media/resolve-promo.mp4?raw=true)** (MP4 download, 19 MB; 1080p, 60 fps, with sound). Made in code with
-Remotion and a synthesized soundtrack; the complaint, tickets and scores on screen come from a real response of the
-running system.
+▶ **[Play the full 56-second promo with sound](https://cdn.jsdelivr.net/gh/munish1303/Prodapt-Support-Ticket-Resolution@03d838a/docs/media/resolve-promo.mp4)**
+(opens in the browser's video player; 1080p, 60 fps). The animation above is the whole video without sound. Made in
+code with Remotion and a synthesized soundtrack; the complaint, tickets and scores on screen come from a real response
+of the running system. [Download the MP4](docs/media/resolve-promo.mp4?raw=true) (19 MB).
 
 **Screenshots** (live site; click any image for full size)
 
