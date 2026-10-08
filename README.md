@@ -7,9 +7,9 @@ automatically from `main`; the first visit after 5 idle minutes waits ~15 s whil
 
 **Promo video**
 
-[![Resolve promo: a "charged twice" complaint gets cited steps, every step is validated, and it resolves at 96 confidence](docs/media/resolve-promo-preview.gif)](docs/media/resolve-promo.mp4)
+[![Resolve promo: a "charged twice" complaint gets cited steps, every step is validated, and it resolves at 96 confidence](docs/media/resolve-promo-preview.gif)](docs/media/resolve-promo.mp4?raw=true)
 
-▶ **[Watch the full 56-second promo](docs/media/resolve-promo.mp4)** (1080p, 60 fps, with sound). Made in code with
+▶ **[Watch the full 56-second promo](docs/media/resolve-promo.mp4?raw=true)** (MP4 download, 19 MB; 1080p, 60 fps, with sound). Made in code with
 Remotion and a synthesized soundtrack; the complaint, tickets and scores on screen come from a real response of the
 running system.
 
