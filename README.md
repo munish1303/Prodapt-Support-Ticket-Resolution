@@ -5,6 +5,42 @@ Prodapt AI Engineering evaluation, **Use Case 2: Intelligent Support Ticket Reso
 **Live demo: https://resolve-support-assistant.vercel.app** (Vercel container + Neon Postgres, deployed
 automatically from `main`; the first visit after 5 idle minutes waits ~15 s while the models load).
 
+**Promo video**
+
+[![Resolve promo: a "charged twice" complaint gets cited steps, every step is validated, and it resolves at 96 confidence](docs/media/resolve-promo-preview.gif)](docs/media/resolve-promo.mp4)
+
+▶ **[Watch the full 56-second promo](docs/media/resolve-promo.mp4)** (1080p, 60 fps, with sound). Made in code with
+Remotion and a synthesized soundtrack; the complaint, tickets and scores on screen come from a real response of the
+running system.
+
+**Screenshots** (live site; click any image for full size)
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><a href="docs/screenshots/01-console.png"><img src="docs/screenshots/01-console.png" alt="Agent console"></a><br><sub><b>Agent console</b>: paste a raw customer complaint</sub></td>
+    <td width="50%" valign="top"><a href="docs/screenshots/02-result-resolve.png"><img src="docs/screenshots/02-result-resolve.png" alt="RESOLVE result"></a><br><sub><b>RESOLVE at 96</b>: intent, product, severity and sentiment, with a cited, validated draft</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/03-result-citations.png"><img src="docs/screenshots/03-result-citations.png" alt="Cited steps and sources"></a><br><sub><b>Citations</b>: every step cites its sources and is checked against them; the four confidence components</sub></td>
+    <td valign="top"><a href="docs/screenshots/04-result-review.png"><img src="docs/screenshots/04-result-review.png" alt="REVIEW result"></a><br><sub><b>REVIEW</b>: critical severity always gets a human check, even at 98 confidence</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/05-result-escalate.png"><img src="docs/screenshots/05-result-escalate.png" alt="ESCALATE result"></a><br><sub><b>ESCALATE</b>: an unseen issue type (roaming); the LLM declines to draft from sources that don't fit</sub></td>
+    <td valign="top"><a href="docs/screenshots/06-retrieval-playground.png"><img src="docs/screenshots/06-retrieval-playground.png" alt="Retrieval playground"></a><br><sub><b>Retrieval playground</b>: semantic, lexical and hybrid results side by side (no LLM)</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/07-knowledge-base.png"><img src="docs/screenshots/07-knowledge-base.png" alt="Knowledge base view"></a><br><sub><b>Knowledge base</b>: corpus statistics, retrieval configuration and the live database indexes</sub></td>
+    <td valign="top"><a href="docs/screenshots/08-database-record.png"><img src="docs/screenshots/08-database-record.png" alt="Database record"></a><br><sub><b>Database record</b>: any source opens its row, labels, provenance and stored 768-d embedding</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/09-insights.png"><img src="docs/screenshots/09-insights.png" alt="Insights"></a><br><sub><b>Insights</b>: latency percentiles, decision mix, groundedness and the drift monitor</sub></td>
+    <td valign="top"><a href="docs/screenshots/10-api-docs.png"><img src="docs/screenshots/10-api-docs.png" alt="API docs"></a><br><sub><b>API docs</b>: interactive OpenAPI documentation at <code>/docs</code></sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><a href="docs/screenshots/11-mobile.png"><img src="docs/screenshots/11-mobile.png" alt="Phone layout" width="280"></a><br><sub><b>Phone layout</b></sub></td>
+  </tr>
+</table>
+
 An agent pastes a raw customer complaint and gets structured understanding, the most similar resolved tickets and
 KB articles, a cited step-by-step resolution, validation of every step, and a decision. Real output from the
 containerized service (Groq LLM generator):

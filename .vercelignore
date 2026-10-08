@@ -9,3 +9,5 @@ htmlcov
 experiments/results/*.log
 data/external
 experiments/results/minilm_baseline
+docs/media
+docs/screenshots
